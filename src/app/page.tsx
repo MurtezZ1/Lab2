@@ -1,0 +1,169 @@
+import { getProducts } from "@/lib/products";
+import ProductCard from "@/components/ProductCard";
+import Link from "next/link";
+import { ArrowRight, Star, Zap, Shield, Truck } from "lucide-react";
+import Image from "next/image";
+
+export const revalidate = 60; // Revalidate cache every 60s
+
+export default async function Home() {
+  const products = await getProducts({ take: 4 });
+
+  return (
+    <div className="flex flex-col gap-24 pb-24">
+      {/* Hero Section */}
+      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(10,132,255,0.15)_0%,rgba(9,9,11,1)_70%)]" />
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] mix-blend-screen" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/20 rounded-full blur-[100px] mix-blend-screen" />
+        </div>
+
+        <div className="container relative z-10 px-6 mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <div className="flex flex-col gap-6 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/30 text-primary self-center lg:self-start mb-4">
+              <Zap className="w-4 h-4 fill-primary" />
+              <span className="text-sm font-semibold tracking-wide uppercase">Next-Gen Tech is Here</span>
+            </div>
+            
+            <h1 className="text-5xl lg:text-7xl font-black text-white leading-tight">
+              Elevate Your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                Digital Lifestyle
+              </span>
+            </h1>
+            
+            <p className="text-lg text-gray-400 max-w-xl mx-auto lg:mx-0">
+              Discover the most premium selection of laptops, smartphones, and accessories. Engineered for perfection, designed for you.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 mt-4 justify-center lg:justify-start">
+              <Link href="/products" className="px-8 py-4 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(10,132,255,0.4)] transition-all flex items-center justify-center gap-2 group">
+                Shop Now
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link href="/deals" className="px-8 py-4 rounded-xl glass border border-white/10 text-white font-bold hover:bg-white/5 transition-all flex items-center justify-center">
+                View Flash Sales
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-white/10">
+              <div className="flex flex-col gap-1">
+                <span className="text-3xl font-black text-white">5K+</span>
+                <span className="text-sm text-gray-500">Premium Products</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-3xl font-black text-white">24H</span>
+                <span className="text-sm text-gray-500">Fast Delivery</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-3xl font-black text-white">100%</span>
+                <span className="text-sm text-gray-500">Secure Checkout</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative hidden lg:block h-[600px]">
+             {/* Main Hero Image - Using a product image from the db or generic tech */}
+             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-3xl" />
+             <div className="relative w-full h-full flex items-center justify-center animate-[float_6s_ease-in-out_infinite]">
+                <Image 
+                  src="https://m.media-amazon.com/images/I/41MOVNsGMbL.jpg" 
+                  alt="Hero Device" 
+                  width={500} 
+                  height={500} 
+                  className="object-contain drop-shadow-[0_20px_50px_rgba(0,240,255,0.2)]"
+                />
+             </div>
+             
+             {/* Floating elements */}
+             <div className="absolute top-1/4 right-10 glass p-4 rounded-2xl border border-white/10 animate-[float_4s_ease-in-out_infinite_reverse]">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                    <Star className="w-5 h-5 text-green-500" />
+                  </div>
+                  <div>
+                    <p className="text-white font-bold text-sm">4.9/5 Rating</p>
+                    <p className="text-gray-400 text-xs">Based on 10k reviews</p>
+                  </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="container mx-auto px-6">
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="glass-card p-6 rounded-2xl flex items-start gap-4">
+            <div className="bg-primary/20 p-3 rounded-xl">
+              <Truck className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg">Free Express Delivery</h3>
+              <p className="text-gray-400 text-sm mt-1">On all orders over $200</p>
+            </div>
+          </div>
+          <div className="glass-card p-6 rounded-2xl flex items-start gap-4">
+            <div className="bg-accent/20 p-3 rounded-xl">
+              <Shield className="w-6 h-6 text-accent" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg">2 Year Warranty</h3>
+              <p className="text-gray-400 text-sm mt-1">Peace of mind guaranteed</p>
+            </div>
+          </div>
+          <div className="glass-card p-6 rounded-2xl flex items-start gap-4">
+            <div className="bg-purple-500/20 p-3 rounded-xl">
+              <Zap className="w-6 h-6 text-purple-400" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg">Secure Payments</h3>
+              <p className="text-gray-400 text-sm mt-1">256-bit SSL Encryption</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trending Products */}
+      <section className="container mx-auto px-6">
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <h2 className="text-3xl font-bold text-white mb-2">Trending Now</h2>
+            <p className="text-gray-400">The most sought-after tech this week.</p>
+          </div>
+          <Link href="/products" className="hidden sm:flex items-center gap-2 text-primary hover:text-accent transition-colors font-medium">
+            View All <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard 
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              image={product.image}
+              manufacturer={product.manufacturer}
+            />
+          ))}
+        </div>
+      </section>
+      
+      {/* Category Showcase (Static) */}
+      <section className="container mx-auto px-6 mb-12">
+        <h2 className="text-3xl font-bold text-white mb-10 text-center">Shop by Category</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {["Laptops", "Smartphones", "Tablets", "Cameras"].map((category) => (
+            <Link href={`/category/${category.toLowerCase()}`} key={category} className="group relative h-48 rounded-2xl overflow-hidden glass-card flex items-center justify-center border border-white/5 hover:border-primary/50 transition-colors">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+              <h3 className="relative z-20 text-white font-bold text-xl group-hover:scale-110 transition-transform">{category}</h3>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
