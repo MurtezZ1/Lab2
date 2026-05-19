@@ -1,0 +1,422 @@
+
+.about_us_body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Raleway', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: rgb(var(--dark));
+    transition: background-color 0.3s, color 0.3s;
+    margin: 0;
+}
+
+
+
+.top_header {
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.second_header {
+    display: flex;
+    padding: 4px 0;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#logoLink{
+    text-decoration: none;
+    color: white;
+}
+
+.bgfoto {
+    padding-top: 30px;
+    background-image: url("../assets/bgimage.jpg");
+    width: 100%;
+    height: 500px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.bgfoto::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.6) 0%, rgba(118, 75, 162, 0.6) 100%);
+}
+
+/* About Us hero header: centered, consistent with other section headers */
+.bgHeader {
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	font-weight: bold;
+	padding: 0 40px;
+	font-size: clamp(1.65rem, 4vw, 50px);
+	position: relative;
+	z-index: 1;
+	text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+	text-align: center;
+	line-height: 1.3;
+	box-sizing: border-box;
+}
+
+.bgimage2{
+    width: 480px;
+    height: 380px;
+    border-radius: 10px;
+}
+
+.whatsNew {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 50px;
+	gap: 50px;
+	background: linear-gradient(135deg, rgb(var(--dark)) 0%, #34495e 100%);
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.whatsNewLeft {
+	font-size: 24px;
+	color: rgb(var(--light));
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
+}
+
+.whatsNewRight {
+	padding-top: 0;
+	display: flex;
+	flex-direction: column;
+	padding-left: 0;
+	justify-content: center;
+	max-width: 500px;
+	color: rgb(var(--light));
+	gap: 15px;
+}
+
+.whatsNewRight>button {
+	margin: 0;
+	display: inline-block;
+	padding: 12px 25px;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+	text-decoration: none;
+	background: linear-gradient(135deg, rgb(var(--brown-dark)), rgb(var(--accent)));
+	border: none;
+	border-radius: 25px;
+	color: white;
+	transition: all 0.3s ease;
+	width: auto;
+	max-width: 200px;
+	box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+	cursor: pointer;
+}
+
+.whatsNewRight>button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+    background: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--brown-dark)));
+    cursor: pointer;
+}
+
+
+.whatsNewRight1>a{
+    text-decoration: none;
+    color:rgb(var(--light   ));
+    
+}
+
+.whatsNewRight1>a:hover{
+    text-decoration: underline;
+}
+
+.globalBrand {
+	padding: 50px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 50px;
+	background-color: rgb(var(--light));
+	flex-wrap: wrap;
+}
+
+.globalBrand1 {
+	max-width: 500px;
+	height: auto;
+	flex: 1;
+	min-width: 300px;
+}
+
+.bgimage3 {
+	padding: 0;
+	width: 100%;
+	max-width: 600px;
+	height: auto;
+	flex: 1;
+	min-width: 300px;
+	border-radius: 15px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+	filter: grayscale(30%);
+	transition: filter 0.3s ease;
+}
+
+.globalBrand:hover .bgimage3 {
+	filter: grayscale(0%);
+}
+
+.facts{
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    width: 100%;
+    height: 580px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: inset 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.fact1{
+    padding:40px 0;
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.fact2{
+    padding:40px 0;
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.exploreUs{
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;    
+}
+.exploreUsParent{
+    background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+    padding-top: 20px;
+}
+.exploreUsBox{
+    padding: 20px 0;
+    transition: all 0.3s ease;
+    text-align: left;
+    width: 330px;
+    height: 300px;
+}
+
+.exploreUsBox:hover {
+    transform: translateY(-10px);
+}
+
+.exploreUsBox img{
+    width: 330px;
+    height: 240px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.exploreUsBox:hover img{
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    transform: scale(1.02);
+}
+
+/* ========== MOBILE: About Us page ========== */
+@media (max-width: 768px) {
+	/* About Us page header row: remove large left padding */
+	.top_header {
+		padding: 16px 18px;
+		flex-wrap: wrap;
+	}
+
+	.bgfoto {
+		height: 300px;
+		background-size: cover;
+		padding-top: 20px;
+	}
+
+	/* About Us hero header: center, no overflow, consistent with other section headers */
+	.bgHeader {
+		width: 100%;
+		max-width: 100%;
+		margin: 0 auto;
+		padding: 0 18px;
+		font-size: 1.65rem;
+		text-align: center;
+		line-height: 1.35;
+		box-sizing: border-box;
+	}
+
+	.second_header {
+		padding: 4px 18px;
+		justify-content: center;
+	}
+
+	.whatsNew {
+		flex-direction: column;
+		padding: 30px 18px;
+		gap: 30px;
+	}
+
+	.whatsNewLeft {
+		font-size: 18px;
+		text-align: center;
+		width: 100%;
+	}
+
+	.bgimage2 {
+		width: 100%;
+		max-width: 100%;
+		height: auto;
+	}
+
+	.whatsNewRight {
+		padding: 0;
+		width: 100%;
+		max-width: 100%;
+		text-align: center;
+	}
+
+	.whatsNewRight h1 {
+		font-size: 20px;
+	}
+
+	.whatsNewRight>button {
+		margin: 10px auto;
+		width: auto;
+		max-width: 200px;
+	}
+
+	.globalBrand {
+		flex-direction: column;
+		padding: 30px 18px;
+	}
+
+	.globalBrand1 {
+		width: 100%;
+		height: auto;
+	}
+
+	.globalBrand1 h1 {
+		font-size: 28px !important;
+	}
+
+	.bgimage3 {
+		width: 100%;
+		height: auto;
+		padding: 20px 0;
+	}
+
+	.facts {
+		height: auto;
+		padding: 40px 18px;
+	}
+
+	.facts h1 {
+		font-size: 28px !important;
+		text-align: center;
+	}
+
+	.fact1, .fact2 {
+		flex-direction: column;
+		gap: 20px;
+		padding: 20px 0;
+	}
+
+	.fact1 div, .fact2 div {
+		width: 100%;
+	}
+
+	.exploreUs {
+		flex-direction: column;
+		align-items: center;
+		padding: 20px 18px;
+	}
+
+	.exploreUsBox {
+		width: 90%;
+		height: auto;
+		padding: 15px 0;
+	}
+
+	.exploreUsBox img {
+		width: 100%;
+		height: auto;
+	}
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+	.bgHeader {
+		width: auto;
+		max-width: 700px;
+		font-size: 40px;
+		padding: 0 30px;
+	}
+
+	.whatsNew {
+		padding: 30px 20px;
+	}
+
+	.bgimage2 {
+		width: 400px;
+		height: 320px;
+	}
+
+	.globalBrand {
+		padding: 40px 100px;
+	}
+
+	.exploreUs {
+		gap: 20px;
+	}
+
+	.exploreUsBox {
+		width: 300px;
+	}
+
+	.exploreUsBox img {
+		width: 300px;
+		height: 220px;
+	}
+}
+
+.exploreUsBox a{
+    text-decoration: none;
+}
+
+.exploreUsBox a h2{
+    color: #58626c;
+}
+
+.exploreUsBox a h2:hover{
+    color: #ecc1a1;
+}
+
+.exploreUsBox a p{
+    color:#ecc1a1;
+}

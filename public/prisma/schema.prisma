@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model cart_items {
+  item_id       Int           @id @default(autoincrement())
+  cart_id       Int
+  product_id    Int
+  image         String        @db.VarChar(1000)
+  name          String        @db.VarChar(30)
+  price         Decimal       @db.Decimal(10, 2)
+  ordered       Int           @default(0)
+  order_date    DateTime      @default(now()) @db.Timestamp(0)
+  shopping_cart shopping_cart @relation(fields: [cart_id], references: [cart_id], onDelete: Cascade, map: "cart_items_ibfk_1")
+  products      products      @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "cart_items_ibfk_2")
+
+  @@index([cart_id], map: "cart_id")
+  @@index([product_id], map: "product_id")
+}
+
+model orders {
+  order_id      Int            @id @default(autoincrement())
+  cart_id       Int?
+  order_date    DateTime       @default(now()) @db.Timestamp(0)
+  total_amount  Decimal?       @db.Decimal(10, 2)
+  shopping_cart shopping_cart? @relation(fields: [cart_id], references: [cart_id], onDelete: Cascade, map: "orders_ibfk_2")
+
+  @@index([cart_id], map: "cart_id")
+}
+
+model products {
+  id                  Int          @id @default(autoincrement())
+  name                String       @db.VarChar(50)
+  manufacturer        String       @db.VarChar(50)
+  model               String       @db.VarChar(50)
+  year                Int?         @db.Year
+  price               Float
+  processor           String?      @db.VarChar(50)
+  ram_size            String?      @db.VarChar(50)
+  storage             String?      @db.VarChar(50)
+  display             String?      @db.LongText
+  os                  String?      @db.VarChar(50)
+  battery             String?      @db.VarChar(50)
+  weight              String?      @db.VarChar(50)
+  dimensions          String?      @db.LongText
+  keyboard            String?      @db.VarChar(50)
+  ports               String?      @db.LongText
+  connectivity        String?      @db.LongText
+  camera              String?      @db.LongText
+  additional_features String?      @db.LongText
+  image               String       @db.VarChar(200)
+  description         String?      @db.Text
+  cart_items          cart_items[]
+}
+
+model shopping_cart {
+  cart_id    Int          @id @default(autoincrement())
+  user_id    Int          @unique(map: "user_id")
+  cart_items cart_items[]
+  orders     orders[]
+  users      users        @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "shopping_cart_ibfk_1")
+}
+
+model users {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique(map: "email") @db.VarChar(50)
+  username      String         @db.VarChar(30)
+  password      String         @db.Text
+  role          String         @default("user") @db.VarChar(30)
+  active        Int            @default(0)
+  shopping_cart shopping_cart?
+}

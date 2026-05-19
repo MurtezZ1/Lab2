@@ -1,0 +1,285 @@
+/* Theme system (shared across views) */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500;600;700&family=Raleway:wght@100;300;400;500;600;700&display=swap');
+
+/* Local brand font */
+@font-face {
+  font-family: 'Dune_Rise';
+  src: url('./fonts/Dune_Rise.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Design tokens */
+:root {
+  --dark: #2C3E50;
+  --light: #FFFFFF;
+  --brown-dark: #FF6B6B;
+  --brown-light: #FFB3B3;
+  --accent: #6AB04C;
+  --accent-light: #81D4FA;
+  --success: #4caf50;
+  --error: #d32f2f;
+  --sale: #e44d26;
+  --table-header: #f2f2f2;
+  --body-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --header-gradient: linear-gradient(135deg, rgba(44, 62, 80, .95) 0%, rgba(52, 73, 94, .95) 100%);
+  --footer-gradient: linear-gradient(135deg, #2C3E50 0%, #34495e 100%);
+  --btn-gradient: linear-gradient(135deg, #FF6B6B, #6AB04C);
+  --about-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --facts-gradient: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  --explore-gradient: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+  --radius-card: 20px;
+  --radius-btn: 50px;
+  --radius-img: 15px;
+  --radius-input: 5px;
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, .1);
+  --shadow-card-hover: 0 15px 40px rgba(0, 0, 0, .2);
+  --shadow-btn: 0 8px 25px rgba(255, 107, 107, .4);
+  --shadow-btn-hover: 0 12px 35px rgba(255, 107, 107, .6);
+  --shadow-header: 0 4px 20px rgba(0, 0, 0, .1);
+  --shadow-footer: 0 -5px 20px rgba(0, 0, 0, .1);
+  --t: .3s;
+  --ease: ease-in-out;
+}
+
+/* Base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Raleway', 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--body-gradient);
+  background-attachment: fixed;
+  color: var(--light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Header + navigation */
+header {
+  background: var(--header-gradient);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-header);
+}
+
+header nav a,
+nav a {
+  position: relative;
+  text-decoration: none;
+  transition: color var(--t) var(--ease), transform var(--t) var(--ease);
+}
+
+/* underline animation with gradient */
+header nav a::after,
+nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--brown-dark), var(--accent-light));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t) var(--ease);
+}
+
+header nav a:hover::after,
+nav a:hover::after,
+header nav a:focus-visible::after,
+nav a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Buttons */
+button,
+input[type="button"],
+input[type="submit"],
+.btn,
+a.button,
+a.home_button {
+  background: var(--btn-gradient);
+  border-radius: var(--radius-btn);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-btn);
+  transition: transform var(--t) var(--ease), box-shadow var(--t) var(--ease), filter var(--t) var(--ease);
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+.btn:hover,
+a.button:hover,
+a.home_button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--shadow-btn-hover);
+}
+
+button:focus-visible,
+input[type="button"]:focus-visible,
+input[type="submit"]:focus-visible,
+a.button:focus-visible,
+a.home_button:focus-visible {
+  outline: 2px solid var(--accent-light);
+  outline-offset: 2px;
+}
+
+/* Cards */
+.card,
+.product,
+.products,
+.item,
+.cart-item,
+.exploreUsBox,
+.facts,
+.whatsNew,
+.globalBrand,
+.container > div,
+.container .product,
+.home_container,
+.account,
+.accountAdmin {
+  background: rgba(255, 255, 255, .95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--t) var(--ease), box-shadow var(--t) var(--ease);
+  color: var(--dark);
+}
+
+.card:hover,
+.product:hover,
+.exploreUsBox:hover,
+.whatsNew:hover,
+.globalBrand:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Images */
+img {
+  border-radius: var(--radius-img);
+  max-width: 100%;
+  height: auto;
+}
+
+/* Product images: contain */
+.card_img img,
+.product img,
+.product .card_img img,
+.item img,
+.slider img {
+  object-fit: contain;
+}
+
+/* Forms */
+input,
+select,
+textarea {
+  border-radius: var(--radius-input);
+  transition: border-color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent-light);
+  box-shadow: 0 0 0 4px rgba(129, 212, 250, .25);
+  outline: none;
+}
+
+.error,
+.error-message,
+.input-error {
+  color: var(--error);
+}
+
+.success,
+.success-message {
+  color: var(--success);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background: var(--table-header);
+  color: var(--dark);
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, .03);
+}
+
+th,
+td {
+  border: 1px solid rgba(0, 0, 0, .08);
+}
+
+/* Hero */
+.hero,
+.bgfoto {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, .3);
+}
+
+/* Footer */
+footer {
+  background: var(--footer-gradient);
+  box-shadow: var(--shadow-footer);
+}
+
+/* Page section gradients (apply safely where classes exist) */
+body.about_us_body {
+  background: var(--about-gradient);
+  background-attachment: fixed;
+  color: var(--dark);
+}
+
+.facts {
+  background: var(--facts-gradient);
+}
+
+.exploreUsParent,
+.exploreUs {
+  background: var(--explore-gradient);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  header nav a::after,
+  nav a::after {
+    bottom: -4px;
+  }
+
+  button,
+  input[type="button"],
+  input[type="submit"],
+  .btn,
+  a.button,
+  a.home_button {
+    letter-spacing: 0.35px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* tablet */
+}
+
+@media (min-width: 1025px) {
+  /* desktop */
+}
+
