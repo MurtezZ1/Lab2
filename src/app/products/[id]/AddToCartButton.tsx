@@ -1,6 +1,7 @@
 "use client";
 
 import { addToCart } from "@/app/cart/actions";
+import CartNotice from "@/components/CartNotice";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -8,6 +9,7 @@ import { useState, useTransition } from "react";
 export default function AddToCartButton({ productId }: { productId: number }) {
   const [isAdded, setIsAdded] = useState(false);
   const [message, setMessage] = useState("");
+  const [showNotice, setShowNotice] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const handleAdd = () => {
@@ -27,7 +29,9 @@ export default function AddToCartButton({ productId }: { productId: number }) {
       }
 
       setIsAdded(true);
+      setShowNotice(true);
       setTimeout(() => setIsAdded(false), 2000);
+      setTimeout(() => setShowNotice(false), 2600);
     });
   };
 
@@ -47,6 +51,7 @@ export default function AddToCartButton({ productId }: { productId: number }) {
         {isPending ? "Adding..." : isAdded ? "Added to Cart!" : "Add to Cart"}
       </motion.button>
       {message && <p className="mt-2 text-sm text-red-300">{message}</p>}
+      <CartNotice show={showNotice} />
     </div>
   );
 }

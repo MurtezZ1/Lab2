@@ -1,6 +1,7 @@
 "use client";
 
 import { addToCart } from "@/app/cart/actions";
+import CartNotice from "@/components/CartNotice";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -17,6 +18,7 @@ interface ProductProps {
 
 export default function ProductCard({ id, name, price, image, manufacturer }: ProductProps) {
   const [isAdded, setIsAdded] = useState(false);
+  const [showNotice, setShowNotice] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const handleAddToCart = () => {
@@ -30,7 +32,9 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
 
       if (result.ok) {
         setIsAdded(true);
+        setShowNotice(true);
         setTimeout(() => setIsAdded(false), 1500);
+        setTimeout(() => setShowNotice(false), 2600);
       }
     });
   };
@@ -94,6 +98,7 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
           <ShoppingCart className="w-5 h-5" />
         </button>
       </div>
+      <CartNotice show={showNotice} message={`${name} u shtua ne shporte.`} />
     </motion.div>
   );
 }

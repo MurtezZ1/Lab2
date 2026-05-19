@@ -1,5 +1,6 @@
 import { getProducts } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
+import PriceRangeFilter from "@/components/PriceRangeFilter";
 import { Filter, ChevronDown } from "lucide-react";
 
 export const revalidate = 60;
@@ -49,13 +50,7 @@ export default async function ProductsPage() {
                   Price Range
                   <ChevronDown className="w-4 h-4" />
                 </h3>
-                <div className="space-y-4">
-                  <input type="range" className="w-full accent-primary" />
-                  <div className="flex items-center justify-between text-xs text-gray-400">
-                    <span>$0</span>
-                    <span>$2000+</span>
-                  </div>
-                </div>
+                <PriceRangeFilter />
               </div>
               
             </div>
