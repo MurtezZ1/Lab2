@@ -1,0 +1,15 @@
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Editor folders
+.vscode/
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+
+# Environment files
+.env
+.env.local
