@@ -73,7 +73,7 @@ export default function ProductFeedback({ productId, compact = false }: ProductF
             >
               <Star
                 className={`transition-colors ${compact ? "h-4 w-4" : "h-6 w-6"} ${
-                  star <= visibleRating ? "fill-accent text-accent" : "text-gray-600"
+                  star <= visibleRating ? "fill-yellow-400 text-yellow-400" : "text-gray-600"
                 }`}
               />
             </button>
