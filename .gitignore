@@ -7,8 +7,13 @@ Desktop.ini
 
 # Dependencies and build output
 node_modules/
+.next/
 dist/
 build/
+tsconfig.tsbuildinfo
+
+# Local runtime logs
+*.log
 
 # Environment files
 .env

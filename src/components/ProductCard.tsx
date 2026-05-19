@@ -1,9 +1,11 @@
 "use client";
 
+import { addToCart } from "@/app/cart/actions";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShoppingCart, Heart, Star } from "lucide-react";
+import { useState, useTransition } from "react";
 
 interface ProductProps {
   id: number;
@@ -14,6 +16,25 @@ interface ProductProps {
 }
 
 export default function ProductCard({ id, name, price, image, manufacturer }: ProductProps) {
+  const [isAdded, setIsAdded] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const handleAddToCart = () => {
+    startTransition(async () => {
+      const result = await addToCart(id);
+
+      if (result.needsLogin) {
+        window.location.href = "/account";
+        return;
+      }
+
+      if (result.ok) {
+        setIsAdded(true);
+        setTimeout(() => setIsAdded(false), 1500);
+      }
+    });
+  };
+
   return (
     <motion.div 
       whileHover={{ y: -10 }}
@@ -59,7 +80,17 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
           <span className="text-xs text-gray-400 line-through">${(price * 1.2).toFixed(2)}</span>
           <span className="text-xl font-bold text-white">${price.toFixed(2)}</span>
         </div>
-        <button className="bg-primary/20 hover:bg-primary text-primary hover:text-white p-3 rounded-xl transition-all duration-300 transform active:scale-95 group-hover:shadow-[0_0_15px_rgba(10,132,255,0.5)]">
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          disabled={isPending}
+          aria-label={`Add ${name} to cart`}
+          className={`p-3 rounded-xl transition-all duration-300 transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-70 group-hover:shadow-[0_0_15px_rgba(10,132,255,0.5)] ${
+            isAdded
+              ? "bg-green-500 text-white"
+              : "bg-primary/20 hover:bg-primary text-primary hover:text-white"
+          }`}
+        >
           <ShoppingCart className="w-5 h-5" />
         </button>
       </div>

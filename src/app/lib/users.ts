@@ -18,7 +18,7 @@ export type CreateUserInput = {
   password: string;
 };
 
-const fallbackUsersPath = path.join(process.cwd(), "src", "data", "users.json");
+const fallbackUsersPath = path.join(process.cwd(), "src", "app", "data", "users.json");
 
 const getFallbackUsers = async () => {
   const users = await readFile(fallbackUsersPath, "utf-8");
