@@ -2,10 +2,11 @@
 
 import { addToCart } from "@/app/cart/actions";
 import CartNotice from "@/components/CartNotice";
+import ProductFeedback from "@/components/ProductFeedback";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ShoppingCart, Heart, Star } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { useState, useTransition } from "react";
 
 interface ProductProps {
@@ -70,13 +71,7 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
           </h3>
         </Link>
         
-        {/* Rating Mock */}
-        <div className="flex items-center gap-1 mt-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <Star key={star} className="w-3 h-3 fill-accent text-accent" />
-          ))}
-          <span className="text-xs text-gray-400 ml-1">(24)</span>
-        </div>
+        <ProductFeedback productId={id} compact />
       </div>
 
       <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">

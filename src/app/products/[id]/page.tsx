@@ -1,8 +1,9 @@
 import { getProductById } from "@/lib/products";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ShoppingCart, Star, Shield, Truck, RotateCcw, Cpu, Battery, Maximize } from "lucide-react";
+import { Shield, Truck, RotateCcw, Cpu, Battery, Maximize } from "lucide-react";
 import AddToCartButton from "./AddToCartButton";
+import ProductFeedback from "@/components/ProductFeedback";
 
 export const revalidate = 60;
 
@@ -60,14 +61,8 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
             {product.name}
           </h1>
           
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star key={star} className="w-5 h-5 fill-accent text-accent" />
-              ))}
-            </div>
-            <span className="text-gray-400 text-sm">4.9 (128 Reviews)</span>
-            <span className="text-gray-600 text-sm">|</span>
+          <div className="flex flex-col gap-3">
+            <ProductFeedback productId={product.id} />
             <span className="text-green-400 text-sm font-medium">In Stock</span>
           </div>
 
