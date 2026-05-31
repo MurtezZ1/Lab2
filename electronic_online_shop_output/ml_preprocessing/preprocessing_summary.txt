@@ -1,0 +1,32 @@
+Electronic Online Shop - ML Preprocessing Summary
+====================================================
+
+Original dataset shape: (2400, 12)
+Feature matrix shape before preprocessing: (2400, 9)
+X_train shape: (1920, 9)
+X_test shape: (480, 9)
+Processed X_train shape: (1920, 57)
+Processed X_test shape: (480, 57)
+
+Label encoding mapping: {'High': 0, 'Low': 1, 'Medium': 2}
+
+Numeric features scaled: ['Price', 'Rating', 'NumberOfReviews', 'StockQuantity', 'DiscountPercentage', 'WarrantyMonths', 'SoldUnits']
+Categorical features one hot encoded: ['Category', 'Brand']
+
+Baseline accuracy: 0.9646
+
+Classification report:
+              precision    recall  f1-score   support
+
+        High       0.96      0.94      0.95        87
+         Low       0.99      0.93      0.96       123
+      Medium       0.95      0.99      0.97       270
+
+    accuracy                           0.96       480
+   macro avg       0.97      0.95      0.96       480
+weighted avg       0.97      0.96      0.96       480
+
+Confusion matrix:
+[[ 82   0   5]
+ [  1 114   8]
+ [  2   1 267]]
