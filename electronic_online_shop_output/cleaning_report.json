@@ -1,0 +1,82 @@
+{
+  "rawShape": [
+    2435,
+    12
+  ],
+  "cleanedShape": [
+    2401,
+    12
+  ],
+  "rawDuplicates": 34,
+  "cleanedDuplicates": 0,
+  "rawMissing": {
+    "StockQuantity": 3.3675564681724848,
+    "WarrantyMonths": 3.0390143737166326,
+    "Rating": 2.299794661190965,
+    "Brand": 2.1765913757700206,
+    "NumberOfReviews": 2.135523613963039,
+    "Price": 1.9301848049281316,
+    "DiscountPercentage": 1.3141683778234086,
+    "ProductID": 0,
+    "ProductName": 0,
+    "Category": 0,
+    "SoldUnits": 0,
+    "DemandLevel": 0
+  },
+  "cleanedMissing": {
+    "ProductID": 0,
+    "ProductName": 0,
+    "Category": 0,
+    "Brand": 0,
+    "Price": 0,
+    "Rating": 0,
+    "NumberOfReviews": 0,
+    "StockQuantity": 0,
+    "DiscountPercentage": 0,
+    "WarrantyMonths": 0,
+    "SoldUnits": 0,
+    "DemandLevel": 0
+  },
+  "outlierSummary": {
+    "Price": {
+      "lower": -730.62,
+      "upper": 1887.65,
+      "capped": 104
+    },
+    "Rating": {
+      "lower": 2.65,
+      "upper": 5.45,
+      "capped": 16
+    },
+    "NumberOfReviews": {
+      "lower": -120.5,
+      "upper": 411.5,
+      "capped": 81
+    },
+    "StockQuantity": {
+      "lower": -42.5,
+      "upper": 297.5,
+      "capped": 20
+    },
+    "DiscountPercentage": {
+      "lower": -17,
+      "upper": 47,
+      "capped": 14
+    },
+    "WarrantyMonths": {
+      "lower": -6,
+      "upper": 42,
+      "capped": 0
+    },
+    "SoldUnits": {
+      "lower": 159.5,
+      "upper": 803.5,
+      "capped": 24
+    }
+  },
+  "demandDistribution": {
+    "Medium": 1440,
+    "High": 903,
+    "Low": 58
+  }
+}
