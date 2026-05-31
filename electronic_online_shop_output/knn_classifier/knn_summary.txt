@@ -1,0 +1,44 @@
+Electronic Online Shop - KNN Classifier Summary
+====================================================
+
+Dataset shape: (2400, 12)
+Feature matrix shape: (2400, 9)
+Target classes: High, Low, Medium
+Numeric features scaled: ['Price', 'Rating', 'NumberOfReviews', 'StockQuantity', 'DiscountPercentage', 'WarrantyMonths', 'SoldUnits']
+Categorical features one hot encoded: ['Category', 'Brand']
+
+Hyperparameter tuning:
+- n_neighbors: [3, 5, 7, 9, 11, 15, 21]
+- weights: ['uniform', 'distance']
+- distance metrics: ['euclidean', 'manhattan', 'minkowski']
+- scoring: weighted F1 score
+- cross validation: 5 folds
+
+Best parameters: {'classifier__metric': 'euclidean', 'classifier__n_neighbors': 15, 'classifier__weights': 'distance'}
+Best CV weighted F1 score: 0.7921
+
+Test metrics:
+- accuracy: 0.7708
+- precision_macro: 0.8573
+- recall_macro: 0.6632
+- f1_macro: 0.7137
+- precision_weighted: 0.8101
+- recall_weighted: 0.7708
+- f1_weighted: 0.7544
+
+Classification report:
+              precision    recall  f1-score   support
+
+        High       0.93      0.48      0.64        87
+         Low       0.92      0.54      0.68       123
+      Medium       0.72      0.97      0.83       270
+
+    accuracy                           0.77       480
+   macro avg       0.86      0.66      0.71       480
+weighted avg       0.81      0.77      0.75       480
+
+Confusion matrix:
+        High  Low  Medium
+High      42    0      45
+Low        1   66      56
+Medium     2    6     262
