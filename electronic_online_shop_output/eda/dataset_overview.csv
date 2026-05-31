@@ -1,0 +1,13 @@
+Column,DataType,MissingValues,UniqueValues
+ProductID,str,0,2400
+ProductName,str,0,2399
+Category,str,0,10
+Brand,str,0,40
+Price,float64,0,2193
+Rating,float64,0,27
+NumberOfReviews,int64,0,421
+StockQuantity,int64,0,300
+DiscountPercentage,int64,0,47
+WarrantyMonths,int64,0,4
+SoldUnits,int64,0,539
+DemandLevel,str,0,3
