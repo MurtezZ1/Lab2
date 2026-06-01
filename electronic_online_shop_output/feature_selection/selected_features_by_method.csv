@@ -1,0 +1,102 @@
+Method,Feature,Rank
+All Features,Price,1
+All Features,Rating,2
+All Features,NumberOfReviews,3
+All Features,StockQuantity,4
+All Features,DiscountPercentage,5
+All Features,WarrantyMonths,6
+All Features,Category_Accessory,7
+All Features,Category_Camera,8
+All Features,Category_Gaming Console,9
+All Features,Category_Headphones,10
+All Features,Category_Laptop,11
+All Features,Category_Monitor,12
+All Features,Category_Smartphone,13
+All Features,Category_Smartwatch,14
+All Features,Category_TV,15
+All Features,Category_Tablet,16
+All Features,Brand_AOC,17
+All Features,Brand_Acer,18
+All Features,Brand_Amazfit,19
+All Features,Brand_Anker,20
+All Features,Brand_Apple,21
+All Features,Brand_Asus,22
+All Features,Brand_Belkin,23
+All Features,Brand_BenQ,24
+All Features,Brand_Bose,25
+All Features,Brand_Canon,26
+All Features,Brand_Corsair,27
+All Features,Brand_Dell,28
+All Features,Brand_Fitbit,29
+All Features,Brand_Fujifilm,30
+All Features,Brand_Garmin,31
+All Features,Brand_GoPro,32
+All Features,Brand_Google,33
+All Features,Brand_HP,34
+All Features,Brand_Hisense,35
+All Features,Brand_Huawei,36
+All Features,Brand_JBL,37
+All Features,Brand_LG,38
+All Features,Brand_Lenovo,39
+All Features,Brand_Logitech,40
+All Features,Brand_MSI,41
+All Features,Brand_Meta,42
+All Features,Brand_Microsoft,43
+All Features,Brand_Motorola,44
+All Features,Brand_Nikon,45
+All Features,Brand_Nintendo,46
+All Features,Brand_OnePlus,47
+All Features,Brand_Panasonic,48
+All Features,Brand_Philips,49
+All Features,Brand_Razer,50
+All Features,Brand_Samsung,51
+All Features,Brand_Sennheiser,52
+All Features,Brand_Sony,53
+All Features,Brand_TCL,54
+All Features,Brand_Valve,55
+All Features,Brand_Xiaomi,56
+SelectKBest,Rating,1
+SelectKBest,Price,2
+SelectKBest,DiscountPercentage,3
+SelectKBest,Brand_Microsoft,4
+SelectKBest,Brand_Google,5
+SelectKBest,NumberOfReviews,6
+SelectKBest,Brand_Bose,7
+SelectKBest,Brand_Meta,8
+SelectKBest,Brand_Canon,9
+SelectKBest,Category_Smartphone,10
+SelectKBest,Brand_Apple,11
+SelectKBest,Category_TV,12
+SelectKBest,Brand_Amazfit,13
+SelectKBest,Brand_Fitbit,14
+SelectKBest,Brand_Samsung,15
+Correlation Analysis,Rating,1
+Correlation Analysis,Brand_Google,2
+Correlation Analysis,DiscountPercentage,3
+Correlation Analysis,Brand_Microsoft,4
+Correlation Analysis,Brand_Meta,5
+Correlation Analysis,Category_TV,6
+Correlation Analysis,Category_Smartphone,7
+Correlation Analysis,Price,8
+Correlation Analysis,NumberOfReviews,9
+Correlation Analysis,Brand_Apple,10
+Correlation Analysis,Brand_Samsung,11
+Correlation Analysis,Brand_Canon,12
+Correlation Analysis,Category_Tablet,13
+Correlation Analysis,Brand_BenQ,14
+Correlation Analysis,Brand_Corsair,15
+Random Forest Importance,Price,1
+Random Forest Importance,Rating,2
+Random Forest Importance,NumberOfReviews,3
+Random Forest Importance,DiscountPercentage,4
+Random Forest Importance,StockQuantity,5
+Random Forest Importance,WarrantyMonths,6
+Random Forest Importance,Brand_Apple,7
+Random Forest Importance,Category_Smartphone,8
+Random Forest Importance,Brand_Samsung,9
+Random Forest Importance,Category_Laptop,10
+Random Forest Importance,Category_Headphones,11
+Random Forest Importance,Category_Smartwatch,12
+Random Forest Importance,Category_Tablet,13
+Random Forest Importance,Category_TV,14
+Random Forest Importance,Brand_Sony,15
