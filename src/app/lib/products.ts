@@ -1,4 +1,4 @@
-import fallbackProductsJson from "../../../public/old_php_backup/data.json";
+import fallbackProductsJson from "../../../public/sunspot_products.json";
 import { prisma } from "@/lib/prisma";
 
 type FallbackProduct = (typeof fallbackProductsJson)[number];

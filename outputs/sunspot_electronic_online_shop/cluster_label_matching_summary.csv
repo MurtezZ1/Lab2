@@ -1,0 +1,2 @@
+Optimal K,Matching Percentage,Selection Rule
+2,56.166666666666664,"Highest silhouette score, checked against elbow curve"
