@@ -1,0 +1,69 @@
+Electronic Online Shop - Random Forest Classifier Summary
+==============================================================
+
+Dataset shape: (2400, 12)
+Feature matrix shape: (2400, 8)
+Target classes: High, Low, Medium
+Excluded leakage columns: ['SoldUnits']
+Numeric features: ['Price', 'Rating', 'NumberOfReviews', 'StockQuantity', 'DiscountPercentage', 'WarrantyMonths']
+Categorical features one hot encoded: ['Category', 'Brand']
+
+Random Forest hyperparameter tuning:
+- n_estimators: [100, 200]
+- max_depth: [5, 10, None]
+- min_samples_split: [2, 10]
+- min_samples_leaf: [1, 5]
+- max_features: ['sqrt', 'log2']
+- scoring: weighted F1 score
+- cross validation: 5 folds
+
+Best Random Forest parameters: {'classifier__max_depth': None, 'classifier__max_features': 'log2', 'classifier__min_samples_leaf': 1, 'classifier__min_samples_split': 10, 'classifier__n_estimators': 100}
+Best Random Forest CV weighted F1 score: 0.5117
+
+Random Forest test metrics:
+- accuracy: 0.4979
+- precision_macro: 0.4150
+- recall_macro: 0.3979
+- f1_macro: 0.4017
+- precision_weighted: 0.4770
+- recall_weighted: 0.4979
+- f1_weighted: 0.4828
+
+Random Forest classification report:
+              precision    recall  f1-score   support
+
+        High       0.25      0.21      0.23        87
+         Low       0.42      0.31      0.36       123
+      Medium       0.58      0.68      0.62       270
+
+    accuracy                           0.50       480
+   macro avg       0.41      0.40      0.40       480
+weighted avg       0.48      0.50      0.48       480
+
+Random Forest confusion matrix:
+        High  Low  Medium
+High      18    6      63
+Low       14   38      71
+Medium    40   47     183
+
+Model comparison against KNN and Decision Tree:
+        Model                                                                                                                                                               BestParameters  BestCVF1Weighted  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+Random Forest {'classifier__max_depth': None, 'classifier__max_features': 'log2', 'classifier__min_samples_leaf': 1, 'classifier__min_samples_split': 10, 'classifier__n_estimators': 100}          0.511724  0.497917         0.414956      0.397872  0.401688            0.477042         0.497917     0.482766
+          KNN                                                                         {'classifier__metric': 'euclidean', 'classifier__n_neighbors': 9, 'classifier__weights': 'distance'}          0.477884  0.504167         0.396064      0.359437  0.351340            0.450641         0.504167     0.453692
+Decision Tree                                                                       {'classifier__max_depth': None, 'classifier__min_samples_leaf': 1, 'classifier__min_samples_split': 2}          0.433462  0.445833         0.372115      0.372615  0.372207            0.443704         0.445833     0.444647
+
+Feature importance explanation:
+Random Forest feature importance estimates how much each feature reduced impurity across all trees. Higher importance means the feature contributed more strongly to DemandLevel predictions.
+
+Top 10 important features:
+            Feature  Importance
+              Price    0.158435
+             Rating    0.126645
+    NumberOfReviews    0.118267
+ DiscountPercentage    0.112224
+      StockQuantity    0.108194
+     WarrantyMonths    0.039431
+Category_Smartphone    0.015072
+        Brand_Apple    0.014433
+      Brand_Samsung    0.013103
+Category_Headphones    0.011516
