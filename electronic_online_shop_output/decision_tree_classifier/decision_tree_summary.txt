@@ -1,0 +1,63 @@
+Electronic Online Shop - Decision Tree Classifier Summary
+============================================================
+
+Dataset shape: (2400, 12)
+Feature matrix shape: (2400, 8)
+Target classes: High, Low, Medium
+Excluded leakage columns: ['SoldUnits']
+Numeric features: ['Price', 'Rating', 'NumberOfReviews', 'StockQuantity', 'DiscountPercentage', 'WarrantyMonths']
+Categorical features one hot encoded: ['Category', 'Brand']
+
+Hyperparameter tuning:
+- max_depth: [3, 4, 5, 6, 8, 10, None]
+- min_samples_split: [2, 5, 10, 20]
+- min_samples_leaf: [1, 2, 5, 10]
+- scoring: weighted F1 score
+- cross validation: 5 folds
+
+Best parameters: {'classifier__max_depth': None, 'classifier__min_samples_leaf': 1, 'classifier__min_samples_split': 2}
+Best CV weighted F1 score: 0.4335
+
+Test metrics:
+- accuracy: 0.4458
+- precision_macro: 0.3721
+- recall_macro: 0.3726
+- f1_macro: 0.3722
+- precision_weighted: 0.4437
+- recall_weighted: 0.4458
+- f1_weighted: 0.4446
+
+Classification report:
+              precision    recall  f1-score   support
+
+        High       0.25      0.26      0.26        87
+         Low       0.29      0.27      0.28       123
+      Medium       0.58      0.59      0.58       270
+
+    accuracy                           0.45       480
+   macro avg       0.37      0.37      0.37       480
+weighted avg       0.44      0.45      0.44       480
+
+Confusion matrix:
+        High  Low  Medium
+High      23   21      43
+Low       17   33      73
+Medium    51   61     158
+
+Feature importance explanation:
+Feature importance shows which columns the tree used most often to split the data and reduce impurity. Higher values indicate stronger influence on DemandLevel predictions.
+
+SoldUnits was excluded from the feature set because DemandLevel was generated from demand/sales behavior. Keeping SoldUnits would make the model unrealistically accurate and would leak information from the target.
+
+Top 10 important features:
+            Feature  Importance
+              Price    0.213379
+ DiscountPercentage    0.146319
+    NumberOfReviews    0.140534
+      StockQuantity    0.130364
+             Rating    0.116711
+     WarrantyMonths    0.039763
+        Brand_Apple    0.014611
+Category_Smartphone    0.013443
+Category_Smartwatch    0.011755
+     Brand_Motorola    0.009713
