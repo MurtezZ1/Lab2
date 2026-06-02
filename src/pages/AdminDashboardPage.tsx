@@ -1,6 +1,7 @@
 import { useProducts } from "@/hooks/useProducts";
 import { useAppSelector } from "@/redux/hooks";
 import { BarChart3, Package, Users, Upload } from "lucide-react";
+import { downloadReport } from "@/services/reportExportService";
 
 export default function AdminDashboardPage() {
   const { products } = useProducts();
@@ -20,6 +21,14 @@ export default function AdminDashboardPage() {
       <div className="glass-card rounded-2xl p-6">
         <h2 className="text-xl font-bold text-white flex items-center gap-2"><Upload className="w-5 h-5 text-primary" /> Product Image Upload</h2>
         <input type="file" accept="image/*" className="mt-4 block w-full text-sm text-gray-300 file:mr-4 file:rounded-xl file:border-0 file:bg-primary file:px-4 file:py-2 file:font-bold file:text-white" />
+      </div>
+      <div className="glass-card rounded-2xl p-6 mt-8">
+        <h2 className="text-xl font-bold text-white">Dynamic Reports</h2>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button onClick={() => downloadReport("pdf")} className="rounded-xl bg-primary px-4 py-2 font-bold text-white">PDF Export</button>
+          <button onClick={() => downloadReport("excel")} className="rounded-xl border border-white/10 px-4 py-2 font-bold text-gray-200">Excel Export</button>
+          <button onClick={() => downloadReport("csv")} className="rounded-xl border border-white/10 px-4 py-2 font-bold text-gray-200">CSV Export</button>
+        </div>
       </div>
     </div>
   );

@@ -65,14 +65,22 @@ pip install -r requirements.txt
 
 ## Database Setup
 
-Create a local MySQL database named `sunspot_db`, copy `.env.example` to `.env`, and update `DATABASE_URL` with your own MySQL username, password, host, and port.
+The backend uses PostgreSQL for relational data, MongoDB for notification/activity history, and Redis for cache.
+
+Start MongoDB and Redis with Docker:
 
 ```bash
-copy .env.example .env
-npm run db:setup
+npm run infra:start
 ```
 
-`npm run db:setup` generates the Prisma client, runs the migration files from `public/prisma/migrations`, and seeds products from `public/sunspot_products.json`.
+Copy `backend/.env.example` to `backend/.env`, then update `DATABASE_URL`, `MONGO_URL`, and `REDIS_URL` if your local ports are different.
+
+```bash
+copy backend\.env.example backend\.env
+npm run backend:setup
+```
+
+`npm run backend:setup` generates the Prisma client, runs PostgreSQL migrations, and seeds roles, permissions, admin user, categories, brands, and sample products.
 
 ## Run The Main ML Pipeline
 
@@ -101,7 +109,8 @@ Including:
 ## Run The Web App
 
 ```bash
-npm run db:setup
+npm run infra:start
+npm run backend:dev
 npm run dev
 ```
 
@@ -122,8 +131,14 @@ http://localhost:3000
 - TensorFlow
 - Jupyter
 - Plotly
-- Next.js
 - React
+- Vite
+- Express.js
+- PostgreSQL
+- Prisma ORM
+- Socket.IO
+- MongoDB
+- Redis
 
 ## Main Results
 
@@ -148,7 +163,7 @@ outputs/sunspot_electronic_online_shop/model_comparison.csv
 
 ## Future Improvements
 
-- Add live prediction UI to the Next.js application
+- Add live prediction UI to the React + Vite application
 - Store trained models through a model registry
 - Add API endpoints for demand prediction
 - Test additional models such as XGBoost or LightGBM

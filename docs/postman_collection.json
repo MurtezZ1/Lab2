@@ -1,0 +1,21 @@
+{
+  "info": {
+    "name": "Sunspot Electronic Online Shop API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    { "name": "Health", "request": { "method": "GET", "url": "{{baseUrl}}/health" } },
+    { "name": "Login", "request": { "method": "POST", "url": "{{baseUrl}}/api/auth/login", "body": { "mode": "raw", "raw": "{\"email\":\"admin@sunspot.com\",\"password\":\"AdminPassword123!\"}" } } },
+    { "name": "Register", "request": { "method": "POST", "url": "{{baseUrl}}/api/auth/register" } },
+    { "name": "Refresh Token", "request": { "method": "POST", "url": "{{baseUrl}}/api/auth/refresh-token" } },
+    { "name": "Advanced Search", "request": { "method": "GET", "url": "{{baseUrl}}/api/search?scope=products&query=lenovo" } },
+    { "name": "Recommendations", "request": { "method": "GET", "url": "{{baseUrl}}/api/recommendations/1" } },
+    { "name": "Reports", "request": { "method": "GET", "url": "{{baseUrl}}/api/reports" } },
+    { "name": "Export PDF", "request": { "method": "GET", "url": "{{baseUrl}}/api/reports/export/pdf" } },
+    { "name": "Export Excel", "request": { "method": "GET", "url": "{{baseUrl}}/api/reports/export/excel" } },
+    { "name": "Export CSV", "request": { "method": "GET", "url": "{{baseUrl}}/api/reports/export/csv" } },
+    { "name": "CMS", "request": { "method": "GET", "url": "{{baseUrl}}/api/cms" } },
+    { "name": "Upload File", "request": { "method": "POST", "url": "{{baseUrl}}/api/files/upload" } }
+  ],
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:5000" }]
+}

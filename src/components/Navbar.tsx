@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ShoppingCart, User, Menu, X, Cpu } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Cpu, Bell } from "lucide-react";
 import { useAppSelector } from "@/redux/hooks";
 
 export default function Navbar() {
@@ -10,6 +10,7 @@ export default function Navbar() {
   const cartCount = useAppSelector((state) =>
     state.cart.items.reduce((total, item) => total + item.quantity, 0),
   );
+  const unreadCount = useAppSelector((state) => state.notifications.items.filter((item) => item.unread).length);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,6 +64,15 @@ export default function Navbar() {
             </span>
           </Link>
 
+          <Link to="/notifications" className="relative group">
+            <Bell className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {unreadCount}
+              </span>
+            )}
+          </Link>
+
           <Link to="/account" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
             <User className="w-5 h-5" />
           </Link>
@@ -91,6 +101,7 @@ export default function Navbar() {
               <MobileNavLink to="/deals" onClick={() => setIsMobileMenuOpen(false)}>Deals</MobileNavLink>
               <div className="h-px bg-white/10 my-2" />
               <MobileNavLink to="/cart" onClick={() => setIsMobileMenuOpen(false)}>Cart ({cartCount})</MobileNavLink>
+              <MobileNavLink to="/notifications" onClick={() => setIsMobileMenuOpen(false)}>Notifications ({unreadCount})</MobileNavLink>
               <MobileNavLink to="/account" onClick={() => setIsMobileMenuOpen(false)}>Account</MobileNavLink>
             </div>
           </motion.div>

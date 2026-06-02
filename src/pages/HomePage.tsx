@@ -1,10 +1,18 @@
 import ProductCard from "@/components/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
+import { getPersonalizedRecommendations } from "@/services/recommendationService";
 import { ArrowRight, Star, Zap, Shield, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import type { Product } from "@/types";
 
 export default function HomePage() {
   const { products } = useProducts({ take: 4 });
+  const [recommendations, setRecommendations] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getPersonalizedRecommendations().then(setRecommendations);
+  }, []);
 
   return (
     <div className="flex flex-col gap-24 pb-24">
@@ -142,6 +150,15 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
               <h3 className="relative z-20 text-white font-bold text-xl group-hover:scale-110 transition-transform">{category}</h3>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="container mx-auto px-6">
+        <h2 className="text-3xl font-bold text-white mb-10">Recommended For You</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {recommendations.map((product) => (
+            <ProductCard key={product.id} {...product} />
           ))}
         </div>
       </section>
