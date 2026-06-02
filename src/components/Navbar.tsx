@@ -1,13 +1,15 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ShoppingCart, User, Menu, X, Cpu } from "lucide-react";
+import { useAppSelector } from "@/redux/hooks";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const cartCount = useAppSelector((state) =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0),
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,8 +28,7 @@ export default function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
+        <Link to="/" className="flex items-center gap-2 group">
           <div className="bg-primary/20 p-2 rounded-xl group-hover:bg-primary/30 transition-colors">
             <Cpu className="w-6 h-6 text-accent" />
           </div>
@@ -36,41 +37,38 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/products">Products</NavLink>
-          <NavLink href="/categories">Categories</NavLink>
-          <NavLink href="/deals">Deals</NavLink>
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/products">Products</NavLink>
+          <NavLink to="/categories">Categories</NavLink>
+          <NavLink to="/deals">Deals</NavLink>
         </nav>
 
-        {/* Actions */}
         <div className="hidden md:flex items-center gap-6">
           <div className="relative group">
             <Search className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors cursor-pointer" />
             <div className="absolute right-0 top-10 w-64 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity glass p-2 rounded-xl border border-white/10">
-              <input 
-                type="text" 
-                placeholder="Search products..." 
+              <input
+                type="text"
+                placeholder="Search products..."
                 className="w-full bg-black/50 text-white text-sm px-4 py-2 rounded-lg outline-none border border-white/10 focus:border-primary transition-colors"
               />
             </div>
           </div>
-          
-          <Link href="/cart" className="relative group">
+
+          <Link to="/cart" className="relative group">
             <ShoppingCart className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
             <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-              0
+              {cartCount}
             </span>
           </Link>
-          
-          <Link href="/account" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+
+          <Link to="/account" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
             <User className="w-5 h-5" />
           </Link>
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <button 
+        <button
           className="md:hidden text-gray-300"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
@@ -78,7 +76,6 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Nav */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -88,13 +85,13 @@ export default function Navbar() {
             className="md:hidden glass border-t border-white/10 overflow-hidden"
           >
             <div className="flex flex-col px-6 py-4 gap-4">
-              <MobileNavLink href="/" onClick={() => setIsMobileMenuOpen(false)}>Home</MobileNavLink>
-              <MobileNavLink href="/products" onClick={() => setIsMobileMenuOpen(false)}>Products</MobileNavLink>
-              <MobileNavLink href="/categories" onClick={() => setIsMobileMenuOpen(false)}>Categories</MobileNavLink>
-              <MobileNavLink href="/deals" onClick={() => setIsMobileMenuOpen(false)}>Deals</MobileNavLink>
+              <MobileNavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</MobileNavLink>
+              <MobileNavLink to="/products" onClick={() => setIsMobileMenuOpen(false)}>Products</MobileNavLink>
+              <MobileNavLink to="/categories" onClick={() => setIsMobileMenuOpen(false)}>Categories</MobileNavLink>
+              <MobileNavLink to="/deals" onClick={() => setIsMobileMenuOpen(false)}>Deals</MobileNavLink>
               <div className="h-px bg-white/10 my-2" />
-              <MobileNavLink href="/cart" onClick={() => setIsMobileMenuOpen(false)}>Cart (0)</MobileNavLink>
-              <MobileNavLink href="/account" onClick={() => setIsMobileMenuOpen(false)}>Account</MobileNavLink>
+              <MobileNavLink to="/cart" onClick={() => setIsMobileMenuOpen(false)}>Cart ({cartCount})</MobileNavLink>
+              <MobileNavLink to="/account" onClick={() => setIsMobileMenuOpen(false)}>Account</MobileNavLink>
             </div>
           </motion.div>
         )}
@@ -103,18 +100,18 @@ export default function Navbar() {
   );
 }
 
-function NavLink({ href, children }: { href: string, children: React.ReactNode }) {
+function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="text-sm font-medium text-gray-300 hover:text-white hover:text-gradient transition-all relative group">
+    <Link to={to} className="text-sm font-medium text-gray-300 hover:text-white hover:text-gradient transition-all relative group">
       {children}
       <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent transition-all group-hover:w-full rounded-full" />
     </Link>
   );
 }
 
-function MobileNavLink({ href, onClick, children }: { href: string, onClick: () => void, children: React.ReactNode }) {
+function MobileNavLink({ to, onClick, children }: { to: string; onClick: () => void; children: React.ReactNode }) {
   return (
-    <Link href={href} onClick={onClick} className="text-gray-300 hover:text-white text-lg font-medium">
+    <Link to={to} onClick={onClick} className="text-gray-300 hover:text-white text-lg font-medium">
       {children}
     </Link>
   );

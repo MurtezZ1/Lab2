@@ -1,13 +1,13 @@
-"use client";
-
-import { addToCart } from "@/app/cart/actions";
 import CartNotice from "@/components/CartNotice";
 import ProductFeedback from "@/components/ProductFeedback";
-import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShoppingCart, Heart } from "lucide-react";
 import { useState, useTransition } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setCartItems } from "@/redux/slices/cartSlice";
+import { addProductToCart } from "@/services/cartService";
+import type { Product } from "@/types";
 
 interface ProductProps {
   id: number;
@@ -21,56 +21,77 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
   const [isAdded, setIsAdded] = useState(false);
   const [showNotice, setShowNotice] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleAddToCart = () => {
     startTransition(async () => {
-      const result = await addToCart(id);
-
-      if (result.needsLogin) {
-        window.location.href = "/account";
+      if (!user) {
+        navigate("/account");
         return;
       }
 
-      if (result.ok) {
-        setIsAdded(true);
-        setShowNotice(true);
-        setTimeout(() => setIsAdded(false), 1500);
-        setTimeout(() => setShowNotice(false), 2600);
-      }
+      const product: Product = {
+        id,
+        name,
+        price,
+        image,
+        manufacturer,
+        model: "",
+        type: "laptop",
+        year: null,
+        processor: null,
+        ram_size: null,
+        storage: null,
+        display: null,
+        os: null,
+        battery: null,
+        weight: null,
+        dimensions: null,
+        keyboard: null,
+        ports: null,
+        connectivity: null,
+        camera: null,
+        additional_features: null,
+        description: null,
+      };
+      dispatch(setCartItems(addProductToCart(user, product)));
+      setIsAdded(true);
+      setShowNotice(true);
+      setTimeout(() => setIsAdded(false), 1500);
+      setTimeout(() => setShowNotice(false), 2600);
     });
   };
 
   return (
-    <motion.div 
+    <motion.div
       whileHover={{ y: -10 }}
       className="glass-card rounded-2xl p-4 flex flex-col gap-4 group relative overflow-hidden"
     >
-      {/* Quick Actions - hidden by default, visible on hover */}
       <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 translate-x-4 group-hover:translate-x-0 duration-300">
         <button className="bg-white/10 hover:bg-primary text-white p-2 rounded-full backdrop-blur-md transition-colors">
           <Heart className="w-4 h-4" />
         </button>
       </div>
 
-      <Link href={`/products/${id}`} className="block relative w-full h-48 rounded-xl overflow-hidden bg-white/5">
-        <Image 
-          src={image} 
-          alt={name} 
-          fill 
-          className="object-contain p-4 group-hover:scale-110 transition-transform duration-500"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      <Link to={`/products/${id}`} className="block relative w-full h-48 rounded-xl overflow-hidden bg-white/5">
+        <img
+          src={image}
+          alt={name}
+          className="h-full w-full object-contain p-4 group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </Link>
 
       <div className="flex flex-col gap-1 flex-1">
         <span className="text-xs font-semibold text-primary uppercase tracking-wider">{manufacturer}</span>
-        <Link href={`/products/${id}`}>
+        <Link to={`/products/${id}`}>
           <h3 className="text-lg font-bold text-white leading-tight hover:text-accent transition-colors line-clamp-2">
             {name}
           </h3>
         </Link>
-        
+
         <ProductFeedback productId={id} compact />
       </div>
 
