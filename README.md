@@ -10,7 +10,7 @@ The project includes:
 - Data cleaning and quality visualizations
 - Exploratory Data Analysis
 - Machine Learning preprocessing pipeline
-- KNN, Decision Tree, Random Forest, Logistic Regression
+- KNN, Decision Tree, Random Forest, Logistic Regression, SVM
 - Neural Network Architecture 1 and Architecture 2
 - Neural Network hyperparameter tuning
 - K-Means clustering with elbow and silhouette analysis
@@ -21,6 +21,16 @@ The project includes:
 ## Main Structure
 
 ```text
+frontend/
+  src/
+  public/
+  package.json
+  vite.config.ts
+
+backend/
+  src/
+  prisma/
+
 data/
   sunspot_electronic_online_shop.csv
 
@@ -36,6 +46,8 @@ reports/
 
 outputs/
   sunspot_electronic_online_shop/
+
+docs/
 ```
 
 ## Dataset
@@ -59,8 +71,14 @@ For model training, the integrated pipeline excludes:
 ## Installation
 
 ```bash
-npm install
+npm run install:all
 pip install -r requirements.txt
+```
+
+Optional notebook/report tooling:
+
+```bash
+pip install -r requirements-notebooks.txt
 ```
 
 ## Database Setup
@@ -73,7 +91,7 @@ Start MongoDB and Redis with Docker:
 npm run infra:start
 ```
 
-Copy `backend/.env.example` to `backend/.env`, then update `DATABASE_URL`, `MONGO_URL`, and `REDIS_URL` if your local ports are different.
+Copy `backend/.env.example` to `backend/.env`, then update `DATABASE_URL`, `MONGO_URL`, `REDIS_URL`, and Stripe keys if your local ports or payment credentials are different.
 
 ```bash
 copy backend\.env.example backend\.env
@@ -81,6 +99,25 @@ npm run backend:setup
 ```
 
 `npm run backend:setup` generates the Prisma client, runs PostgreSQL migrations, and seeds roles, permissions, admin user, categories, brands, and sample products.
+
+## Stripe Payment Setup
+
+Create a Stripe test account and add these values to `backend/.env`:
+
+```env
+STRIPE_SECRET_KEY=sk_test_your_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+STRIPE_CURRENCY=usd
+```
+
+For local webhook testing:
+
+```bash
+stripe listen --forward-to localhost:5000/api/payments/webhook
+```
+
+Use Stripe test card `4242 4242 4242 4242`, any future expiry date, any CVC, and any ZIP/postal code.
 
 ## Run The Main ML Pipeline
 
@@ -128,9 +165,6 @@ http://localhost:3000
 - Scikit-learn
 - Matplotlib
 - Seaborn
-- TensorFlow
-- Jupyter
-- Plotly
 - React
 - Vite
 - Express.js
@@ -139,6 +173,7 @@ http://localhost:3000
 - Socket.IO
 - MongoDB
 - Redis
+- Stripe
 
 ## Main Results
 
@@ -148,6 +183,7 @@ The integrated pipeline trains and compares:
 - Decision Tree
 - Random Forest
 - Logistic Regression
+- SVM
 - Neural Network Architecture 1
 - Neural Network Architecture 2
 

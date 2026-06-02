@@ -3,12 +3,13 @@ Sunspot Electronic Online Shop Machine Learning Pipeline
 
 This module covers the integrated Sunspot ML responsibilities:
 - Logistic Regression for DemandLevel prediction
+- SVM for DemandLevel prediction
 - Neural Network Architecture 1 and 2 with MLPClassifier
 - Neural Network GridSearchCV hyperparameter tuning
 - K-Means clustering with elbow and silhouette analysis
 - Cluster evaluation against real DemandLevel labels
 - Final comparison table for KNN, Decision Tree, Random Forest,
-  Logistic Regression, and two Neural Network architectures
+  Logistic Regression, SVM, and two Neural Network architectures
 
 Dataset path:
     data/sunspot_electronic_online_shop.csv
@@ -50,6 +51,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 
@@ -346,6 +348,14 @@ def classification_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, G
             {
                 "model__C": [0.1, 1.0, 10.0],
                 "model__solver": ["lbfgs"],
+            },
+        ),
+        "SVM": (
+            pipeline_for(SVC(random_state=RANDOM_STATE)),
+            {
+                "model__C": [0.1, 1.0, 10.0],
+                "model__kernel": ["linear", "rbf"],
+                "model__gamma": ["scale", "auto"],
             },
         ),
         "Neural Network Architecture 1": (

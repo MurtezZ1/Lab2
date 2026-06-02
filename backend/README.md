@@ -11,6 +11,7 @@ Safe-mode backend extension for the Electronic Online Shop. The React + Vite UI 
 - JWT access and refresh tokens
 - bcrypt
 - dotenv
+- Stripe payments
 
 ## Install
 
@@ -20,7 +21,16 @@ npm install
 copy .env.example .env
 ```
 
-Update `DATABASE_URL`, `JWT_ACCESS_SECRET`, and `JWT_REFRESH_SECRET` in `.env`.
+Update `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, and Stripe keys in `.env`.
+
+Stripe variables:
+
+```env
+STRIPE_SECRET_KEY=sk_test_your_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+STRIPE_CURRENCY=usd
+```
 
 ## Database
 
@@ -61,4 +71,7 @@ POST /api/auth/verify-email
 GET  /api/auth/me
 GET  /api/rbac/admin-only
 GET  /api/rbac/reports
+POST /api/payments/orders/:orderId/intent
+POST /api/payments/verify
+POST /api/payments/webhook
 ```

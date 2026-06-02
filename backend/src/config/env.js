@@ -14,6 +14,10 @@ export const env = {
   bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS ?? 12),
   mongoUrl: process.env.MONGO_URL ?? "",
   redisUrl: process.env.REDIS_URL ?? "",
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
+  stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY ?? "",
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
+  stripeCurrency: process.env.STRIPE_CURRENCY ?? "usd",
 };
 
 export function validateEnv() {

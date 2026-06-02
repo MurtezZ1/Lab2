@@ -114,7 +114,9 @@ model UserRole {
   user_id    String
   role_id    String
   created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
   created_by String?
+  updated_by String?
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   role       Role     @relation(fields: [role_id], references: [id], onDelete: Cascade)
 
@@ -142,7 +144,9 @@ model RolePermission {
   role_id       String
   permission_id String
   created_at    DateTime   @default(now())
+  updated_at    DateTime   @default(now()) @updatedAt
   created_by    String?
+  updated_by    String?
   role          Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
   permission    Permission @relation(fields: [permission_id], references: [id], onDelete: Cascade)
 
@@ -159,7 +163,9 @@ model RefreshToken {
   expires_at DateTime
   revoked_at DateTime?
   created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  updated_at DateTime  @default(now()) @updatedAt
+  created_by String?
+  updated_by String?
   user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
@@ -177,6 +183,9 @@ model AuditLog {
   user_agent String?
   metadata   Json?
   created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  created_by String?
+  updated_by String?
   user       User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
 
   @@index([user_id])
@@ -207,7 +216,7 @@ model Setting {
   key        String   @unique
   value      Json
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  updated_at DateTime @default(now()) @updatedAt
   created_by String?
   updated_by String?
 
@@ -321,7 +330,7 @@ model ProductImage {
   sort_order Int      @default(0)
   is_primary Boolean  @default(false)
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  updated_at DateTime @default(now()) @updatedAt
   created_by String?
   updated_by String?
   product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
@@ -365,7 +374,7 @@ model CartItem {
   quantity   Int      @default(1)
   unit_price Decimal  @db.Decimal(12, 2)
   created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  updated_at DateTime @default(now()) @updatedAt
   created_by String?
   updated_by String?
   cart       Cart     @relation(fields: [cart_id], references: [id], onDelete: Cascade)
@@ -382,7 +391,9 @@ model Wishlist {
   user_id    String
   product_id String
   created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
   created_by String?
+  updated_by String?
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
@@ -464,7 +475,7 @@ model Payment {
   id             String        @id @default(uuid())
   order_id       String
   provider       String
-  transaction_id String?
+  transaction_id String?       @unique
   amount         Decimal       @db.Decimal(12, 2)
   status         PaymentStatus @default(PENDING)
   paid_at        DateTime?
@@ -486,7 +497,9 @@ model PaymentLog {
   event      String
   payload    Json?
   created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
   created_by String?
+  updated_by String?
   payment    Payment  @relation(fields: [payment_id], references: [id], onDelete: Cascade)
 
   @@index([payment_id])
@@ -545,7 +558,10 @@ model CouponUsage {
   user_id    String
   order_id   String?
   used_at    DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
   created_by String?
+  updated_by String?
   coupon     Coupon   @relation(fields: [coupon_id], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 

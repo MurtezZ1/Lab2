@@ -1,0 +1,35 @@
+{
+  "name": "sunspot",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "start": "vite --host 0.0.0.0",
+    "preview": "vite preview --host 0.0.0.0",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.12.0",
+    "@stripe/react-stripe-js": "^6.6.0",
+    "@stripe/stripe-js": "^9.7.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "axios": "^1.16.1",
+    "framer-motion": "^12.39.0",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-redux": "^9.3.0",
+    "react-router-dom": "^7.16.0",
+    "socket.io-client": "^4.8.3",
+    "vite": "^8.0.16"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest"
+  }
+}

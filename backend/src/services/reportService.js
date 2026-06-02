@@ -35,10 +35,29 @@ export async function getReports(filters = {}) {
     ...(filters.categoryId ? { category_id: filters.categoryId } : {}),
     ...(filters.productId ? { id: filters.productId } : {}),
   };
+  const paymentOrderWhere = {
+    ...(filters.status ? { status: filters.status } : {}),
+    ...(filters.customerId ? { user_id: filters.customerId } : {}),
+  };
+  const paymentWhere = {
+    ...(Object.keys(dateWhere).length ? { created_at: dateWhere } : {}),
+    ...(Object.keys(paymentOrderWhere).length ? { order: paymentOrderWhere } : {}),
+  };
 
-  const [stats, revenue, ordersByStatus, topProducts, lowInventory] = await Promise.all([
+  const [stats, revenue, paidPayments, paymentsByStatus, ordersByStatus, topProducts, lowInventory] = await Promise.all([
     getDashboardStats(),
     prisma.order.aggregate({ where: orderWhere, _sum: { total: true, subtotal: true, tax_total: true } }),
+    prisma.payment.aggregate({
+      where: { ...paymentWhere, status: "COMPLETED" },
+      _sum: { amount: true },
+      _count: { id: true },
+    }),
+    prisma.payment.groupBy({
+      by: ["status"],
+      where: paymentWhere,
+      _count: { id: true },
+      _sum: { amount: true },
+    }),
     prisma.order.groupBy({ by: ["status"], where: orderWhere, _count: { id: true }, _sum: { total: true } }),
     prisma.orderItem.groupBy({
       by: ["product_id"],
@@ -64,9 +83,16 @@ export async function getReports(filters = {}) {
         orders: row._count.id,
         revenue: Number(row._sum.total ?? 0),
       })),
+      paymentsByStatus: paymentsByStatus.map((row) => ({
+        status: row.status,
+        payments: row._count.id,
+        amount: Number(row._sum.amount ?? 0),
+      })),
     },
     revenue: {
       totalRevenue: Number(revenue._sum.total ?? 0),
+      paidRevenue: Number(paidPayments._sum.amount ?? 0),
+      paidPayments: paidPayments._count.id,
       subtotal: Number(revenue._sum.subtotal ?? 0),
       tax: Number(revenue._sum.tax_total ?? 0),
     },

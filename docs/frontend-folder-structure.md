@@ -1,7 +1,12 @@
 # Frontend Folder Documentation
 
 ```text
-src/
+frontend/
+  package.json
+  vite.config.ts
+  tsconfig.json
+  public/
+  src/
   components/   Reusable UI components
   hooks/        Shared React hooks
   layouts/      App layouts

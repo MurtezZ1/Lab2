@@ -1,18 +1,22 @@
 {
-  "name": "sunspot",
+  "name": "sunspot-workspace",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
-    "start": "vite --host 0.0.0.0",
-    "preview": "vite preview --host 0.0.0.0",
-    "lint": "tsc --noEmit",
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "start": "npm run start --prefix frontend",
+    "preview": "npm run preview --prefix frontend",
+    "lint": "npm run lint --prefix frontend",
+    "frontend:install": "npm install --prefix frontend",
+    "frontend:dev": "npm run dev --prefix frontend",
+    "frontend:build": "npm run build --prefix frontend",
     "backend:install": "npm install --prefix backend",
     "backend:dev": "npm run dev --prefix backend",
     "backend:setup": "npm run db:setup --prefix backend",
     "backend:seed": "npm run prisma:seed --prefix backend",
     "backend:check": "npm run check --prefix backend",
+    "install:all": "npm install --prefix frontend && npm install --prefix backend",
     "infra:start": "docker compose up -d mongodb redis",
     "infra:stop": "docker compose stop mongodb redis",
     "infra:logs": "docker compose logs -f mongodb redis",
@@ -21,26 +25,5 @@
     "db:seed": "npm run prisma:seed --prefix backend",
     "db:setup": "npm run backend:setup",
     "postinstall": "npm run prisma:generate --prefix backend"
-  },
-  "dependencies": {
-    "@reduxjs/toolkit": "^2.12.0",
-    "@vitejs/plugin-react": "^6.0.2",
-    "axios": "^1.16.1",
-    "framer-motion": "^12.39.0",
-    "lucide-react": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-redux": "^9.3.0",
-    "react-router-dom": "^7.16.0",
-    "socket.io-client": "^4.8.3",
-    "vite": "^8.0.16"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "tailwindcss": "latest",
-    "typescript": "latest"
   }
 }

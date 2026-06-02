@@ -53,8 +53,19 @@ export type Order = {
   orderNumber: string;
   status: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "RETURNED" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
   total: number;
+  subtotal?: number;
+  taxTotal?: number;
+  shippingTotal?: number;
+  discountTotal?: number;
   createdAt: string;
   items: CartItem[];
+  payments?: Array<{
+    id: string;
+    provider: string;
+    transaction_id?: string;
+    amount: number;
+    status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+  }>;
 };
 
 export type Notification = {

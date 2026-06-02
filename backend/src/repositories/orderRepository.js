@@ -18,7 +18,7 @@ export async function createOrderWithItems({ userId, items, addressId = null }) 
       user_id: userId,
       address_id: addressId,
       order_number: `SUN-${Date.now()}`,
-      status: "PROCESSING",
+      status: "PENDING",
       subtotal,
       tax_total: taxTotal,
       shipping_total: shippingTotal,
@@ -38,7 +38,7 @@ export async function createOrderWithItems({ userId, items, addressId = null }) 
       },
       payments: {
         create: {
-          provider: "Manual",
+          provider: "Stripe",
           amount: total,
           status: "PENDING",
           created_by: userId,

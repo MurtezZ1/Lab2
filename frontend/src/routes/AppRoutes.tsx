@@ -15,6 +15,8 @@ const HomePage = lazy(() => import("@/pages/HomePage"));
 const NotificationsPage = lazy(() => import("@/pages/NotificationsPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 const OrderHistoryPage = lazy(() => import("@/pages/OrderHistoryPage"));
+const PaymentFailedPage = lazy(() => import("@/pages/PaymentFailedPage"));
+const PaymentSuccessPage = lazy(() => import("@/pages/PaymentSuccessPage"));
 const ProductDetailsPage = lazy(() => import("@/pages/ProductDetailsPage"));
 const ProductsPage = lazy(() => import("@/pages/ProductsPage"));
 const SupportTicketsPage = lazy(() => import("@/pages/SupportTicketsPage"));
@@ -41,6 +43,8 @@ export function AppRoutes() {
           <Route element={<ProtectedRoute />}>
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/payment-success" element={<PaymentSuccessPage />} />
+            <Route path="/payment-failed" element={<PaymentFailedPage />} />
             <Route path="/orders" element={<OrderHistoryPage />} />
             <Route path="/dashboard" element={<UserDashboardPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
