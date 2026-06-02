@@ -30,6 +30,8 @@ export type User = {
   password: string;
   role: string;
   active: number;
+  accessToken?: string;
+  refreshToken?: string;
 };
 
 export type CartItem = {
@@ -39,4 +41,28 @@ export type CartItem = {
   price: number;
   quantity: number;
   subtotal: number;
+};
+
+export type Order = {
+  id: string;
+  orderNumber: string;
+  status: "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  total: number;
+  createdAt: string;
+  items: CartItem[];
+};
+
+export type Notification = {
+  id: string;
+  title: string;
+  message: string;
+  unread: boolean;
+  createdAt: string;
+};
+
+export type SupportTicket = {
+  id: string;
+  subject: string;
+  status: "Open" | "In Progress" | "Resolved";
+  createdAt: string;
 };

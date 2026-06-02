@@ -6,7 +6,9 @@ import { useState, useTransition } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCartItems } from "@/redux/slices/cartSlice";
+import { setWishlistItems } from "@/redux/slices/wishlistSlice";
 import { addProductToCart } from "@/services/cartService";
+import { toggleWishlist } from "@/services/wishlistService";
 import type { Product } from "@/types";
 
 interface ProductProps {
@@ -24,6 +26,30 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const product: Product = {
+    id,
+    name,
+    price,
+    image,
+    manufacturer,
+    model: "",
+    type: "laptop",
+    year: null,
+    processor: null,
+    ram_size: null,
+    storage: null,
+    display: null,
+    os: null,
+    battery: null,
+    weight: null,
+    dimensions: null,
+    keyboard: null,
+    ports: null,
+    connectivity: null,
+    camera: null,
+    additional_features: null,
+    description: null,
+  };
 
   const handleAddToCart = () => {
     startTransition(async () => {
@@ -32,30 +58,6 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
         return;
       }
 
-      const product: Product = {
-        id,
-        name,
-        price,
-        image,
-        manufacturer,
-        model: "",
-        type: "laptop",
-        year: null,
-        processor: null,
-        ram_size: null,
-        storage: null,
-        display: null,
-        os: null,
-        battery: null,
-        weight: null,
-        dimensions: null,
-        keyboard: null,
-        ports: null,
-        connectivity: null,
-        camera: null,
-        additional_features: null,
-        description: null,
-      };
       dispatch(setCartItems(addProductToCart(user, product)));
       setIsAdded(true);
       setShowNotice(true);
@@ -70,7 +72,11 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
       className="glass-card rounded-2xl p-4 flex flex-col gap-4 group relative overflow-hidden"
     >
       <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 translate-x-4 group-hover:translate-x-0 duration-300">
-        <button className="bg-white/10 hover:bg-primary text-white p-2 rounded-full backdrop-blur-md transition-colors">
+        <button
+          type="button"
+          onClick={() => dispatch(setWishlistItems(toggleWishlist(user, product)))}
+          className="bg-white/10 hover:bg-primary text-white p-2 rounded-full backdrop-blur-md transition-colors"
+        >
           <Heart className="w-4 h-4" />
         </button>
       </div>

@@ -1,4 +1,4 @@
-import { LogOut, ShieldCheck, User } from "lucide-react";
+import { LogOut, ShieldCheck, Upload, User } from "lucide-react";
 import LoginForm from "@/pages/account/LoginForm";
 import RegisterForm from "@/pages/account/RegisterForm";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -56,6 +56,15 @@ export default function AccountPage() {
                 <p className="text-xs text-gray-400">Role: {user.role}</p>
               </div>
             </div>
+
+            <label className="rounded-xl border border-white/10 bg-black/30 p-4 flex items-center gap-3 cursor-pointer">
+              <Upload className="w-5 h-5 text-primary" />
+              <div>
+                <p className="text-sm font-semibold text-white">Avatar Upload</p>
+                <p className="text-xs text-gray-400">Choose a profile image.</p>
+              </div>
+              <input type="file" accept="image/*" className="hidden" />
+            </label>
 
             <button onClick={handleLogout} className="w-full border border-white/10 text-gray-200 py-3 rounded-xl font-bold hover:bg-white/5 transition-colors flex items-center justify-center gap-2">
               <LogOut className="w-5 h-5" />

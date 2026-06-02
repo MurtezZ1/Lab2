@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Trash2, ShoppingBag } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCartItems } from "@/redux/slices/cartSlice";
@@ -15,6 +15,7 @@ export default function CartPage() {
   const user = useAppSelector((state) => state.auth.user);
   const items = useAppSelector((state) => state.cart.items);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const cart = getCartSummary(items);
 
   const addOne = async (productId: number) => {
@@ -108,7 +109,7 @@ export default function CartPage() {
               </div>
             </div>
 
-            <button disabled={!user || items.length === 0} className="w-full mt-8 bg-primary text-white py-4 rounded-xl font-bold hover:bg-primary/90 transition-colors hover:shadow-[0_0_20px_rgba(10,132,255,0.3)] flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50">
+            <button onClick={() => navigate("/checkout")} disabled={!user || items.length === 0} className="w-full mt-8 bg-primary text-white py-4 rounded-xl font-bold hover:bg-primary/90 transition-colors hover:shadow-[0_0_20px_rgba(10,132,255,0.3)] flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50">
               Proceed to Checkout
               <ArrowRight className="w-5 h-5" />
             </button>
