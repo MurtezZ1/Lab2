@@ -18,9 +18,9 @@ export default function CartPage() {
   const navigate = useNavigate();
   const cart = getCartSummary(items);
 
-  const addOne = async (productId: number) => {
+  const addOne = async (productId: number | string) => {
     const product = await getProductById(productId);
-    if (product) dispatch(setCartItems(addProductToCart(user, product)));
+    if (product) dispatch(setCartItems(await addProductToCart(user, product)));
   };
 
   return (
@@ -67,7 +67,7 @@ export default function CartPage() {
 
               <div className="flex items-center gap-4">
                 <div className="flex items-center bg-black/50 rounded-lg border border-white/10">
-                  <button type="button" onClick={() => dispatch(setCartItems(removeOneFromCart(user, item.productId)))} className="px-3 py-1 text-gray-400 hover:text-white" aria-label={`Remove one ${item.name}`}>
+                  <button type="button" onClick={async () => dispatch(setCartItems(await removeOneFromCart(user, item.productId)))} className="px-3 py-1 text-gray-400 hover:text-white" aria-label={`Remove one ${item.name}`}>
                     -
                   </button>
                   <span className="px-3 py-1 text-white text-sm font-medium border-x border-white/10">{item.quantity}</span>
@@ -75,7 +75,7 @@ export default function CartPage() {
                     +
                   </button>
                 </div>
-                <button type="button" onClick={() => dispatch(setCartItems(removeProductFromCart(user, item.productId)))} className="p-2 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-lg transition-colors" aria-label={`Remove ${item.name} from cart`}>
+                <button type="button" onClick={async () => dispatch(setCartItems(await removeProductFromCart(user, item.productId)))} className="p-2 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-lg transition-colors" aria-label={`Remove ${item.name} from cart`}>
                   <Trash2 className="w-5 h-5" />
                 </button>
               </div>

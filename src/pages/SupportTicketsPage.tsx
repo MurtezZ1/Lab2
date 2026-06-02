@@ -1,24 +1,23 @@
 import type { SupportTicket } from "@/types";
 import { LifeBuoy, Send } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { createSupportTicket, getSupportTickets } from "@/services/supportService";
 
 export default function SupportTicketsPage() {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
 
-  const submitTicket = (event: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    getSupportTickets().then(setTickets).catch(() => setTickets([]));
+  }, []);
+
+  const submitTicket = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const subject = String(formData.get("subject") ?? "").trim();
+    const message = String(formData.get("message") ?? "").trim();
     if (!subject) return;
-    setTickets([
-      {
-        id: crypto.randomUUID(),
-        subject,
-        status: "Open",
-        createdAt: new Date().toISOString(),
-      },
-      ...tickets,
-    ]);
+    const ticket = await createSupportTicket({ subject, message });
+    setTickets([ticket, ...tickets]);
     event.currentTarget.reset();
   };
 
@@ -37,7 +36,7 @@ export default function SupportTicketsPage() {
           </label>
           <label className="block">
             <span className="text-sm text-gray-300">Message</span>
-            <textarea rows={5} className="mt-2 w-full resize-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
+            <textarea name="message" rows={5} className="mt-2 w-full resize-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
           </label>
           <button className="w-full rounded-xl bg-primary py-3 font-bold text-white hover:bg-primary/90 flex items-center justify-center gap-2">
             <Send className="w-5 h-5" /> Submit Ticket

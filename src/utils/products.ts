@@ -8,11 +8,12 @@ const stringifySpec = (value: unknown): string | null => {
 };
 
 export const normalizeProduct = (product: RawProduct): Product => ({
-  id: Number(product.id),
+  id: Number.isNaN(Number(product.id)) ? String(product.id) : Number(product.id),
+  uuid: product.uuid == null ? undefined : String(product.uuid),
   name: String(product.name ?? ""),
-  manufacturer: String(product.manufacturer ?? ""),
+  manufacturer: String(product.manufacturer ?? (product.brand as { name?: string } | null)?.name ?? ""),
   model: String(product.model ?? ""),
-  type: String(product.type ?? "laptop"),
+  type: String(product.type ?? (product.category as { slug?: string; name?: string } | null)?.slug ?? "laptop"),
   year: product.year == null ? null : Number(product.year),
   price: Number(product.price ?? 0),
   processor: product.processor == null ? null : String(product.processor),

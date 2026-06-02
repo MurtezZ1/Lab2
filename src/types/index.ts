@@ -1,5 +1,6 @@
 export type Product = {
-  id: number;
+  id: number | string;
+  uuid?: string;
   name: string;
   manufacturer: string;
   model: string;
@@ -24,18 +25,22 @@ export type Product = {
 };
 
 export type User = {
-  id: number;
+  id: number | string;
   email: string;
   username: string;
-  password: string;
+  password?: string;
   role: string;
   active: number;
+  roles?: string[];
+  permissions?: string[];
   accessToken?: string;
   refreshToken?: string;
 };
 
 export type CartItem = {
-  productId: number;
+  id?: string;
+  productId: number | string;
+  productUuid?: string;
   name: string;
   image: string;
   price: number;
@@ -46,7 +51,7 @@ export type CartItem = {
 export type Order = {
   id: string;
   orderNumber: string;
-  status: "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  status: "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "RETURNED" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
   total: number;
   createdAt: string;
   items: CartItem[];
@@ -63,6 +68,7 @@ export type Notification = {
 export type SupportTicket = {
   id: string;
   subject: string;
-  status: "Open" | "In Progress" | "Resolved";
+  status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED" | "Open" | "In Progress" | "Resolved";
   createdAt: string;
+  messages?: Array<{ id: string; message: string; created_at?: string }>;
 };

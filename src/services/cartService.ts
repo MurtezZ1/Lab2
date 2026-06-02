@@ -1,76 +1,54 @@
 import type { CartItem, Product, User } from "@/types";
+import { apiClient } from "@/services/apiClient";
 
-const cartKey = (user: User | null) => `sunspot_cart_${user?.id ?? "guest"}`;
-
-export function getCartItems(user: User | null): CartItem[] {
-  const storedCart = window.localStorage.getItem(cartKey(user));
-  return storedCart ? (JSON.parse(storedCart) as CartItem[]) : [];
+export async function getCartItems(user: User | null): Promise<CartItem[]> {
+  if (!user) return [];
+  const { data } = await apiClient.get("/cart");
+  return data.data.items;
 }
 
-export function saveCartItems(user: User | null, items: CartItem[]) {
-  window.localStorage.setItem(cartKey(user), JSON.stringify(items));
+export async function saveCartItems(user: User | null, items: CartItem[]) {
+  if (!user) {
+    return [];
+  }
+  if (items.length === 0) {
+    const { data } = await apiClient.delete("/cart");
+    return data.data.items;
+  }
+  return getCartItems(user);
 }
 
-export function addProductToCart(user: User | null, product: Product) {
-  const items = getCartItems(user);
-  const existingItem = items.find((item) => item.productId === product.id);
+export async function addProductToCart(user: User | null, product: Product) {
+  if (!user) {
+    throw new Error("You must be signed in to use the cart.");
+  }
 
-  const nextItems = existingItem
-    ? items.map((item) =>
-        item.productId === product.id
-          ? {
-              ...item,
-              quantity: item.quantity + 1,
-              subtotal: product.price * (item.quantity + 1),
-            }
-          : item,
-      )
-    : [
-        ...items,
-        {
-          productId: product.id,
-          name: product.name,
-          image: product.image,
-          price: product.price,
-          quantity: 1,
-          subtotal: product.price,
-        },
-      ];
-
-  saveCartItems(user, nextItems);
-  return nextItems;
+  const { data } = await apiClient.post("/cart/items", { productId: product.id, quantity: 1 });
+  return data.data.items as CartItem[];
 }
 
-export function removeOneFromCart(user: User | null, productId: number) {
-  const items = getCartItems(user);
-  const nextItems = items
-    .map((item) =>
-      item.productId === productId
-        ? {
-            ...item,
-            quantity: item.quantity - 1,
-            subtotal: item.price * (item.quantity - 1),
-          }
-        : item,
-    )
-    .filter((item) => item.quantity > 0);
+export async function removeOneFromCart(user: User | null, productId: number | string) {
+  const items = await getCartItems(user);
+  const item = items.find((entry) => entry.productId === productId);
+  if (!item) return items;
+  const nextQuantity = item.quantity - 1;
 
-  saveCartItems(user, nextItems);
-  return nextItems;
+  if (!user) return [];
+
+  const { data } = await apiClient.put(`/cart/items/${productId}`, { quantity: nextQuantity });
+  return data.data.items as CartItem[];
 }
 
-export function removeProductFromCart(user: User | null, productId: number) {
-  const nextItems = getCartItems(user).filter((item) => item.productId !== productId);
-  saveCartItems(user, nextItems);
-  return nextItems;
+export async function removeProductFromCart(user: User | null, productId: number | string) {
+  if (!user) {
+    return [];
+  }
+  const { data } = await apiClient.delete(`/cart/items/${productId}`);
+  return data.data.items as CartItem[];
 }
 
 export function getCartSummary(items: CartItem[]) {
   const subtotal = items.reduce((total, item) => total + item.subtotal, 0);
   const tax = subtotal * 0.08;
-  return {
-    subtotal,
-    tax,
-    total: subtotal + tax,
-  };
+  return { subtotal, tax, total: subtotal + tax };
 }

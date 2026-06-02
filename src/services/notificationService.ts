@@ -1,35 +1,14 @@
-import type { Notification } from "@/types";
+import type { Notification, User } from "@/types";
+import { apiClient } from "@/services/apiClient";
 
-const KEY = "sunspot_notifications";
-
-const initialNotifications: Notification[] = [
-  {
-    id: "stock-alert",
-    title: "Stock alert",
-    message: "A saved product is almost out of stock.",
-    unread: true,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "order-update",
-    title: "Order update",
-    message: "Your latest order status will appear here.",
-    unread: false,
-    createdAt: new Date().toISOString(),
-  },
-];
-
-export function getNotifications() {
-  const value = window.localStorage.getItem(KEY);
-  if (!value) {
-    window.localStorage.setItem(KEY, JSON.stringify(initialNotifications));
-    return initialNotifications;
-  }
-  return JSON.parse(value) as Notification[];
+export async function getNotifications(user?: User | null) {
+  if (!user) return [] as Notification[];
+  const { data } = await apiClient.get("/notifications");
+  return data.data as Notification[];
 }
 
-export function markNotificationsRead() {
-  const next = getNotifications().map((item) => ({ ...item, unread: false }));
-  window.localStorage.setItem(KEY, JSON.stringify(next));
-  return next;
+export async function markNotificationsRead(user?: User | null) {
+  if (!user) return [] as Notification[];
+  await apiClient.put("/notifications/read");
+  return getNotifications(user);
 }

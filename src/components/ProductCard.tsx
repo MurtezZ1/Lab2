@@ -12,14 +12,15 @@ import { toggleWishlist } from "@/services/wishlistService";
 import type { Product } from "@/types";
 
 interface ProductProps {
-  id: number;
+  id: number | string;
+  uuid?: string;
   name: string;
   price: number;
   image: string;
   manufacturer: string;
 }
 
-export default function ProductCard({ id, name, price, image, manufacturer }: ProductProps) {
+export default function ProductCard({ id, uuid, name, price, image, manufacturer }: ProductProps) {
   const [isAdded, setIsAdded] = useState(false);
   const [showNotice, setShowNotice] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -28,6 +29,7 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
   const navigate = useNavigate();
   const product: Product = {
     id,
+    uuid,
     name,
     price,
     image,
@@ -58,7 +60,7 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
         return;
       }
 
-      dispatch(setCartItems(addProductToCart(user, product)));
+      dispatch(setCartItems(await addProductToCart(user, product)));
       setIsAdded(true);
       setShowNotice(true);
       setTimeout(() => setIsAdded(false), 1500);
@@ -74,7 +76,13 @@ export default function ProductCard({ id, name, price, image, manufacturer }: Pr
       <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 translate-x-4 group-hover:translate-x-0 duration-300">
         <button
           type="button"
-          onClick={() => dispatch(setWishlistItems(toggleWishlist(user, product)))}
+          onClick={async () => {
+            if (!user) {
+              navigate("/account");
+              return;
+            }
+            dispatch(setWishlistItems(await toggleWishlist(user, product)));
+          }}
           className="bg-white/10 hover:bg-primary text-white p-2 rounded-full backdrop-blur-md transition-colors"
         >
           <Heart className="w-4 h-4" />

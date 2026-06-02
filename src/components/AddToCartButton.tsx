@@ -26,7 +26,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
         return;
       }
 
-      dispatch(setCartItems(addProductToCart(user, product)));
+      dispatch(setCartItems(await addProductToCart(user, product)));
       setIsAdded(true);
       setShowNotice(true);
       setTimeout(() => setIsAdded(false), 2000);

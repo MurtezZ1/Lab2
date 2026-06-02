@@ -1,33 +1,25 @@
+import axios from "axios";
 import type { User } from "@/types";
 
-const USERS_KEY = "sunspot_users";
 const CURRENT_USER_KEY = "sunspot_current_user";
 const ACCESS_TOKEN_KEY = "sunspot_access_token";
 const REFRESH_TOKEN_KEY = "sunspot_refresh_token";
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000/api";
 
-const defaultUsers: User[] = [
-  {
-    id: 1,
-    email: "admin@sunspot.com",
-    username: "admin",
-    password: "AdminPassword123!",
-    role: "admin",
-    active: 1,
-  },
-];
+type AuthResponse = {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+};
 
-function getUsers() {
-  const storedUsers = window.localStorage.getItem(USERS_KEY);
-  if (!storedUsers) {
-    window.localStorage.setItem(USERS_KEY, JSON.stringify(defaultUsers));
-    return defaultUsers;
-  }
+const authClient = axios.create({ baseURL: API_URL });
 
-  return JSON.parse(storedUsers) as User[];
-}
-
-function saveUsers(users: User[]) {
-  window.localStorage.setItem(USERS_KEY, JSON.stringify(users));
+function normalizeUser(user: User): User {
+  return {
+    ...user,
+    role: user.role ?? user.roles?.[0] ?? "Customer",
+    active: user.active ?? 1,
+  };
 }
 
 export function getCurrentUser() {
@@ -47,63 +39,45 @@ export function saveAuthTokens(accessToken?: string, refreshToken?: string) {
   if (refreshToken) window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 }
 
-function issueLocalTokens(user: User) {
-  const accessToken = `local-access-${user.id}-${Date.now()}`;
-  const refreshToken = `local-refresh-${user.id}-${Date.now()}`;
-  saveAuthTokens(accessToken, refreshToken);
-  return { ...user, accessToken, refreshToken };
+function saveSession(data: AuthResponse) {
+  const user = normalizeUser({ ...data.user, accessToken: data.accessToken, refreshToken: data.refreshToken });
+  saveAuthTokens(data.accessToken, data.refreshToken);
+  window.localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+  return user;
 }
 
-export function registerUser(input: {
+export async function registerUser(input: {
   username: string;
   email: string;
   password: string;
   confirmPassword: string;
 }) {
-  if (!input.username || !input.email || !input.password || !input.confirmPassword) {
-    throw new Error("Please fill in all register fields.");
-  }
-  if (input.password.length < 8) throw new Error("Password must be at least 8 characters.");
   if (input.password !== input.confirmPassword) throw new Error("Passwords do not match.");
-
-  const users = getUsers();
-  const exists = users.some(
-    (user) =>
-      user.email.toLowerCase() === input.email.toLowerCase() ||
-      user.username.toLowerCase() === input.username.toLowerCase(),
-  );
-
-  if (exists) throw new Error("A user with this email or username already exists.");
-
-  const user: User = {
-    id: Date.now(),
-    email: input.email,
+  const { data } = await authClient.post<{ data: AuthResponse }>("/auth/register", {
     username: input.username,
+    email: input.email,
     password: input.password,
-    role: "user",
-    active: 1,
-  };
-
-  saveUsers([...users, user]);
-  const sessionUser = issueLocalTokens(user);
-  window.localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(sessionUser));
-  return sessionUser;
+  });
+  return saveSession(data.data);
 }
 
-export function loginUser(input: { email: string; password: string }) {
-  if (!input.email || !input.password) throw new Error("Please fill in both email and password.");
-  const user = getUsers().find(
-    (entry) =>
-      entry.email.toLowerCase() === input.email.toLowerCase() &&
-      entry.password === input.password,
-  );
-  if (!user) throw new Error("Invalid email or password.");
-  const sessionUser = issueLocalTokens(user);
-  window.localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(sessionUser));
-  return sessionUser;
+export async function loginUser(input: { email: string; password: string }) {
+  const { data } = await authClient.post<{ data: AuthResponse }>("/auth/login", input);
+  return saveSession(data.data);
 }
 
-export function logoutUser() {
+export async function refreshSession() {
+  const { refreshToken } = getAuthTokens();
+  if (!refreshToken) return null;
+  const { data } = await authClient.post<{ data: AuthResponse }>("/auth/refresh-token", { refreshToken });
+  return saveSession(data.data);
+}
+
+export async function logoutUser() {
+  const { refreshToken } = getAuthTokens();
+  if (refreshToken) {
+    await authClient.post("/auth/logout", { refreshToken }).catch(() => undefined);
+  }
   window.localStorage.removeItem(CURRENT_USER_KEY);
   window.localStorage.removeItem(ACCESS_TOKEN_KEY);
   window.localStorage.removeItem(REFRESH_TOKEN_KEY);

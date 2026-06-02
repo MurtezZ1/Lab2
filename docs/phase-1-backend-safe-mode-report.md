@@ -7,8 +7,8 @@ This phase extends the project with a backend foundation. It does not redesign t
 ## Compatibility
 
 - React + Vite frontend remains unchanged.
-- Existing product source `public/sunspot_products.json` remains available.
-- Existing MySQL Prisma schema in `public/prisma/schema.prisma` is left untouched for compatibility.
+- Legacy product seed artifacts remain only for history and are not used by the React frontend runtime.
+- Legacy database artifacts remain only for history and are not referenced by active root database scripts.
 - New PostgreSQL Prisma schema is isolated in `backend/prisma/schema.prisma`.
 
 ## Database Changes
@@ -50,5 +50,5 @@ The backend PostgreSQL schema includes:
 ## Risks
 
 - PostgreSQL must be installed and running before migrations can be applied.
-- The frontend still uses localStorage/JSON services until Phase 2 connects it to backend APIs.
+- The frontend is now connected to backend APIs for the primary application workflows.
 - Existing MySQL local database files are not migrated automatically into PostgreSQL; seed uses the current product JSON.

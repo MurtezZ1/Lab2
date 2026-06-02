@@ -1,6 +1,7 @@
 import ProductCard from "@/components/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
 import { getPersonalizedRecommendations } from "@/services/recommendationService";
+import { getCmsContent, type CmsContent } from "@/services/cmsService";
 import { ArrowRight, Star, Zap, Shield, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -9,9 +10,11 @@ import type { Product } from "@/types";
 export default function HomePage() {
   const { products } = useProducts({ take: 4 });
   const [recommendations, setRecommendations] = useState<Product[]>([]);
+  const [cms, setCms] = useState<CmsContent | null>(null);
 
   useEffect(() => {
     getPersonalizedRecommendations().then(setRecommendations);
+    getCmsContent().then(setCms).catch(() => undefined);
   }, []);
 
   return (
@@ -31,14 +34,14 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-black text-white leading-tight">
-              Elevate Your <br />
+              {(cms?.hero.title ?? "Elevate Your Digital Lifestyle").replace("Digital Lifestyle", "")} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
                 Digital Lifestyle
               </span>
             </h1>
 
             <p className="text-lg text-gray-400 max-w-xl mx-auto lg:mx-0">
-              Discover the most premium selection of laptops, smartphones, and accessories. Engineered for perfection, designed for you.
+              {cms?.hero.subtitle ?? "Discover the most premium selection of laptops, smartphones, and accessories. Engineered for perfection, designed for you."}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-4 justify-center lg:justify-start">
@@ -127,7 +130,7 @@ export default function HomePage() {
       <section className="container mx-auto px-6">
         <div className="flex items-end justify-between mb-10">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2">Trending Now</h2>
+            <h2 className="text-3xl font-bold text-white mb-2">{cms?.homepage.featuredTitle ?? "Trending Now"}</h2>
             <p className="text-gray-400">The most sought-after tech this week.</p>
           </div>
           <Link to="/products" className="hidden sm:flex items-center gap-2 text-primary hover:text-accent transition-colors font-medium">

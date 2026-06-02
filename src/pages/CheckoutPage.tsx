@@ -14,11 +14,11 @@ export default function CheckoutPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const placeOrder = () => {
-    createOrder(user, items, summary.total);
-    saveCartItems(user, []);
+  const placeOrder = async () => {
+    await createOrder(user, items, summary.total);
+    await saveCartItems(user, []);
     dispatch(setCartItems([]));
-    dispatch(setOrders(getOrders(user)));
+    dispatch(setOrders(await getOrders(user)));
     navigate("/orders");
   };
 

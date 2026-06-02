@@ -9,8 +9,8 @@ export default function AccountPage() {
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
 
-  const handleLogout = () => {
-    logoutUser();
+  const handleLogout = async () => {
+    await logoutUser();
     dispatch(setUser(null));
   };
 

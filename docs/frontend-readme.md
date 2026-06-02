@@ -35,4 +35,4 @@ npm run build
 
 `src/services/apiClient.ts` configures Axios with JWT access tokens and refresh token retry handling.
 
-Current frontend behavior remains compatible with localStorage services until backend endpoints are connected feature by feature.
+Current frontend behavior is connected to the Express backend for authentication, products, cart, orders, wishlist, notifications, support tickets, CMS, reports, and recommendations.

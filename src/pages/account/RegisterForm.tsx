@@ -9,14 +9,14 @@ export default function RegisterForm() {
   const [pending, setPending] = useState(false);
   const dispatch = useAppDispatch();
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setPending(true);
     setMessage("");
 
     try {
       const formData = new FormData(event.currentTarget);
-      const user = registerUser({
+      const user = await registerUser({
         username: String(formData.get("username") ?? ""),
         email: String(formData.get("email") ?? ""),
         password: String(formData.get("password") ?? ""),

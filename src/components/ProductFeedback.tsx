@@ -1,19 +1,12 @@
-"use client";
-
 import { MessageSquare, Send, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useAppSelector } from "@/redux/hooks";
+import { createReview, getReviews } from "@/services/reviewService";
 
 type ProductFeedbackProps = {
-  productId: number;
+  productId: number | string;
   compact?: boolean;
 };
-
-type StoredFeedback = {
-  rating: number;
-  comment: string;
-};
-
-const getStorageKey = (productId: number) => `sunspot_feedback_${productId}`;
 
 export default function ProductFeedback({ productId, compact = false }: ProductFeedbackProps) {
   const [rating, setRating] = useState(0);
@@ -21,19 +14,14 @@ export default function ProductFeedback({ productId, compact = false }: ProductF
   const [comment, setComment] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const user = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
-    const savedFeedback = window.localStorage.getItem(getStorageKey(productId));
-
-    if (!savedFeedback) return;
-
-    try {
-      const parsedFeedback = JSON.parse(savedFeedback) as StoredFeedback;
-      setRating(parsedFeedback.rating);
-      setComment(parsedFeedback.comment);
-    } catch {
-      window.localStorage.removeItem(getStorageKey(productId));
-    }
+    getReviews(productId).then((reviews) => {
+      const latest = reviews[0];
+      if (latest?.rating) setRating(latest.rating);
+      if (latest?.comment) setComment(latest.comment);
+    }).catch(() => undefined);
   }, [productId]);
 
   const visibleRating = hoveredRating || rating;
@@ -42,16 +30,10 @@ export default function ProductFeedback({ productId, compact = false }: ProductF
     return compact ? `${rating}/5` : `Your rating: ${rating}/5`;
   }, [compact, rating]);
 
-  const saveFeedback = () => {
+  const saveFeedback = async () => {
     if (rating === 0 && comment.trim().length === 0) return;
-
-    window.localStorage.setItem(
-      getStorageKey(productId),
-      JSON.stringify({
-        rating,
-        comment: comment.trim(),
-      } satisfies StoredFeedback),
-    );
+    if (!user) return;
+    await createReview(productId, { rating, comment: comment.trim() });
 
     setIsSaved(true);
     setIsOpen(false);

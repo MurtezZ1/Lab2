@@ -1,19 +1,13 @@
-import { getProducts } from "@/services/productService";
+import type { Product } from "@/types";
+import { apiClient } from "@/services/apiClient";
+import { normalizeProduct } from "@/utils/products";
 
-export async function getSimilarProducts(productId?: number) {
-  const products = await getProducts();
-  const current = products.find((product) => product.id === productId);
-  if (!current) return products.slice(0, 4);
-  return products
-    .filter(
-      (product) =>
-        product.id !== current.id &&
-        (product.type === current.type || product.manufacturer === current.manufacturer),
-    )
-    .slice(0, 4);
+export async function getSimilarProducts(productId?: number | string) {
+  const { data } = await apiClient.get(`/recommendations/${productId ?? 1}`);
+  return (data.data.similarProducts ?? []).map(normalizeProduct) as Product[];
 }
 
 export async function getPersonalizedRecommendations() {
-  const products = await getProducts();
-  return products.slice(0, 4);
+  const { data } = await apiClient.get("/recommendations/1");
+  return (data.data.personalized ?? []).map(normalizeProduct) as Product[];
 }

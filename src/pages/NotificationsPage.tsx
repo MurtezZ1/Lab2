@@ -6,11 +6,12 @@ import { useEffect } from "react";
 
 export default function NotificationsPage() {
   const notifications = useAppSelector((state) => state.notifications.items);
+  const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setNotifications(getNotifications()));
-  }, [dispatch]);
+    getNotifications(user).then((items) => dispatch(setNotifications(items)));
+  }, [dispatch, user]);
 
   return (
     <div className="container mx-auto px-6 py-12">
@@ -19,7 +20,7 @@ export default function NotificationsPage() {
           <Bell className="w-8 h-8 text-primary" />
           Notifications
         </h1>
-        <button onClick={() => dispatch(setNotifications(markNotificationsRead()))} className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:bg-white/5">
+        <button onClick={async () => dispatch(setNotifications(await markNotificationsRead(user)))} className="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:bg-white/5">
           Mark all read
         </button>
       </div>

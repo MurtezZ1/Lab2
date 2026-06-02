@@ -12,7 +12,13 @@ export default function WishlistPage() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setWishlistItems(getWishlist(user)));
+    let active = true;
+    getWishlist(user).then((items) => {
+      if (active) dispatch(setWishlistItems(items));
+    });
+    return () => {
+      active = false;
+    };
   }, [dispatch, user]);
 
   return (

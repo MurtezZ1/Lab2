@@ -1,13 +1,116 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 const prisma = new PrismaClient();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const productsPath = path.resolve(__dirname, "..", "..", "public", "sunspot_products.json");
+
+const sampleProducts = [
+  {
+    id: 1,
+    name: "Lenovo L15 I7",
+    manufacturer: "Lenovo",
+    model: "L15 I7",
+    type: "laptop",
+    year: 2019,
+    price: 349.99,
+    processor: "Intel Core i7-8650U",
+    ram_size: "16GB DDR4",
+    storage: "512GB SSD + 1TB HDD",
+    image: "https://www.westcoast.co.uk/Images/Product/Default/large/ecc050e8ccd192d4cd723e6fbe652951.jpg",
+    description: "Powerful Lenovo laptop with Intel Core i7 processor, 16GB RAM, and hybrid storage.",
+  },
+  {
+    id: 2,
+    name: "HP Spectre XT Ultrabook",
+    manufacturer: "HP",
+    model: "Spectre XT Ultrabook",
+    type: "laptop",
+    year: 2019,
+    price: 349.99,
+    processor: "Intel Core i7-8550U",
+    ram_size: "16GB DDR4",
+    storage: "512GB SSD + 1TB HDD",
+    image: "https://support.hp.com/doc-images/813/c03406488.jpg",
+    description: "Stylish HP ultrabook with backlit keyboard, strong storage, and portable design.",
+  },
+  {
+    id: 3,
+    name: "Dell Inspiron 14",
+    manufacturer: "Dell",
+    model: "Inspiron 14",
+    type: "laptop",
+    year: 2020,
+    price: 899.99,
+    processor: "Intel Core i5-10210U",
+    ram_size: "8GB DDR4",
+    storage: "256GB SSD",
+    image: "https://www.gollo.com/media/catalog/product/1/0/1002010024-nuev-_2__0sxfcyq14j5niokb.jpg",
+    description: "Compact Dell laptop with reliable everyday performance.",
+  },
+  {
+    id: 4,
+    name: "Acer Aspire 5",
+    manufacturer: "Acer",
+    model: "Aspire 5",
+    type: "laptop",
+    year: 2021,
+    price: 599.99,
+    processor: "AMD Ryzen 5 4500U",
+    ram_size: "12GB DDR4",
+    storage: "512GB SSD",
+    image: "https://hnsgsfp.imgix.net/9/images/detailed/78/Acer_Aspire_5_15.6-inch_Laptop_-_Silver_(IMG_1).jpg",
+    description: "Acer laptop with Ryzen processor, Radeon graphics, and large SSD.",
+  },
+  {
+    id: 5,
+    name: "Samsung Galaxy S21",
+    manufacturer: "Samsung",
+    model: "Galaxy S21",
+    type: "smartphone",
+    year: 2021,
+    price: 799.99,
+    processor: "Exynos 2100 / Snapdragon 888",
+    ram_size: "8GB RAM",
+    storage: "128GB / 256GB",
+    image: "https://i.ebayimg.com/images/g/Jh8AAOSwk9pie--O/s-l500.jpg",
+    description: "Samsung smartphone with 5G connectivity and triple rear camera system.",
+  },
+  {
+    id: 6,
+    name: "Apple iPad Pro (2022)",
+    manufacturer: "Apple",
+    model: "iPad Pro (2022)",
+    type: "tablet",
+    year: 2022,
+    price: 1099.99,
+    processor: "Apple M2",
+    ram_size: "8GB RAM",
+    storage: "256GB / 512GB / 1TB / 2TB",
+    image: "https://ducttape.co.nz/media/cache/45/f4/45f44df6b27fe71a78846791a20fe1ff.jpg",
+    description: "Apple tablet with M2 chip, ProMotion display, and USB-C connectivity.",
+  },
+  {
+    id: 7,
+    name: "Sony Alpha A7III",
+    manufacturer: "Sony",
+    model: "Alpha A7III",
+    type: "camera",
+    year: 2018,
+    price: 1999.99,
+    image: "/file.svg",
+    description: "High-performance full-frame Sony camera with fast hybrid autofocus.",
+  },
+  {
+    id: 8,
+    name: "Fitbit Charge 5",
+    manufacturer: "Fitbit",
+    model: "Charge 5",
+    type: "fitness tracker",
+    year: 2022,
+    price: 149.99,
+    image: "/file.svg",
+    description: "Fitness tracker with GPS, stress tracking, SpO2 sensor, and long battery life.",
+  },
+];
 
 const roles = [
   { name: "Admin", description: "Full platform administrator." },
@@ -105,7 +208,7 @@ async function seedAdmin() {
 }
 
 async function seedCatalog(admin) {
-  const rawProducts = JSON.parse(await readFile(productsPath, "utf8"));
+  const rawProducts = sampleProducts;
 
   for (const rawProduct of rawProducts) {
     const categoryName = rawProduct.type ?? "laptop";

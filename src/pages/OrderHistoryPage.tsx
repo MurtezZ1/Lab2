@@ -11,7 +11,13 @@ export default function OrderHistoryPage() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setOrders(getOrders(user)));
+    let active = true;
+    getOrders(user).then((items) => {
+      if (active) dispatch(setOrders(items));
+    });
+    return () => {
+      active = false;
+    };
   }, [dispatch, user]);
 
   return (

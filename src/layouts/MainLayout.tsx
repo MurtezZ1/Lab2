@@ -13,14 +13,23 @@ export default function MainLayout() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setCartItems(getCartItems(user)));
+    let active = true;
+    getCartItems(user).then((items) => {
+      if (active) dispatch(setCartItems(items));
+    });
+    return () => {
+      active = false;
+    };
   }, [dispatch, user]);
 
   useEffect(() => {
+    let active = true;
+    getNotifications(user).then((items) => {
+      if (active) dispatch(setNotifications(items));
+    });
     connectSocket();
     const onNotification = (payload: { title: string; message: string }) => {
-      const current = getNotifications();
-      const next = [
+      dispatch(setNotifications([
         {
           id: crypto.randomUUID(),
           title: payload.title,
@@ -28,10 +37,7 @@ export default function MainLayout() {
           unread: true,
           createdAt: new Date().toISOString(),
         },
-        ...current,
-      ];
-      window.localStorage.setItem("sunspot_notifications", JSON.stringify(next));
-      dispatch(setNotifications(next));
+      ]));
     };
     socket.on("notification", onNotification);
     socket.on("order:update", onNotification);
@@ -39,8 +45,9 @@ export default function MainLayout() {
     return () => {
       socket.off("notification", onNotification);
       socket.off("order:update", onNotification);
+      active = false;
     };
-  }, [dispatch]);
+  }, [dispatch, user]);
 
   return (
     <main className="min-h-screen bg-dark-bg text-foreground selection:bg-primary selection:text-white">

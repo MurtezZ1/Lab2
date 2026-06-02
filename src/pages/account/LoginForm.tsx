@@ -9,14 +9,14 @@ export default function LoginForm() {
   const [pending, setPending] = useState(false);
   const dispatch = useAppDispatch();
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setPending(true);
     setMessage("");
 
     try {
       const formData = new FormData(event.currentTarget);
-      const user = loginUser({
+      const user = await loginUser({
         email: String(formData.get("email") ?? ""),
         password: String(formData.get("password") ?? ""),
       });

@@ -15,7 +15,7 @@ export default function ProductDetailsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProductById(Number(id))
+    getProductById(id)
       .then((item) => {
         setProduct(item);
         return getSimilarProducts(item?.id);

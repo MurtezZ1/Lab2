@@ -35,8 +35,8 @@ export const trackProductViewController = asyncHandler(async (req, res) => {
   res.json({ success: true });
 });
 
-export const reportsController = asyncHandler(async (_req, res) => {
-  res.json({ success: true, data: await getReports() });
+export const reportsController = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: await getReports(req.query) });
 });
 
 export const dashboardController = asyncHandler(async (_req, res) => {
@@ -46,7 +46,7 @@ export const dashboardController = asyncHandler(async (_req, res) => {
 });
 
 export const exportReportController = asyncHandler(async (req, res) => {
-  const reports = await getReports();
+  const reports = await getReports(req.query);
   const format = req.params.format;
   const rows = Object.entries(reports).map(([name, value]) => ({ name, value: JSON.stringify(value) }));
 
