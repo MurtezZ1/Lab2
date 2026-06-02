@@ -59,8 +59,20 @@ For model training, the integrated pipeline excludes:
 ## Installation
 
 ```bash
+npm install
 pip install -r requirements.txt
 ```
+
+## Database Setup
+
+Create a local MySQL database named `sunspot_db`, copy `.env.example` to `.env`, and update `DATABASE_URL` with your own MySQL username, password, host, and port.
+
+```bash
+copy .env.example .env
+npm run db:setup
+```
+
+`npm run db:setup` generates the Prisma client, runs the migration files from `public/prisma/migrations`, and seeds products from `public/sunspot_products.json`.
 
 ## Run The Main ML Pipeline
 
@@ -89,6 +101,7 @@ Including:
 ## Run The Web App
 
 ```bash
+npm run db:setup
 npm run dev
 ```
 

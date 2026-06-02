@@ -14,6 +14,7 @@ tsconfig.tsbuildinfo
 
 # Local runtime logs
 *.log
+.local_mysql/
 
 # Environment files
 .env
