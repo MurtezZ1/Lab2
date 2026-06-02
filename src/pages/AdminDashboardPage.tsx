@@ -1,7 +1,6 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
 import { BarChart3, Package, Upload, Users } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
-import { downloadReport } from "@/services/reportExportService";
 import {
   getAdminOrders,
   getAdminSupportTickets,
@@ -12,6 +11,14 @@ import {
 } from "@/services/adminService";
 import { getCmsContent, type CmsContent, updateCmsContent } from "@/services/cmsService";
 import type { Order, SupportTicket } from "@/types";
+
+const AdminManagementPanel = lazy(() => import("@/pages/admin/AdminManagementPanel"));
+const AdminCmsPanel = lazy(() => import("@/pages/admin/AdminCmsPanel"));
+const AdminReportsPanel = lazy(() => import("@/pages/admin/AdminReportsPanel"));
+
+function PanelLoader() {
+  return <div className="glass-card rounded-2xl p-6 mt-8 text-sm text-gray-400">Loading...</div>;
+}
 
 export default function AdminDashboardPage() {
   const { products } = useProducts();
@@ -82,64 +89,30 @@ export default function AdminDashboardPage() {
         <div className="glass-card rounded-2xl p-6"><BarChart3 className="w-7 h-7 text-purple-400" /><p className="mt-6 text-sm text-gray-400">Orders</p><h2 className="text-3xl font-black text-white">{orders.length}</h2></div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        <form onSubmit={createAdminProduct} className="glass-card rounded-2xl p-6 space-y-4">
-          <h2 className="text-xl font-bold text-white">Products Management</h2>
-          {["name", "manufacturer", "type", "price", "image"].map((field) => (
-            <input key={field} name={field} required={field !== "image"} placeholder={field} className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-          ))}
-          <textarea name="description" placeholder="description" className="w-full resize-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-          <button className="rounded-xl bg-primary px-4 py-2 font-bold text-white">Save Product</button>
-        </form>
-
-        <div className="glass-card rounded-2xl p-6 space-y-4">
-          <h2 className="text-xl font-bold text-white">Categories & Brands Management</h2>
-          <form onSubmit={(event) => createNamedEntity(event, "category")} className="flex gap-3">
-            <input name="name" placeholder="Category name" className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-            <button className="rounded-xl bg-primary px-4 py-2 font-bold text-white">Save</button>
-          </form>
-          <form onSubmit={(event) => createNamedEntity(event, "brand")} className="flex gap-3">
-            <input name="name" placeholder="Brand name" className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-            <button className="rounded-xl bg-primary px-4 py-2 font-bold text-white">Save</button>
-          </form>
-        </div>
-      </div>
+      <Suspense fallback={<PanelLoader />}>
+        <AdminManagementPanel
+          users={users}
+          orders={orders}
+          tickets={tickets}
+          onSaveNamedEntity={createNamedEntity}
+          onSaveProduct={createAdminProduct}
+        />
+      </Suspense>
 
       <div className="glass-card rounded-2xl p-6 mt-8">
         <h2 className="text-xl font-bold text-white flex items-center gap-2"><Upload className="w-5 h-5 text-primary" /> Product Image Upload</h2>
         <input type="file" accept="image/*" className="mt-4 block w-full text-sm text-gray-300 file:mr-4 file:rounded-xl file:border-0 file:bg-primary file:px-4 file:py-2 file:font-bold file:text-white" />
       </div>
 
-      <div className="glass-card rounded-2xl p-6 mt-8">
-        <h2 className="text-xl font-bold text-white">Orders / Users / Support Tickets Management</h2>
-        <div className="mt-4 grid md:grid-cols-3 gap-4 text-sm text-gray-300">
-          <div>Latest users: {users.slice(0, 3).map((user) => user.username).join(", ") || "none"}</div>
-          <div>Latest orders: {orders.slice(0, 3).map((order) => order.orderNumber).join(", ") || "none"}</div>
-          <div>Support tickets: {tickets.length}</div>
-        </div>
-      </div>
-
       {cms && (
-        <div className="glass-card rounded-2xl p-6 mt-8 space-y-4">
-          <h2 className="text-xl font-bold text-white">CMS Management</h2>
-          <input value={cms.hero.title} onChange={(event) => setCms({ ...cms, hero: { ...cms.hero, title: event.target.value } })} className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-          <input value={cms.hero.subtitle} onChange={(event) => setCms({ ...cms, hero: { ...cms.hero, subtitle: event.target.value } })} className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-          <input value={cms.homepage.featuredTitle} onChange={(event) => setCms({ ...cms, homepage: { featuredTitle: event.target.value } })} className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-          <input value={cms.footer.text} onChange={(event) => setCms({ ...cms, footer: { text: event.target.value } })} className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-          <input value={cms.about.text} onChange={(event) => setCms({ ...cms, about: { text: event.target.value } })} className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-          <input value={cms.contact.email} onChange={(event) => setCms({ ...cms, contact: { email: event.target.value } })} className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none" />
-          <button onClick={saveCms} className="rounded-xl bg-primary px-4 py-2 font-bold text-white">Save CMS</button>
-        </div>
+        <Suspense fallback={<PanelLoader />}>
+          <AdminCmsPanel cms={cms} onChange={setCms} onSave={saveCms} />
+        </Suspense>
       )}
 
-      <div className="glass-card rounded-2xl p-6 mt-8">
-        <h2 className="text-xl font-bold text-white">Reports Management</h2>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <button onClick={() => downloadReport("pdf")} className="rounded-xl bg-primary px-4 py-2 font-bold text-white">PDF Export</button>
-          <button onClick={() => downloadReport("excel")} className="rounded-xl border border-white/10 px-4 py-2 font-bold text-gray-200">Excel Export</button>
-          <button onClick={() => downloadReport("csv")} className="rounded-xl border border-white/10 px-4 py-2 font-bold text-gray-200">CSV Export</button>
-        </div>
-      </div>
+      <Suspense fallback={<PanelLoader />}>
+        <AdminReportsPanel />
+      </Suspense>
     </div>
   );
 }
