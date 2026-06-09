@@ -24,6 +24,7 @@ export type Product = {
   description: string | null;
   rating_average?: number;
   similarityScore?: number;
+  recommendationScore?: number;
 };
 
 export type User = {

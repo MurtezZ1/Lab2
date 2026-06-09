@@ -12,6 +12,7 @@ import {
 } from "../services/auditLogService.js";
 import {
   getFrequentlyBoughtTogether,
+  getPersonalizedRecommendationBundle,
   getPersonalizedRecommendations,
   getSimilarProducts,
   trackProductView,
@@ -38,6 +39,13 @@ export const recommendationsController = asyncHandler(async (req, res) => {
 
 export const similarProductsController = asyncHandler(async (req, res) => {
   res.json({ success: true, data: { similarProducts: await getSimilarProducts(req.params.productId) } });
+});
+
+export const personalizedRecommendationsController = asyncHandler(async (req, res) => {
+  res.json({
+    success: true,
+    data: await getPersonalizedRecommendationBundle(req.user?.id ?? null),
+  });
 });
 
 export const trackProductViewController = asyncHandler(async (req, res) => {

@@ -6,6 +6,7 @@ import {
   emitTestOrderController,
   exportReportController,
   getCmsController,
+  personalizedRecommendationsController,
   recommendationsController,
   reportsController,
   searchController,
@@ -14,12 +15,12 @@ import {
   updateCmsController,
   uploadController,
 } from "../controllers/advancedController.js";
-import { authenticate, authorizePermissions, authorizeRoles } from "../middleware/authMiddleware.js";
+import { authenticate, authorizePermissions, authorizeRoles, optionalAuthenticate } from "../middleware/authMiddleware.js";
 
 const router = Router();
 const upload = multer({ dest: "uploads/" });
 
-router.get("/search", searchController);
+router.get("/search", optionalAuthenticate, searchController);
 
 /**
  * @openapi
@@ -39,8 +40,23 @@ router.get("/search", searchController);
  *         description: Similar products with similarity scores.
  */
 router.get("/recommendations/similar/:productId", similarProductsController);
+
+/**
+ * @openapi
+ * /recommendations/personalized:
+ *   get:
+ *     summary: Get personalized and trending recommendations
+ *     tags:
+ *       - Recommendations
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Personalized, frequently bought together, and trending products.
+ */
+router.get("/recommendations/personalized", optionalAuthenticate, personalizedRecommendationsController);
 router.get("/recommendations/:productId", recommendationsController);
-router.post("/recommendations/view", trackProductViewController);
+router.post("/recommendations/view", optionalAuthenticate, trackProductViewController);
 router.get("/reports", reportsController);
 router.get("/reports/export/:format", exportReportController);
 router.get("/dashboard", dashboardController);

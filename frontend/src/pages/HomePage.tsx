@@ -1,19 +1,35 @@
 import ProductCard from "@/components/ProductCard";
+import RecommendationSection from "@/components/RecommendationSection";
 import { useProducts } from "@/hooks/useProducts";
-import { getPersonalizedRecommendations } from "@/services/recommendationService";
+import {
+  getPersonalizedRecommendations,
+  type PersonalizedRecommendationBundle,
+} from "@/services/recommendationService";
 import { getCmsContent, type CmsContent } from "@/services/cmsService";
 import { ArrowRight, Star, Zap, Shield, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import type { Product } from "@/types";
+
+const initialRecommendations: PersonalizedRecommendationBundle = {
+  personalizedProducts: [],
+  frequentlyBoughtTogether: [],
+  trendingProducts: [],
+  fallback: false,
+  signals: [],
+};
 
 export default function HomePage() {
   const { products } = useProducts({ take: 4 });
-  const [recommendations, setRecommendations] = useState<Product[]>([]);
+  const [recommendations, setRecommendations] = useState<PersonalizedRecommendationBundle>(initialRecommendations);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(true);
+  const [recommendationsError, setRecommendationsError] = useState("");
   const [cms, setCms] = useState<CmsContent | null>(null);
 
   useEffect(() => {
-    getPersonalizedRecommendations().then(setRecommendations);
+    getPersonalizedRecommendations()
+      .then(setRecommendations)
+      .catch(() => setRecommendationsError("Recommendations could not be loaded."))
+      .finally(() => setRecommendationsLoading(false));
     getCmsContent().then(setCms).catch(() => undefined);
   }, []);
 
@@ -157,14 +173,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="container mx-auto px-6">
-        <h2 className="text-3xl font-bold text-white mb-10">Recommended For You</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {recommendations.map((product) => (
-            <ProductCard key={product.id} {...product} />
-          ))}
-        </div>
-      </section>
+      <RecommendationSection
+        title="Recommended For You"
+        products={recommendations.personalizedProducts}
+        loading={recommendationsLoading}
+        error={recommendationsError}
+      />
+
+      <RecommendationSection
+        title="Trending Products"
+        products={recommendations.trendingProducts}
+        loading={recommendationsLoading}
+        error={recommendationsError}
+      />
     </div>
   );
 }

@@ -25,6 +25,28 @@ export async function authenticate(req, _res, next) {
   }
 }
 
+export async function optionalAuthenticate(req, _res, next) {
+  try {
+    const header = req.headers.authorization;
+    const token = header?.startsWith("Bearer ") ? header.slice(7) : null;
+    if (!token) return next();
+
+    const decoded = verifyAccessToken(token);
+    const user = await findUserById(decoded.sub);
+    if (user) {
+      req.user = {
+        id: user.id,
+        email: user.email,
+        roles: decoded.roles ?? [],
+        permissions: decoded.permissions ?? [],
+      };
+    }
+    next();
+  } catch (_error) {
+    next();
+  }
+}
+
 export const authorizeRoles = (...roles) => (req, _res, next) => {
   const allowed = req.user?.roles?.some((role) => roles.includes(role));
   if (!allowed) return next(new AppError("Required role is missing.", 403));

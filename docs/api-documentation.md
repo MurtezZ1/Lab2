@@ -12,6 +12,7 @@ Important endpoints:
 - `POST /api/auth/login`
 - `POST /api/auth/refresh-token`
 - `GET /api/search`
+- `GET /api/recommendations/personalized`
 - `GET /api/recommendations/similar/:productId`
 - `GET /api/recommendations/:productId`
 - `POST /api/recommendations/view`
@@ -50,3 +51,9 @@ Similar products:
 - `GET /api/recommendations/similar/:productId` returns recommended products for the Product Details page.
 - Each item includes product fields plus `similarityScore`.
 - The score is based on category, brand, price, rating, and product feature overlap.
+
+Personalized recommendations:
+
+- `GET /api/recommendations/personalized` returns `personalizedProducts`, `frequentlyBoughtTogether`, `trendingProducts`, `fallback`, and `signals`.
+- The endpoint uses purchase history, cart history, wishlist, MongoDB `ProductViewHistory`, and MongoDB `SearchHistory`.
+- Guests and users with no history receive popular/trending products.

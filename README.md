@@ -301,6 +301,87 @@ ProductDetailsPage
 
 The backend service reuses the recommendation layer and returns serialized products with `similarityScore`. The frontend widget owns loading and error states, then renders product image, name, price, rating, and match percentage in the current glass-card design.
 
+## Personalized Recommendations
+
+The Home Page includes ML-backed sections for:
+
+- Recommended For You
+- Trending Products
+
+Backend endpoint:
+
+```text
+GET /api/recommendations/personalized
+```
+
+The endpoint returns:
+
+- `personalizedProducts`
+- `frequentlyBoughtTogether`
+- `trendingProducts`
+- `fallback`
+- `signals`
+
+Recommendation signals:
+
+- Purchase History from orders and order items
+- Cart History from current cart items
+- Wishlist from saved products
+- Product Views from MongoDB `ProductViewHistory`
+- Search History from MongoDB `SearchHistory`
+
+Fallback:
+
+- Guests and users with no history receive popular/trending products.
+
+Files created:
+
+- `frontend/src/components/RecommendationSection.tsx`
+
+Files modified:
+
+- `README.md`
+- `backend/src/middleware/authMiddleware.js`
+- `backend/src/services/recommendationService.js`
+- `backend/src/controllers/advancedController.js`
+- `backend/src/routes/advancedRoutes.js`
+- `backend/README.md`
+- `docs/api-documentation.md`
+- `frontend/src/services/recommendationService.ts`
+- `frontend/src/pages/HomePage.tsx`
+- `frontend/src/pages/ProductDetailsPage.tsx`
+- `frontend/src/types/index.ts`
+- `frontend/src/utils/products.ts`
+
+ML integration explanation:
+
+The recommendation service gathers user signals from relational commerce data and MongoDB behavior collections, converts those signals into seed products, then ranks candidate products with the existing similarity scoring logic. The scoring compares category, brand, price, rating, and feature tokens. Trending products are generated from purchased quantities first, then fall back to high-rated and recent active products.
+
+Recommendation flow diagram:
+
+```mermaid
+flowchart TD
+  A["Home Page"] --> B["GET /api/recommendations/personalized"]
+  B --> C["optionalAuthenticate"]
+  C --> D["recommendationService"]
+  D --> E["Purchase History"]
+  D --> F["Cart History"]
+  D --> G["Wishlist"]
+  D --> H["ProductViewHistory"]
+  D --> I["SearchHistory"]
+  E --> J["Seed Products"]
+  F --> J
+  G --> J
+  H --> J
+  I --> J
+  J --> K["Similarity Ranking"]
+  K --> L["Recommended For You"]
+  D --> M["OrderItem Grouping"]
+  M --> N["Trending Products"]
+  L --> O["RecommendationSection"]
+  N --> O
+```
+
 ## Technologies Used
 
 - Python

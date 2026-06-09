@@ -2,6 +2,7 @@ import AddToCartButton from "@/components/AddToCartButton";
 import ProductFeedback from "@/components/ProductFeedback";
 import SimilarProductsWidget from "@/components/SimilarProductsWidget";
 import { getProductById } from "@/services/productService";
+import { trackProductView } from "@/services/recommendationService";
 import type { Product } from "@/types";
 import { Battery, Cpu, Maximize, RotateCcw, Shield, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -14,7 +15,10 @@ export default function ProductDetailsPage() {
 
   useEffect(() => {
     getProductById(id)
-      .then(setProduct)
+      .then((item) => {
+        setProduct(item);
+        if (item) void trackProductView(item);
+      })
       .finally(() => setLoading(false));
   }, [id]);
 

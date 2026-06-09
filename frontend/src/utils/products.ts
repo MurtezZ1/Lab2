@@ -33,6 +33,7 @@ export const normalizeProduct = (product: RawProduct): Product => ({
   description: product.description == null ? null : String(product.description),
   rating_average: Number(product.rating_average ?? product.ratingAverage ?? 0),
   similarityScore: Number(product.similarityScore ?? product.similarity_score ?? 0),
+  recommendationScore: Number(product.recommendationScore ?? product.recommendation_score ?? 0),
 });
 
 export const formatPrice = (price: number) => `$${price.toFixed(2)}`;

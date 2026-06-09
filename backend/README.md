@@ -77,6 +77,7 @@ POST /api/payments/webhook
 GET  /api/admin/audit-logs
 GET  /api/admin/audit-logs/export/csv
 GET  /api/admin/audit-logs/export/excel
+GET  /api/recommendations/personalized
 GET  /api/recommendations/similar/:productId
 ```
 
@@ -97,3 +98,9 @@ The controller delegates listing and export work to `auditLogService`, while `au
 `GET /api/recommendations/similar/:productId` returns products from the existing recommendation service with a `similarityScore`.
 
 The score combines category, brand, price, rating, and product feature overlap, then returns the highest scoring products for the Product Details widget.
+
+## Personalized Recommendations
+
+`GET /api/recommendations/personalized` returns `personalizedProducts`, `frequentlyBoughtTogether`, and `trendingProducts`.
+
+The endpoint uses optional JWT authentication. Authenticated users get recommendations from purchase history, cart items, wishlist, product views, and search history. Guests or users without history receive trending products as fallback.
