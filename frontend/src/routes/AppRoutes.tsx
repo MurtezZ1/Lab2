@@ -6,6 +6,7 @@ import RoleRoute from "@/routes/RoleRoute";
 
 const AccountPage = lazy(() => import("@/pages/AccountPage"));
 const AdminAuditLogsPage = lazy(() => import("@/pages/AdminAuditLogsPage"));
+const AdminAnalyticsDashboardPage = lazy(() => import("@/pages/AdminAnalyticsDashboardPage"));
 const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const CategoriesPage = lazy(() => import("@/pages/CategoriesPage"));
@@ -54,6 +55,9 @@ export function AppRoutes() {
           <Route element={<RoleRoute roles={["admin", "Admin"]} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
+          </Route>
+          <Route element={<RoleRoute roles={["admin", "Admin", "manager", "Manager"]} />}>
+            <Route path="/admin/dashboard" element={<AdminAnalyticsDashboardPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Route>

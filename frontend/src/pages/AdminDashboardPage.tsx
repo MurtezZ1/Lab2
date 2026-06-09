@@ -1,6 +1,6 @@
 import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, FileClock, Package, Upload, Users } from "lucide-react";
+import { BarChart3, FileClock, LineChart, Package, Upload, Users } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import {
   getAdminOrders,
@@ -82,13 +82,22 @@ export default function AdminDashboardPage() {
           <BarChart3 className="w-8 h-8 text-primary" />
           Admin Dashboard
         </h1>
-        <Link
-          to="/admin/audit-logs"
-          className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
-        >
-          <FileClock className="h-4 w-4 text-accent" />
-          Audit Logs
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            to="/admin/dashboard"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
+          >
+            <LineChart className="h-4 w-4 text-primary" />
+            Analytics
+          </Link>
+          <Link
+            to="/admin/audit-logs"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
+          >
+            <FileClock className="h-4 w-4 text-accent" />
+            Audit Logs
+          </Link>
+        </div>
       </div>
 
       {message && <div className="mb-6 glass-card rounded-2xl p-4 text-sm text-green-300">{message}</div>}

@@ -433,6 +433,96 @@ Before/after screenshots list:
 - User/Admin dashboards: dark theme and light theme
 - CMS/Reports/Admin Audit Logs: dark theme and light theme
 
+## Admin Analytics Dashboard
+
+Admin and Manager users can open:
+
+```text
+http://localhost:3000/admin/dashboard
+```
+
+API endpoints created:
+
+```text
+GET /api/admin/analytics/dashboard
+GET /api/admin/analytics/dashboard/export/pdf
+GET /api/admin/analytics/dashboard/export/excel
+GET /api/admin/analytics/dashboard/export/csv
+```
+
+Supported filters:
+
+- `range=today`
+- `range=last7Days`
+- `range=last30Days`
+- `range=last90Days`
+- `range=thisYear`
+- `range=custom&dateFrom=YYYY-MM-DD&dateTo=YYYY-MM-DD`
+
+Files created:
+
+- `backend/src/repositories/analyticsRepository.js`
+- `backend/src/services/analyticsService.js`
+- `backend/src/controllers/analyticsController.js`
+- `backend/src/routes/analyticsRoutes.js`
+- `frontend/src/services/adminAnalyticsService.ts`
+- `frontend/src/pages/AdminAnalyticsDashboardPage.tsx`
+
+Files modified:
+
+- `README.md`
+- `backend/README.md`
+- `docs/api-documentation.md`
+- `backend/src/config/redis.js`
+- `backend/src/routes/index.js`
+- `backend/src/services/authService.js`
+- `backend/src/services/orderService.js`
+- `backend/src/services/paymentService.js`
+- `backend/src/services/catalogService.js`
+- `frontend/src/routes/AppRoutes.tsx`
+- `frontend/src/pages/AdminDashboardPage.tsx`
+
+Dashboard architecture:
+
+```text
+AdminAnalyticsDashboardPage
+  -> adminAnalyticsService.ts
+  -> GET /api/admin/analytics/dashboard
+  -> analyticsRoutes
+  -> analyticsController
+  -> analyticsService
+  -> analyticsRepository
+  -> PostgreSQL + MongoDB + Redis
+```
+
+Database queries used:
+
+- PostgreSQL `users`: total users, new users, user growth.
+- PostgreSQL `orders`: total orders, active customers, orders by status, orders per month.
+- PostgreSQL `payments`: completed revenue, monthly revenue, average order value.
+- PostgreSQL `order_items`: top selling products and category revenue.
+- PostgreSQL `products` and `categories`: product totals, top product/category labels.
+- MongoDB `ProductViewHistory`: product view engagement and active behavior users.
+- MongoDB `UserActivity`: activity engagement and active behavior users.
+- Redis: cached analytics dashboard responses by filter range/date.
+
+Real-time update flow:
+
+```text
+Register / Order Create / Payment Complete / Product Update
+  -> notifyAnalyticsDashboardChanged()
+  -> invalidate analytics Redis cache
+  -> Socket.IO dashboard:update
+  -> /admin/dashboard reloads data without page refresh
+```
+
+Caching strategy:
+
+- Dashboard data is cached under `analytics:dashboard:*`.
+- Cache TTL is 180 seconds.
+- Dashboard statistics, revenue summaries, top products, and chart datasets are cached together per filter.
+- Cache is automatically invalidated when users register, orders are created, payments complete, or products change.
+
 ## Technologies Used
 
 - Python

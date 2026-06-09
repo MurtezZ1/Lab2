@@ -37,3 +37,22 @@ export async function cacheSet(key, value, ttlSeconds = 300) {
     redisAvailable = false;
   }
 }
+
+export async function cacheDelete(key) {
+  if (!redisAvailable || !redisClient?.isOpen) return;
+  try {
+    await redisClient.del(key);
+  } catch {
+    redisAvailable = false;
+  }
+}
+
+export async function cacheDeleteByPrefix(prefix) {
+  if (!redisAvailable || !redisClient?.isOpen) return;
+  try {
+    const keys = await redisClient.keys(`${prefix}*`);
+    if (keys.length) await redisClient.del(keys);
+  } catch {
+    redisAvailable = false;
+  }
+}

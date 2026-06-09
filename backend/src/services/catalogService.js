@@ -16,6 +16,7 @@ import {
   AUDIT_ENTITIES,
   recordAuditLogSafe,
 } from "./auditLogService.js";
+import { notifyAnalyticsDashboardChanged } from "./analyticsService.js";
 import { AppError } from "../utils/AppError.js";
 import { serializeProduct } from "../utils/serializers.js";
 
@@ -44,6 +45,7 @@ export async function createCatalogProduct(data, userId, auditContext = {}) {
     newValue: product,
     ...auditContext,
   });
+  notifyAnalyticsDashboardChanged("product_created", { productId: product.uuid ?? product.id }).catch(() => {});
   return product;
 }
 
@@ -61,6 +63,9 @@ export async function updateCatalogProduct(id, data, userId, auditContext = {}) 
     newValue: serializedProduct,
     ...auditContext,
   });
+  notifyAnalyticsDashboardChanged("product_updated", {
+    productId: serializedProduct.uuid ?? serializedProduct.id,
+  }).catch(() => {});
   return serializedProduct;
 }
 
@@ -78,6 +83,9 @@ export async function removeCatalogProduct(id, userId, auditContext = {}) {
     newValue: serializedProduct,
     ...auditContext,
   });
+  notifyAnalyticsDashboardChanged("product_deleted", {
+    productId: serializedProduct.uuid ?? serializedProduct.id,
+  }).catch(() => {});
   return serializedProduct;
 }
 

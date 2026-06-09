@@ -20,6 +20,8 @@ Important endpoints:
 - `GET /api/reports/export/:format`
 - `GET /api/admin/audit-logs`
 - `GET /api/admin/audit-logs/export/:format`
+- `GET /api/admin/analytics/dashboard`
+- `GET /api/admin/analytics/dashboard/export/:format`
 - `POST /api/payments/orders/:orderId/intent`
 - `POST /api/payments/verify`
 - `POST /api/payments/webhook`
@@ -57,3 +59,12 @@ Personalized recommendations:
 - `GET /api/recommendations/personalized` returns `personalizedProducts`, `frequentlyBoughtTogether`, `trendingProducts`, `fallback`, and `signals`.
 - The endpoint uses purchase history, cart history, wishlist, MongoDB `ProductViewHistory`, and MongoDB `SearchHistory`.
 - Guests and users with no history receive popular/trending products.
+
+Admin analytics dashboard:
+
+- `GET /api/admin/analytics/dashboard` returns KPI cards, chart data, MongoDB engagement counts, and Redis cache metadata.
+- `GET /api/admin/analytics/dashboard/export/pdf` exports the current filtered dashboard as PDF.
+- `GET /api/admin/analytics/dashboard/export/excel` exports the current filtered dashboard as XLSX.
+- `GET /api/admin/analytics/dashboard/export/csv` exports the current filtered dashboard as CSV.
+- Supported filters: `range`, `dateFrom`, and `dateTo`.
+- Access is restricted to `Admin` and `Manager` roles.

@@ -14,6 +14,7 @@ import {
   findActiveRefreshToken,
   revokeRefreshToken,
 } from "../repositories/tokenRepository.js";
+import { notifyAnalyticsDashboardChanged } from "./analyticsService.js";
 import { AppError } from "../utils/AppError.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
 import {
@@ -88,6 +89,7 @@ export async function register(input) {
 
   await assignRoleToUser(user.id, "Customer");
   const fullUser = await findUserById(user.id);
+  notifyAnalyticsDashboardChanged("user_registered", { userId: user.id }).catch(() => {});
 
   return {
     user: publicUser(fullUser),

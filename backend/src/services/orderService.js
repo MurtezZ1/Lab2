@@ -11,6 +11,7 @@ import {
   AUDIT_ENTITIES,
   recordAuditLogSafe,
 } from "./auditLogService.js";
+import { notifyAnalyticsDashboardChanged } from "./analyticsService.js";
 import { AppError } from "../utils/AppError.js";
 import { serializeOrder } from "../utils/serializers.js";
 
@@ -53,6 +54,7 @@ export async function createCheckoutOrder(userId, payload = {}, auditContext = {
     newValue: serializedOrder,
     ...auditContext,
   });
+  notifyAnalyticsDashboardChanged("order_created", { orderId: serializedOrder.id, userId }).catch(() => {});
   return serializedOrder;
 }
 

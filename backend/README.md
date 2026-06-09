@@ -79,6 +79,8 @@ GET  /api/admin/audit-logs/export/csv
 GET  /api/admin/audit-logs/export/excel
 GET  /api/recommendations/personalized
 GET  /api/recommendations/similar/:productId
+GET  /api/admin/analytics/dashboard
+GET  /api/admin/analytics/dashboard/export/:format
 ```
 
 ## Admin Audit Logs
@@ -104,3 +106,17 @@ The score combines category, brand, price, rating, and product feature overlap, 
 `GET /api/recommendations/personalized` returns `personalizedProducts`, `frequentlyBoughtTogether`, and `trendingProducts`.
 
 The endpoint uses optional JWT authentication. Authenticated users get recommendations from purchase history, cart items, wishlist, product views, and search history. Guests or users without history receive trending products as fallback.
+
+## Admin Analytics Dashboard
+
+`GET /api/admin/analytics/dashboard` returns real analytics from PostgreSQL, MongoDB, and Redis cache metadata. Access is restricted to `Admin` and `Manager` roles.
+
+Exports:
+
+```text
+GET /api/admin/analytics/dashboard/export/pdf
+GET /api/admin/analytics/dashboard/export/excel
+GET /api/admin/analytics/dashboard/export/csv
+```
+
+The service caches dashboard responses in Redis with the `analytics:dashboard:` prefix and invalidates that cache when users register, orders are created, payments complete, or products are changed.

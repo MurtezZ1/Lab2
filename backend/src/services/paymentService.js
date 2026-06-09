@@ -10,6 +10,7 @@ import {
 } from "../repositories/paymentRepository.js";
 import { AppError } from "../utils/AppError.js";
 import { serializeOrder } from "../utils/serializers.js";
+import { notifyAnalyticsDashboardChanged } from "./analyticsService.js";
 
 const toCents = (amount) => Math.round(Number(amount) * 100);
 
@@ -46,6 +47,10 @@ async function syncPaymentStatus(paymentIntent, userId = null, eventName = "STRI
 
   if (status === "COMPLETED") {
     await updatePaymentOrderStatus(updatedPayment.order_id, "PAID", userId);
+    notifyAnalyticsDashboardChanged("payment_completed", {
+      orderId: updatedPayment.order_id,
+      paymentId: updatedPayment.id,
+    }).catch(() => {});
   }
 
   return updatedPayment;
@@ -131,6 +136,11 @@ export async function handleStripeWebhookEvent(event) {
 
   if (status === "COMPLETED") {
     await updatePaymentOrderStatus(payment.order_id, "PAID");
+    notifyAnalyticsDashboardChanged("payment_completed", {
+      orderId: payment.order_id,
+      paymentId: payment.id,
+      source: "stripe_webhook",
+    }).catch(() => {});
   }
 
   return { handled: true, status };
