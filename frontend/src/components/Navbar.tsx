@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ShoppingCart, User, Menu, X, Cpu, Bell } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useAppSelector } from "@/redux/hooks";
 
 export default function Navbar() {
@@ -73,6 +74,8 @@ export default function Navbar() {
             )}
           </Link>
 
+          <ThemeToggle />
+
           <Link to="/account" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
             <User className="w-5 h-5" />
           </Link>
@@ -102,6 +105,7 @@ export default function Navbar() {
               <div className="h-px bg-white/10 my-2" />
               <MobileNavLink to="/cart" onClick={() => setIsMobileMenuOpen(false)}>Cart ({cartCount})</MobileNavLink>
               <MobileNavLink to="/notifications" onClick={() => setIsMobileMenuOpen(false)}>Notifications ({unreadCount})</MobileNavLink>
+              <ThemeToggle showLabel className="w-fit px-3" />
               <MobileNavLink to="/account" onClick={() => setIsMobileMenuOpen(false)}>Account</MobileNavLink>
             </div>
           </motion.div>

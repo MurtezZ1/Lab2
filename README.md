@@ -382,6 +382,57 @@ flowchart TD
   N --> O
 ```
 
+## Light And Dark Theme System
+
+The frontend includes a global light/dark mode system with a toggle in the Navbar.
+
+Features:
+
+- Moon icon for dark mode
+- Sun icon for light mode
+- Desktop toggle beside notifications/user actions
+- Mobile toggle inside the mobile menu
+- Instant global theme update
+- `localStorage` persistence through refresh, login, and logout
+- Initial theme script in `index.html` to reduce flash before React loads
+- Smooth color and background transitions
+
+Files created:
+
+- `frontend/src/context/ThemeContext.tsx`
+- `frontend/src/components/ThemeToggle.tsx`
+
+Files modified:
+
+- `README.md`
+- `frontend/index.html`
+- `frontend/src/main.tsx`
+- `frontend/src/components/Navbar.tsx`
+- `frontend/src/styles/globals.css`
+
+Theme architecture:
+
+```text
+index.html initial theme script
+  -> ThemeProvider
+  -> ThemeContext
+  -> ThemeToggle
+  -> html.theme-light / html.theme-dark
+  -> globals.css theme variables and utility overrides
+  -> Navbar, Home, Products, Product Details, Cart, Checkout, Dashboard, Admin, CMS, Reports
+```
+
+The provider stores `sunspot_theme` in `localStorage` and applies `theme-light` or `theme-dark` on the document root. The CSS layer keeps the current palette and glass-card design, then remaps existing Tailwind utilities for light mode so pages inherit the theme without UI redesign.
+
+Before/after screenshots list:
+
+- Navbar: dark theme and light theme
+- Home Page: dark theme and light theme
+- Product listing/details: dark theme and light theme
+- Cart/Checkout: dark theme and light theme
+- User/Admin dashboards: dark theme and light theme
+- CMS/Reports/Admin Audit Logs: dark theme and light theme
+
 ## Technologies Used
 
 - Python
