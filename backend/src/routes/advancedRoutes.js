@@ -9,6 +9,7 @@ import {
   recommendationsController,
   reportsController,
   searchController,
+  similarProductsController,
   trackProductViewController,
   updateCmsController,
   uploadController,
@@ -19,6 +20,25 @@ const router = Router();
 const upload = multer({ dest: "uploads/" });
 
 router.get("/search", searchController);
+
+/**
+ * @openapi
+ * /recommendations/similar/{productId}:
+ *   get:
+ *     summary: Get similar product recommendations
+ *     tags:
+ *       - Recommendations
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Similar products with similarity scores.
+ */
+router.get("/recommendations/similar/:productId", similarProductsController);
 router.get("/recommendations/:productId", recommendationsController);
 router.post("/recommendations/view", trackProductViewController);
 router.get("/reports", reportsController);

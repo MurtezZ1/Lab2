@@ -77,6 +77,7 @@ POST /api/payments/webhook
 GET  /api/admin/audit-logs
 GET  /api/admin/audit-logs/export/csv
 GET  /api/admin/audit-logs/export/excel
+GET  /api/recommendations/similar/:productId
 ```
 
 ## Admin Audit Logs
@@ -90,3 +91,9 @@ search, user, action, entity, dateFrom, dateTo, page, pageSize, sortOrder
 ```
 
 The controller delegates listing and export work to `auditLogService`, while `auditLogRepository` owns all Prisma access. Old and new values are stored in `metadata.oldValue` and `metadata.newValue`.
+
+## Similar Products Recommendations
+
+`GET /api/recommendations/similar/:productId` returns products from the existing recommendation service with a `similarityScore`.
+
+The score combines category, brand, price, rating, and product feature overlap, then returns the highest scoring products for the Product Details widget.

@@ -1,8 +1,7 @@
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductFeedback from "@/components/ProductFeedback";
+import SimilarProductsWidget from "@/components/SimilarProductsWidget";
 import { getProductById } from "@/services/productService";
-import { getSimilarProducts } from "@/services/recommendationService";
-import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/types";
 import { Battery, Cpu, Maximize, RotateCcw, Shield, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -11,16 +10,11 @@ import { useParams } from "react-router-dom";
 export default function ProductDetailsPage() {
   const { id = "" } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
-  const [similar, setSimilar] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getProductById(id)
-      .then((item) => {
-        setProduct(item);
-        return getSimilarProducts(item?.id);
-      })
-      .then(setSimilar)
+      .then(setProduct)
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -132,12 +126,8 @@ export default function ProductDetailsPage() {
           </div>
         </div>
       </div>
-      <section className="mt-16">
-        <h2 className="text-3xl font-bold text-white mb-8">Similar Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {similar.map((item) => <ProductCard key={item.id} {...item} />)}
-        </div>
-      </section>
+
+      <SimilarProductsWidget productId={product.uuid ?? product.id} />
     </div>
   );
 }

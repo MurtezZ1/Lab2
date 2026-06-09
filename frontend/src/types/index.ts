@@ -22,6 +22,8 @@ export type Product = {
   additional_features: string | null;
   image: string;
   description: string | null;
+  rating_average?: number;
+  similarityScore?: number;
 };
 
 export type User = {

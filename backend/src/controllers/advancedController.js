@@ -36,6 +36,10 @@ export const recommendationsController = asyncHandler(async (req, res) => {
   });
 });
 
+export const similarProductsController = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: { similarProducts: await getSimilarProducts(req.params.productId) } });
+});
+
 export const trackProductViewController = asyncHandler(async (req, res) => {
   trackProductView({ userId: req.user?.id ?? "guest", ...req.body });
   res.json({ success: true });

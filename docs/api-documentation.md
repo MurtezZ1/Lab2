@@ -12,6 +12,7 @@ Important endpoints:
 - `POST /api/auth/login`
 - `POST /api/auth/refresh-token`
 - `GET /api/search`
+- `GET /api/recommendations/similar/:productId`
 - `GET /api/recommendations/:productId`
 - `POST /api/recommendations/view`
 - `GET /api/reports`
@@ -43,3 +44,9 @@ Admin audit logs:
 - `GET /api/admin/audit-logs/export/excel` downloads filtered logs as XLSX.
 - Supported query parameters: `search`, `user`, `action`, `entity`, `dateFrom`, `dateTo`, `page`, `pageSize`, `sortOrder`.
 - Access is restricted to the `Admin` role.
+
+Similar products:
+
+- `GET /api/recommendations/similar/:productId` returns recommended products for the Product Details page.
+- Each item includes product fields plus `similarityScore`.
+- The score is based on category, brand, price, rating, and product feature overlap.

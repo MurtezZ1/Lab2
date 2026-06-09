@@ -246,6 +246,61 @@ AdminAuditLogsPage
 
 The service layer builds filtering, search, pagination, date sorting, and export rows. The repository is the only layer that queries `prisma.auditLog`. Tracked actions are recorded through `recordAuditLogSafe`, which stores old and new values in `metadata.oldValue` and `metadata.newValue` so the existing table can be reused without a migration.
 
+## Similar Products Recommendation Widget
+
+The Product Details page includes a reusable "Similar Products" widget backed by the existing recommendation engine.
+
+Backend endpoint:
+
+```text
+GET /api/recommendations/similar/:productId
+```
+
+The endpoint returns:
+
+- Similar products
+- `similarityScore` for each product
+
+Similarity is calculated from:
+
+- Category
+- Brand
+- Price closeness
+- Rating closeness
+- Product feature overlap
+
+Files created:
+
+- `frontend/src/components/SimilarProductsWidget.tsx`
+
+Files modified:
+
+- `README.md`
+- `backend/src/services/recommendationService.js`
+- `backend/src/controllers/advancedController.js`
+- `backend/src/routes/advancedRoutes.js`
+- `backend/README.md`
+- `docs/api-documentation.md`
+- `frontend/src/services/recommendationService.ts`
+- `frontend/src/pages/ProductDetailsPage.tsx`
+- `frontend/src/types/index.ts`
+- `frontend/src/utils/products.ts`
+
+Architecture:
+
+```text
+ProductDetailsPage
+  -> SimilarProductsWidget
+  -> recommendationService.ts
+  -> GET /api/recommendations/similar/:productId
+  -> advancedRoutes
+  -> similarProductsController
+  -> recommendationService.js
+  -> Prisma Product model
+```
+
+The backend service reuses the recommendation layer and returns serialized products with `similarityScore`. The frontend widget owns loading and error states, then renders product image, name, price, rating, and match percentage in the current glass-card design.
+
 ## Technologies Used
 
 - Python
