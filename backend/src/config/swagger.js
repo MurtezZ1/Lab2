@@ -8,6 +8,15 @@ export const swaggerSpec = swaggerJSDoc({
       version: "1.0.0",
     },
     servers: [{ url: "http://localhost:5000/api" }],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: ["./src/routes/*.js"],
 });

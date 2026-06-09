@@ -111,7 +111,11 @@ export async function login({ email, password }) {
 }
 
 export async function logout(refreshToken) {
-  if (refreshToken) await revokeRefreshToken(hashToken(refreshToken));
+  if (!refreshToken) return { userId: null };
+  const tokenHash = hashToken(refreshToken);
+  const tokenRecord = await findActiveRefreshToken(tokenHash);
+  await revokeRefreshToken(tokenHash);
+  return { userId: tokenRecord?.user_id ?? null };
 }
 
 export async function refresh(refreshToken) {

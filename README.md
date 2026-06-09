@@ -157,6 +157,95 @@ Then open:
 http://localhost:3000
 ```
 
+## Admin Audit Logs Module
+
+Admin users can open:
+
+```text
+http://localhost:3000/admin/audit-logs
+```
+
+The page lists important system activity from the existing `audit_logs` table with search, filters, date sorting, pagination, and CSV/Excel export.
+
+Tracked actions:
+
+- Login
+- Logout
+- Register
+- Product Create
+- Product Update
+- Product Delete
+- Order Create
+- Order Status Change
+- User Role Change
+- CMS Update
+- Report Export
+
+Backend endpoints:
+
+```text
+GET /api/admin/audit-logs
+GET /api/admin/audit-logs/export/csv
+GET /api/admin/audit-logs/export/excel
+```
+
+Supported filters:
+
+- `search`
+- `user`
+- `action`
+- `entity`
+- `dateFrom`
+- `dateTo`
+- `page`
+- `pageSize`
+- `sortOrder`
+
+Files created:
+
+- `backend/src/repositories/auditLogRepository.js`
+- `backend/src/services/auditLogService.js`
+- `backend/src/controllers/auditLogController.js`
+- `backend/src/routes/auditLogRoutes.js`
+- `backend/src/utils/auditContext.js`
+- `frontend/src/pages/AdminAuditLogsPage.tsx`
+
+Files modified:
+
+- `README.md`
+- `backend/src/routes/index.js`
+- `backend/src/config/swagger.js`
+- `backend/src/controllers/authController.js`
+- `backend/src/services/authService.js`
+- `backend/src/controllers/catalogController.js`
+- `backend/src/services/catalogService.js`
+- `backend/src/controllers/orderController.js`
+- `backend/src/services/orderService.js`
+- `backend/src/controllers/adminController.js`
+- `backend/src/controllers/advancedController.js`
+- `backend/src/services/cmsService.js`
+- `frontend/src/services/adminService.ts`
+- `frontend/src/types/index.ts`
+- `frontend/src/routes/AppRoutes.tsx`
+- `frontend/src/pages/AdminDashboardPage.tsx`
+- `backend/README.md`
+- `docs/api-documentation.md`
+
+Architecture:
+
+```text
+AdminAuditLogsPage
+  -> adminService.ts
+  -> GET /api/admin/audit-logs
+  -> auditLogRoutes
+  -> auditLogController
+  -> auditLogService
+  -> auditLogRepository
+  -> Prisma AuditLog model
+```
+
+The service layer builds filtering, search, pagination, date sorting, and export rows. The repository is the only layer that queries `prisma.auditLog`. Tracked actions are recorded through `recordAuditLogSafe`, which stores old and new values in `metadata.oldValue` and `metadata.newValue` so the existing table can be reused without a migration.
+
 ## Technologies Used
 
 - Python

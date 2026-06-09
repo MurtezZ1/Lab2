@@ -11,6 +11,11 @@ import {
   upsertBrand,
   upsertCategory,
 } from "../repositories/catalogRepository.js";
+import {
+  AUDIT_ACTIONS,
+  AUDIT_ENTITIES,
+  recordAuditLogSafe,
+} from "./auditLogService.js";
 import { AppError } from "../utils/AppError.js";
 import { serializeProduct } from "../utils/serializers.js";
 
@@ -29,20 +34,51 @@ export async function getProduct(id) {
   return serializeProduct(product);
 }
 
-export async function createCatalogProduct(data, userId) {
-  return serializeProduct(await createProduct(data, userId));
+export async function createCatalogProduct(data, userId, auditContext = {}) {
+  const product = serializeProduct(await createProduct(data, userId));
+  await recordAuditLogSafe({
+    userId,
+    action: AUDIT_ACTIONS.PRODUCT_CREATE,
+    entity: AUDIT_ENTITIES.PRODUCT,
+    entityId: product.uuid ?? String(product.id),
+    newValue: product,
+    ...auditContext,
+  });
+  return product;
 }
 
-export async function updateCatalogProduct(id, data, userId) {
+export async function updateCatalogProduct(id, data, userId, auditContext = {}) {
+  const previousProduct = await findProductIdentifier(id);
+  if (!previousProduct) throw new AppError("Product not found.", 404);
   const product = await updateProduct(id, data, userId);
-  if (!product) throw new AppError("Product not found.", 404);
-  return serializeProduct(product);
+  const serializedProduct = serializeProduct(product);
+  await recordAuditLogSafe({
+    userId,
+    action: AUDIT_ACTIONS.PRODUCT_UPDATE,
+    entity: AUDIT_ENTITIES.PRODUCT,
+    entityId: serializedProduct.uuid ?? String(serializedProduct.id),
+    oldValue: serializeProduct(previousProduct),
+    newValue: serializedProduct,
+    ...auditContext,
+  });
+  return serializedProduct;
 }
 
-export async function removeCatalogProduct(id, userId) {
+export async function removeCatalogProduct(id, userId, auditContext = {}) {
+  const previousProduct = await findProductIdentifier(id);
+  if (!previousProduct) throw new AppError("Product not found.", 404);
   const product = await deleteProduct(id, userId);
-  if (!product) throw new AppError("Product not found.", 404);
-  return serializeProduct(product);
+  const serializedProduct = serializeProduct(product);
+  await recordAuditLogSafe({
+    userId,
+    action: AUDIT_ACTIONS.PRODUCT_DELETE,
+    entity: AUDIT_ENTITIES.PRODUCT,
+    entityId: serializedProduct.uuid ?? String(serializedProduct.id),
+    oldValue: serializeProduct(previousProduct),
+    newValue: serializedProduct,
+    ...auditContext,
+  });
+  return serializedProduct;
 }
 
 export const getCategories = listCategories;

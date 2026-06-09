@@ -74,4 +74,19 @@ GET  /api/rbac/reports
 POST /api/payments/orders/:orderId/intent
 POST /api/payments/verify
 POST /api/payments/webhook
+GET  /api/admin/audit-logs
+GET  /api/admin/audit-logs/export/csv
+GET  /api/admin/audit-logs/export/excel
 ```
+
+## Admin Audit Logs
+
+The audit logs module uses the existing Prisma `AuditLog` model and is restricted to users with the `Admin` role.
+
+Query filters:
+
+```text
+search, user, action, entity, dateFrom, dateTo, page, pageSize, sortOrder
+```
+
+The controller delegates listing and export work to `auditLogService`, while `auditLogRepository` owns all Prisma access. Old and new values are stored in `metadata.oldValue` and `metadata.newValue`.

@@ -7,18 +7,49 @@ import {
   resetPassword,
   verifyEmail,
 } from "../services/authService.js";
+import {
+  AUDIT_ACTIONS,
+  AUDIT_ENTITIES,
+  recordAuditLogSafe,
+} from "../services/auditLogService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { getAuditRequestContext } from "../utils/auditContext.js";
 
 export const registerController = asyncHandler(async (req, res) => {
-  res.status(201).json({ success: true, data: await register(req.body) });
+  const data = await register(req.body);
+  await recordAuditLogSafe({
+    userId: data.user.id,
+    action: AUDIT_ACTIONS.REGISTER,
+    entity: AUDIT_ENTITIES.USER,
+    entityId: data.user.id,
+    newValue: data.user,
+    ...getAuditRequestContext(req),
+  });
+  res.status(201).json({ success: true, data });
 });
 
 export const loginController = asyncHandler(async (req, res) => {
-  res.json({ success: true, data: await login(req.body) });
+  const data = await login(req.body);
+  await recordAuditLogSafe({
+    userId: data.user.id,
+    action: AUDIT_ACTIONS.LOGIN,
+    entity: AUDIT_ENTITIES.AUTH,
+    entityId: data.user.id,
+    metadata: { email: data.user.email },
+    ...getAuditRequestContext(req),
+  });
+  res.json({ success: true, data });
 });
 
 export const logoutController = asyncHandler(async (req, res) => {
-  await logout(req.body.refreshToken);
+  const result = await logout(req.body.refreshToken);
+  await recordAuditLogSafe({
+    userId: result.userId,
+    action: AUDIT_ACTIONS.LOGOUT,
+    entity: AUDIT_ENTITIES.AUTH,
+    entityId: result.userId,
+    ...getAuditRequestContext(req),
+  });
   res.json({ success: true, message: "Logged out successfully." });
 });
 

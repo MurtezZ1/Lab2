@@ -6,12 +6,18 @@ import { advancedSearch } from "../services/searchService.js";
 import { getCmsContent, updateCmsContent } from "../services/cmsService.js";
 import { getDashboardStats, getReports } from "../services/reportService.js";
 import {
+  AUDIT_ACTIONS,
+  AUDIT_ENTITIES,
+  recordAuditLogSafe,
+} from "../services/auditLogService.js";
+import {
   getFrequentlyBoughtTogether,
   getPersonalizedRecommendations,
   getSimilarProducts,
   trackProductView,
 } from "../services/recommendationService.js";
 import { emitDashboardUpdate, emitNotification, emitOrderUpdate } from "../config/socket.js";
+import { getAuditRequestContext } from "../utils/auditContext.js";
 
 export const searchController = asyncHandler(async (req, res) => {
   const results = await advancedSearch({ ...req.query, userId: req.user?.id ?? null });
@@ -49,6 +55,14 @@ export const exportReportController = asyncHandler(async (req, res) => {
   const reports = await getReports(req.query);
   const format = req.params.format;
   const rows = Object.entries(reports).map(([name, value]) => ({ name, value: JSON.stringify(value) }));
+  await recordAuditLogSafe({
+    userId: req.user?.id ?? null,
+    action: AUDIT_ACTIONS.REPORT_EXPORT,
+    entity: AUDIT_ENTITIES.REPORT,
+    entityId: format,
+    metadata: { format, filters: req.query },
+    ...getAuditRequestContext(req),
+  });
 
   if (format === "csv") {
     res.setHeader("Content-Type", "text/csv");
@@ -81,7 +95,10 @@ export const getCmsController = asyncHandler(async (_req, res) => {
 });
 
 export const updateCmsController = asyncHandler(async (req, res) => {
-  res.json({ success: true, data: await updateCmsContent(req.body, req.user?.id ?? null) });
+  res.json({
+    success: true,
+    data: await updateCmsContent(req.body, req.user?.id ?? null, getAuditRequestContext(req)),
+  });
 });
 
 export const uploadController = asyncHandler(async (req, res) => {

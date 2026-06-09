@@ -83,3 +83,46 @@ export type SupportTicket = {
   createdAt: string;
   messages?: Array<{ id: string; message: string; created_at?: string }>;
 };
+
+export type AuditLog = {
+  id: string;
+  user: {
+    id: string;
+    email: string;
+    username: string;
+    role: string;
+  } | null;
+  userDisplay: string;
+  action: string;
+  entity: string;
+  entityId?: string | null;
+  oldValue?: unknown;
+  newValue?: unknown;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  metadata?: Record<string, unknown>;
+  timestamp: string;
+  createdAt: string;
+};
+
+export type AuditLogQuery = {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  user?: string;
+  action?: string;
+  entity?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  sortOrder?: "asc" | "desc";
+};
+
+export type AuditLogListResult = {
+  items: AuditLog[];
+  total: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  actions: string[];
+  entities: string[];
+};

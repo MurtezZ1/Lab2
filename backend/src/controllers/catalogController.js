@@ -1,4 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { getAuditRequestContext } from "../utils/auditContext.js";
 import {
   addProductImage,
   createCatalogProduct,
@@ -22,15 +23,24 @@ export const getProductController = asyncHandler(async (req, res) => {
 });
 
 export const createProductController = asyncHandler(async (req, res) => {
-  res.status(201).json({ success: true, data: await createCatalogProduct(req.body, req.user.id) });
+  res.status(201).json({
+    success: true,
+    data: await createCatalogProduct(req.body, req.user.id, getAuditRequestContext(req)),
+  });
 });
 
 export const updateProductController = asyncHandler(async (req, res) => {
-  res.json({ success: true, data: await updateCatalogProduct(req.params.id, req.body, req.user.id) });
+  res.json({
+    success: true,
+    data: await updateCatalogProduct(req.params.id, req.body, req.user.id, getAuditRequestContext(req)),
+  });
 });
 
 export const deleteProductController = asyncHandler(async (req, res) => {
-  res.json({ success: true, data: await removeCatalogProduct(req.params.id, req.user.id) });
+  res.json({
+    success: true,
+    data: await removeCatalogProduct(req.params.id, req.user.id, getAuditRequestContext(req)),
+  });
 });
 
 export const listCategoriesController = asyncHandler(async (_req, res) => {

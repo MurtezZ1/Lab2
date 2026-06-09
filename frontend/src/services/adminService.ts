@@ -1,5 +1,5 @@
 import { apiClient } from "@/services/apiClient";
-import type { Product, Order, SupportTicket } from "@/types";
+import type { AuditLogListResult, AuditLogQuery, Product, Order, SupportTicket } from "@/types";
 
 export async function getAdminUsers() {
   const { data } = await apiClient.get("/admin/users");
@@ -34,4 +34,35 @@ export async function saveBrand(name: string) {
 export async function saveProduct(product: Partial<Product>) {
   const { data } = await apiClient.post("/products", product);
   return data.data as Product;
+}
+
+export async function getAdminAuditLogs(filters: AuditLogQuery = {}) {
+  const { data } = await apiClient.get("/admin/audit-logs", { params: cleanParams(filters) });
+  return data.data as AuditLogListResult;
+}
+
+export async function downloadAdminAuditLogs(format: "csv" | "excel", filters: AuditLogQuery = {}) {
+  const response = await apiClient.get<Blob>(`/admin/audit-logs/export/${format}`, {
+    params: cleanParams(filters),
+    responseType: "blob",
+  });
+  const extension = format === "excel" ? "xlsx" : "csv";
+  const contentType = response.headers["content-type"];
+  const blob = new Blob([response.data], {
+    type: typeof contentType === "string" ? contentType : "application/octet-stream",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `audit-logs.${extension}`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function cleanParams(filters: AuditLogQuery) {
+  return Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value !== undefined && value !== null && value !== ""),
+  );
 }

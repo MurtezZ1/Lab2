@@ -16,6 +16,8 @@ Important endpoints:
 - `POST /api/recommendations/view`
 - `GET /api/reports`
 - `GET /api/reports/export/:format`
+- `GET /api/admin/audit-logs`
+- `GET /api/admin/audit-logs/export/:format`
 - `POST /api/payments/orders/:orderId/intent`
 - `POST /api/payments/verify`
 - `POST /api/payments/webhook`
@@ -33,3 +35,11 @@ Payment flow:
 3. Confirm the payment on the frontend with Stripe Elements.
 4. Verify the payment with `POST /api/payments/verify`.
 5. Stripe webhooks also update payment and order status asynchronously.
+
+Admin audit logs:
+
+- `GET /api/admin/audit-logs` returns paginated audit logs.
+- `GET /api/admin/audit-logs/export/csv` downloads filtered logs as CSV.
+- `GET /api/admin/audit-logs/export/excel` downloads filtered logs as XLSX.
+- Supported query parameters: `search`, `user`, `action`, `entity`, `dateFrom`, `dateTo`, `page`, `pageSize`, `sortOrder`.
+- Access is restricted to the `Admin` role.

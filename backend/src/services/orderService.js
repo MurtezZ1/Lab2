@@ -6,10 +6,15 @@ import {
   listOrders,
   updateOrderStatus,
 } from "../repositories/orderRepository.js";
+import {
+  AUDIT_ACTIONS,
+  AUDIT_ENTITIES,
+  recordAuditLogSafe,
+} from "./auditLogService.js";
 import { AppError } from "../utils/AppError.js";
 import { serializeOrder } from "../utils/serializers.js";
 
-export async function createCheckoutOrder(userId, payload = {}) {
+export async function createCheckoutOrder(userId, payload = {}, auditContext = {}) {
   const cart = await getOrCreateCart(userId);
   let items = cart.items ?? [];
 
@@ -39,7 +44,16 @@ export async function createCheckoutOrder(userId, payload = {}) {
   });
 
   await clearCart(cart.id);
-  return serializeOrder(order);
+  const serializedOrder = serializeOrder(order);
+  await recordAuditLogSafe({
+    userId,
+    action: AUDIT_ACTIONS.ORDER_CREATE,
+    entity: AUDIT_ENTITIES.ORDER,
+    entityId: serializedOrder.id,
+    newValue: serializedOrder,
+    ...auditContext,
+  });
+  return serializedOrder;
 }
 
 export async function getOrders(userId, query = {}, isAdmin = false) {
@@ -59,6 +73,18 @@ export async function getOrderDetails(id, userId, isAdmin = false) {
   return serializeOrder(order);
 }
 
-export async function changeOrderStatus(id, status, userId) {
-  return serializeOrder(await updateOrderStatus(id, status, userId));
+export async function changeOrderStatus(id, status, userId, auditContext = {}) {
+  const previousOrder = await findOrder(id, userId, true);
+  if (!previousOrder) throw new AppError("Order not found.", 404);
+  const updatedOrder = serializeOrder(await updateOrderStatus(id, status, userId));
+  await recordAuditLogSafe({
+    userId,
+    action: AUDIT_ACTIONS.ORDER_STATUS_CHANGE,
+    entity: AUDIT_ENTITIES.ORDER,
+    entityId: updatedOrder.id,
+    oldValue: { status: previousOrder.status },
+    newValue: { status: updatedOrder.status },
+    ...auditContext,
+  });
+  return updatedOrder;
 }

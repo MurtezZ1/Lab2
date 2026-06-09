@@ -5,6 +5,7 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 import RoleRoute from "@/routes/RoleRoute";
 
 const AccountPage = lazy(() => import("@/pages/AccountPage"));
+const AdminAuditLogsPage = lazy(() => import("@/pages/AdminAuditLogsPage"));
 const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const CategoriesPage = lazy(() => import("@/pages/CategoriesPage"));
@@ -52,6 +53,7 @@ export function AppRoutes() {
           </Route>
           <Route element={<RoleRoute roles={["admin", "Admin"]} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Route>
