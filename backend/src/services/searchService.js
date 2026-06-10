@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 
 const contains = (query) => ({ contains: query, mode: "insensitive" });
 
-export async function advancedSearch({ scope = "products", query = "", userId = null }) {
+export async function advancedSearch({ scope = "products", query = "", q = "", userId = null }) {
+  query = String(query || q || "").trim();
   if (query) {
     if (mongoose.connection.readyState === 1) {
       SearchHistory.create({ userId, scope, query }).catch(() => {});

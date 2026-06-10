@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ShoppingCart, User, Menu, X, Cpu, Bell } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -8,6 +8,11 @@ import { useAppSelector } from "@/redux/hooks";
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const cartCount = useAppSelector((state) =>
     state.cart.items.reduce((total, item) => total + item.quantity, 0),
   );
@@ -20,6 +25,28 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!isSearchOpen) return;
+    searchInputRef.current?.focus();
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [isSearchOpen]);
+
+  const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const value = searchTerm.trim();
+    navigate(value ? `/products?search=${encodeURIComponent(value)}` : "/products");
+    setIsSearchOpen(false);
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <motion.header
@@ -47,14 +74,30 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-6">
-          <div className="relative group">
-            <Search className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors cursor-pointer" />
-            <div className="absolute right-0 top-10 w-64 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity glass p-2 rounded-xl border border-white/10">
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-full bg-black/50 text-white text-sm px-4 py-2 rounded-lg outline-none border border-white/10 focus:border-primary transition-colors"
-              />
+          <div ref={searchRef} className="relative">
+            <button
+              type="button"
+              aria-label="Search products"
+              onClick={() => setIsSearchOpen((open) => !open)}
+              className="text-gray-400 transition-colors hover:text-primary"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            <div
+              className={`absolute right-0 top-10 w-64 transition-opacity glass p-2 rounded-xl border border-white/10 ${
+                isSearchOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+              }`}
+            >
+              <form onSubmit={submitSearch}>
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder="Search products..."
+                  className="w-full bg-black/50 text-white text-sm px-4 py-2 rounded-lg outline-none border border-white/10 focus:border-primary transition-colors"
+                />
+              </form>
             </div>
           </div>
 
@@ -102,6 +145,15 @@ export default function Navbar() {
               <MobileNavLink to="/products" onClick={() => setIsMobileMenuOpen(false)}>Products</MobileNavLink>
               <MobileNavLink to="/categories" onClick={() => setIsMobileMenuOpen(false)}>Categories</MobileNavLink>
               <MobileNavLink to="/deals" onClick={() => setIsMobileMenuOpen(false)}>Deals</MobileNavLink>
+              <form onSubmit={submitSearch}>
+                <input
+                  type="search"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder="Search products..."
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-primary"
+                />
+              </form>
               <div className="h-px bg-white/10 my-2" />
               <MobileNavLink to="/cart" onClick={() => setIsMobileMenuOpen(false)}>Cart ({cartCount})</MobileNavLink>
               <MobileNavLink to="/notifications" onClick={() => setIsMobileMenuOpen(false)}>Notifications ({unreadCount})</MobileNavLink>

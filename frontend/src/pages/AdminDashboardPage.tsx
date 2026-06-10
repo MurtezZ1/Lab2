@@ -16,6 +16,7 @@ import type { Order, SupportTicket } from "@/types";
 const AdminManagementPanel = lazy(() => import("@/pages/admin/AdminManagementPanel"));
 const AdminCmsPanel = lazy(() => import("@/pages/admin/AdminCmsPanel"));
 const AdminReportsPanel = lazy(() => import("@/pages/admin/AdminReportsPanel"));
+const AdminInvoicesPanel = lazy(() => import("@/pages/admin/AdminInvoicesPanel"));
 
 function PanelLoader() {
   return <div className="glass-card rounded-2xl p-6 mt-8 text-sm text-gray-400">Loading...</div>;
@@ -116,6 +117,10 @@ export default function AdminDashboardPage() {
           onSaveNamedEntity={createNamedEntity}
           onSaveProduct={createAdminProduct}
         />
+      </Suspense>
+
+      <Suspense fallback={<PanelLoader />}>
+        <AdminInvoicesPanel />
       </Suspense>
 
       <div className="glass-card rounded-2xl p-6 mt-8">

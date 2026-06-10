@@ -2,23 +2,41 @@ import ProductCard from "@/components/ProductCard";
 import PriceRangeFilter from "@/components/PriceRangeFilter";
 import { useProducts } from "@/hooks/useProducts";
 import { Filter, ChevronDown } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export default function ProductsPage() {
+  const [searchParams] = useSearchParams();
   const { products } = useProducts();
   const [brandFilter, setBrandFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("name");
   const [page, setPage] = useState(1);
+  const searchTerm = String(searchParams.get("search") ?? "").trim().toLowerCase();
   const manufacturers = Array.from(new Set(products.map((product) => product.manufacturer)));
   const categories = Array.from(new Set(products.map((product) => product.type)));
   const pageSize = 6;
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
   const visibleProducts = useMemo(() => {
     const filtered = products.filter((product) => {
       const matchesBrand = brandFilter === "all" || product.manufacturer === brandFilter;
       const matchesCategory = categoryFilter === "all" || product.type === categoryFilter;
-      return matchesBrand && matchesCategory;
+      const searchable = [
+        product.name,
+        product.manufacturer,
+        product.model,
+        product.type,
+        product.description,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      const matchesSearch = !searchTerm || searchable.includes(searchTerm);
+      return matchesBrand && matchesCategory && matchesSearch;
     });
 
     return filtered.sort((a, b) => {
@@ -27,7 +45,7 @@ export default function ProductsPage() {
       if (sortBy === "brand") return a.manufacturer.localeCompare(b.manufacturer);
       return a.name.localeCompare(b.name);
     });
-  }, [brandFilter, categoryFilter, products, sortBy]);
+  }, [brandFilter, categoryFilter, products, searchTerm, sortBy]);
 
   const pageCount = Math.max(1, Math.ceil(visibleProducts.length / pageSize));
   const pageProducts = visibleProducts.slice((page - 1) * pageSize, page * pageSize);
@@ -136,7 +154,9 @@ export default function ProductsPage() {
 
         <div className="flex-1">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-white">All Products</h1>
+            <h1 className="text-2xl font-bold text-white">
+              {searchTerm ? `Search: ${searchParams.get("search")}` : "All Products"}
+            </h1>
             <div className="text-sm text-gray-400 glass px-4 py-2 rounded-lg border border-white/10">
               Showing {visibleProducts.length} results
             </div>

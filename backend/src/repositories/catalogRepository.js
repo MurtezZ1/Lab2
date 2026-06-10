@@ -20,7 +20,7 @@ export async function findProductIdentifier(identifier) {
 export async function listProducts(query = {}) {
   const page = Math.max(Number(query.page ?? 1), 1);
   const pageSize = Math.min(Math.max(Number(query.pageSize ?? query.take ?? 12), 1), 100);
-  const search = String(query.search ?? query.query ?? "").trim();
+  const search = String(query.search ?? query.query ?? query.q ?? "").trim();
   const sort = String(query.sort ?? query.sortBy ?? "name");
   const order = String(query.order ?? "asc").toLowerCase() === "desc" ? "desc" : "asc";
   const where = {

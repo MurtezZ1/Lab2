@@ -541,6 +541,34 @@ Caching strategy:
 - Redis
 - Stripe
 
+## PDF Invoice Generation
+
+The project includes a PDF invoice module for paid orders.
+
+Backend endpoints:
+
+```text
+GET  /api/invoices
+GET  /api/invoices/:orderId
+GET  /api/invoices/:orderId/download
+POST /api/invoices/generate/:orderId
+```
+
+Architecture:
+
+```text
+frontend invoiceService.ts
+  -> /api/invoices
+  -> invoiceRoutes
+  -> invoiceController
+  -> invoiceService
+  -> invoiceRepository
+  -> PostgreSQL invoices/orders/payments/users/order_items
+  -> PDFKit + QRCode PDF response
+```
+
+Invoices are generated automatically after a successful Stripe payment verification or webhook. Customers can access only their own invoices, while Admin and Manager roles can search, view, and download all invoices from the admin dashboard. Invoice data is also connected to report exports through the existing reports module.
+
 ## Main Results
 
 The integrated pipeline trains and compares:

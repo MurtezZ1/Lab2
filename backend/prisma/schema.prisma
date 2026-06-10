@@ -85,6 +85,7 @@ model User {
   wishlist               Wishlist[]
   reviews                Review[]
   orders                 Order[]
+  invoices               Invoice[]
   addresses              Address[]
   coupon_usage           CouponUsage[]
   support_tickets        SupportTicket[]
@@ -444,12 +445,33 @@ model Order {
   coupon         Coupon?      @relation(fields: [coupon_id], references: [id], onDelete: SetNull)
   items          OrderItem[]
   payments       Payment[]
+  invoices       Invoice[]
   shipments      Shipment[]
   returns        Return[]
 
   @@index([user_id])
   @@index([status])
   @@map("orders")
+}
+
+model Invoice {
+  id             String   @id @default(uuid())
+  invoice_number String   @unique
+  order_id       String   @unique
+  user_id        String
+  pdf_url        String?
+  generated_at   DateTime @default(now())
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+  created_by     String?
+  updated_by     String?
+  order          Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([order_id])
+  @@index([user_id])
+  @@index([generated_at])
+  @@map("invoices")
 }
 
 model OrderItem {

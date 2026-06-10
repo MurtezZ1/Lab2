@@ -25,6 +25,10 @@ Important endpoints:
 - `POST /api/payments/orders/:orderId/intent`
 - `POST /api/payments/verify`
 - `POST /api/payments/webhook`
+- `GET /api/invoices`
+- `GET /api/invoices/:orderId`
+- `GET /api/invoices/:orderId/download`
+- `POST /api/invoices/generate/:orderId`
 - `GET /api/dashboard`
 - `GET /api/cms`
 - `PUT /api/cms`
@@ -39,6 +43,17 @@ Payment flow:
 3. Confirm the payment on the frontend with Stripe Elements.
 4. Verify the payment with `POST /api/payments/verify`.
 5. Stripe webhooks also update payment and order status asynchronously.
+6. A successful payment generates an invoice record automatically.
+
+PDF invoices:
+
+- `GET /api/invoices` lists invoices for the current customer, or all invoices for `Admin` and `Manager`.
+- `POST /api/invoices/generate/:orderId` creates a unique invoice number such as `INV-2026-000145`.
+- `GET /api/invoices/:orderId` returns invoice metadata.
+- `GET /api/invoices/:orderId/download` returns a PDF generated with real order, payment, customer, address, and item data.
+- The PDF includes store header, invoice number, order number, payment status, customer information, product table, totals, footer, and a QR verification payload.
+- Customers can access only their own invoices. Admin and Manager users can search, view, and download all invoices.
+- Reports include invoice counts and recent invoice/customer data in sales, revenue, and customer report exports.
 
 Admin audit logs:
 

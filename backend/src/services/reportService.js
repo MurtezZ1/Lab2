@@ -44,7 +44,7 @@ export async function getReports(filters = {}) {
     ...(Object.keys(paymentOrderWhere).length ? { order: paymentOrderWhere } : {}),
   };
 
-  const [stats, revenue, paidPayments, paymentsByStatus, ordersByStatus, topProducts, lowInventory] = await Promise.all([
+  const [stats, revenue, paidPayments, paymentsByStatus, ordersByStatus, topProducts, lowInventory, invoices] = await Promise.all([
     getDashboardStats(),
     prisma.order.aggregate({ where: orderWhere, _sum: { total: true, subtotal: true, tax_total: true } }),
     prisma.payment.aggregate({
@@ -72,6 +72,15 @@ export async function getReports(filters = {}) {
       orderBy: { stock_quantity: "asc" },
       take: 20,
     }),
+    prisma.invoice.findMany({
+      where: {
+        ...(Object.keys(dateWhere).length ? { generated_at: dateWhere } : {}),
+        ...(filters.customerId ? { user_id: filters.customerId } : {}),
+      },
+      include: { user: true, order: { include: { payments: true } } },
+      orderBy: { generated_at: "desc" },
+      take: 25,
+    }),
   ]);
 
   const reports = {
@@ -88,6 +97,7 @@ export async function getReports(filters = {}) {
         payments: row._count.id,
         amount: Number(row._sum.amount ?? 0),
       })),
+      invoicesGenerated: invoices.length,
     },
     revenue: {
       totalRevenue: Number(revenue._sum.total ?? 0),
@@ -104,7 +114,18 @@ export async function getReports(filters = {}) {
         revenue: Number(row._sum.total_price ?? 0),
       })),
     },
-    customers: { totalCustomers: stats.users },
+    customers: {
+      totalCustomers: stats.users,
+      invoicedCustomers: new Set(invoices.map((invoice) => invoice.user_id)).size,
+      recentInvoices: invoices.slice(0, 10).map((invoice) => ({
+        invoiceNumber: invoice.invoice_number,
+        customer: invoice.user.email,
+        orderNumber: invoice.order.order_number,
+        paymentStatus: invoice.order.payments?.[0]?.status ?? "PENDING",
+        total: Number(invoice.order.total ?? 0),
+        generatedAt: invoice.generated_at,
+      })),
+    },
     inventory: {
       alerts: stats.inventoryAlerts,
       lowStock: lowInventory.map((item) => ({
