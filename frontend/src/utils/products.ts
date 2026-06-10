@@ -32,6 +32,8 @@ export const normalizeProduct = (product: RawProduct): Product => ({
   image: String(product.image ?? "/file.svg"),
   description: product.description == null ? null : String(product.description),
   rating_average: Number(product.rating_average ?? product.ratingAverage ?? 0),
+  discount_percentage: Number(product.discount_percentage ?? product.discountPercentage ?? 0),
+  stock_quantity: Number(product.stock_quantity ?? product.stockQuantity ?? product.stock ?? 0),
   similarityScore: Number(product.similarityScore ?? product.similarity_score ?? 0),
   recommendationScore: Number(product.recommendationScore ?? product.recommendation_score ?? 0),
 });

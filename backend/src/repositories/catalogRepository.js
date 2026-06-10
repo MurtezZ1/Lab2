@@ -17,6 +17,30 @@ export async function findProductIdentifier(identifier) {
   });
 }
 
+export async function findProductsForComparison(identifiers = []) {
+  const filters = identifiers
+    .filter(Boolean)
+    .map((identifier) => {
+      const numericId = Number(identifier);
+      return Number.isInteger(numericId)
+        ? { OR: [{ legacy_id: numericId }, { id: String(identifier) }] }
+        : { id: String(identifier) };
+    });
+
+  if (!filters.length) return [];
+
+  return prisma.product.findMany({
+    where: {
+      is_active: true,
+      OR: filters,
+    },
+    include: {
+      ...productInclude,
+      _count: { select: { reviews: true } },
+    },
+  });
+}
+
 export async function listProducts(query = {}) {
   const page = Math.max(Number(query.page ?? 1), 1);
   const pageSize = Math.min(Math.max(Number(query.pageSize ?? query.take ?? 12), 1), 100);

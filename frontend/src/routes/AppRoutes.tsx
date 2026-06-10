@@ -9,6 +9,7 @@ const AdminAuditLogsPage = lazy(() => import("@/pages/AdminAuditLogsPage"));
 const AdminAnalyticsDashboardPage = lazy(() => import("@/pages/AdminAnalyticsDashboardPage"));
 const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
+const ComparePage = lazy(() => import("@/pages/ComparePage"));
 const CategoriesPage = lazy(() => import("@/pages/CategoriesPage"));
 const CategoryPage = lazy(() => import("@/pages/CategoryPage"));
 const CheckoutPage = lazy(() => import("@/pages/CheckoutPage"));
@@ -38,6 +39,7 @@ export function AppRoutes() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:id" element={<ProductDetailsPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/compare" element={<ComparePage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/deals" element={<DealsPage />} />

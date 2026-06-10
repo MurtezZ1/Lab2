@@ -12,6 +12,7 @@ Important endpoints:
 - `POST /api/auth/login`
 - `POST /api/auth/refresh-token`
 - `GET /api/search`
+- `GET /api/products/compare?ids=id1,id2`
 - `GET /api/recommendations/personalized`
 - `GET /api/recommendations/similar/:productId`
 - `GET /api/recommendations/:productId`
@@ -74,6 +75,14 @@ Personalized recommendations:
 - `GET /api/recommendations/personalized` returns `personalizedProducts`, `frequentlyBoughtTogether`, `trendingProducts`, `fallback`, and `signals`.
 - The endpoint uses purchase history, cart history, wishlist, MongoDB `ProductViewHistory`, and MongoDB `SearchHistory`.
 - Guests and users with no history receive popular/trending products.
+
+Product comparison:
+
+- `GET /api/products/compare?ids=id1,id2` compares two products.
+- `GET /api/products/compare?ids=id1,id2,id3` compares three products.
+- The endpoint returns product name, brand, category, price, rating, reviews count, stock, discount, specifications, features, and image.
+- The frontend stores selected products in Redux Toolkit `compareSlice` and persists them in `localStorage`.
+- Duplicate products are blocked and the maximum comparison size is 3 products.
 
 Admin analytics dashboard:
 

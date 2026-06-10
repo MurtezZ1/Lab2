@@ -23,8 +23,22 @@ export type Product = {
   image: string;
   description: string | null;
   rating_average?: number;
+  discount_percentage?: number;
+  stock_quantity?: number;
   similarityScore?: number;
   recommendationScore?: number;
+};
+
+export type ComparedProduct = Product & {
+  brand: string;
+  category: string;
+  rating: number;
+  reviewsCount: number;
+  stock: number;
+  discount: number;
+  specifications: Record<string, string | null>;
+  features: string | null;
+  productImage: string;
 };
 
 export type User = {

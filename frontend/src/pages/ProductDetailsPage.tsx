@@ -1,10 +1,13 @@
 import AddToCartButton from "@/components/AddToCartButton";
+import CartNotice from "@/components/CartNotice";
 import ProductFeedback from "@/components/ProductFeedback";
 import SimilarProductsWidget from "@/components/SimilarProductsWidget";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { addToCompare } from "@/redux/slices/compareSlice";
 import { getProductById } from "@/services/productService";
 import { trackProductView } from "@/services/recommendationService";
 import type { Product } from "@/types";
-import { Battery, Cpu, Maximize, RotateCcw, Shield, Truck } from "lucide-react";
+import { Battery, Cpu, GitCompareArrows, Maximize, RotateCcw, Shield, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -12,6 +15,9 @@ export default function ProductDetailsPage() {
   const { id = "" } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [compareNotice, setCompareNotice] = useState("");
+  const compareItems = useAppSelector((state) => state.compare.items);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     getProductById(id)
@@ -29,6 +35,17 @@ export default function ProductDetailsPage() {
   if (!product) {
     return <div className="container mx-auto px-6 py-12 text-gray-400">Product not found.</div>;
   }
+
+  const handleCompare = () => {
+    const alreadyAdded = compareItems.some(
+      (item) => String(item.uuid ?? item.id) === String(product.uuid ?? product.id) || String(item.id) === String(product.id),
+    );
+    if (alreadyAdded) setCompareNotice("Product is already in compare.");
+    else if (compareItems.length >= 3) setCompareNotice("Maximum 3 products can be compared.");
+    else setCompareNotice(`${product.name} added to compare.`);
+    dispatch(addToCompare(product));
+    setTimeout(() => setCompareNotice(""), 2500);
+  };
 
   let displaySpecs: { width?: string; height?: string } | null = null;
   try {
@@ -112,6 +129,14 @@ export default function ProductDetailsPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 mt-6">
             <AddToCartButton product={product} />
+            <button
+              type="button"
+              onClick={handleCompare}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 px-5 py-3 font-bold text-white transition-colors hover:border-accent/50"
+            >
+              <GitCompareArrows className="h-5 w-5 text-accent" />
+              Compare
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
@@ -132,6 +157,7 @@ export default function ProductDetailsPage() {
       </div>
 
       <SimilarProductsWidget productId={product.uuid ?? product.id} />
+      <CartNotice show={Boolean(compareNotice)} message={compareNotice} />
     </div>
   );
 }

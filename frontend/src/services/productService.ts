@@ -1,4 +1,4 @@
-import type { Product } from "@/types";
+import type { ComparedProduct, Product } from "@/types";
 import { normalizeProduct } from "@/utils/products";
 import { apiClient } from "@/services/apiClient";
 
@@ -34,6 +34,13 @@ export async function getProductById(id: number | string): Promise<Product | nul
 
 export async function searchProducts(search: string, options?: ProductQuery) {
   return getProducts({ ...options, search });
+}
+
+export async function compareProducts(ids: Array<number | string>): Promise<ComparedProduct[]> {
+  const { data } = await apiClient.get("/products/compare", {
+    params: { ids: ids.join(",") },
+  });
+  return data.data as ComparedProduct[];
 }
 
 export async function createProduct(payload: Partial<Product>) {

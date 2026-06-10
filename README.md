@@ -569,6 +569,31 @@ frontend invoiceService.ts
 
 Invoices are generated automatically after a successful Stripe payment verification or webhook. Customers can access only their own invoices, while Admin and Manager roles can search, view, and download all invoices from the admin dashboard. Invoice data is also connected to report exports through the existing reports module.
 
+## Product Comparison
+
+The frontend includes a responsive product comparison flow.
+
+Backend endpoint:
+
+```text
+GET /api/products/compare?ids=id1,id2
+GET /api/products/compare?ids=id1,id2,id3
+```
+
+Frontend architecture:
+
+```text
+ProductCard / ProductDetailsPage
+  -> compareSlice
+  -> localStorage persistence
+  -> Navbar Compare badge
+  -> /compare
+  -> productService.compareProducts()
+  -> GET /api/products/compare
+```
+
+Users can compare 2 or 3 products side-by-side. The comparison page shows price, brand, category, rating, review count, stock, discount, storage, RAM, camera, battery, processor, display, and features. The page highlights best values such as best price, best rating, best storage, biggest battery, and best performance.
+
 ## Main Results
 
 The integrated pipeline trains and compares:

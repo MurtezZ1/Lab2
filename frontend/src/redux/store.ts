@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "@/redux/slices/authSlice";
 import brandsReducer from "@/redux/slices/brandsSlice";
 import cartReducer from "@/redux/slices/cartSlice";
+import compareReducer from "@/redux/slices/compareSlice";
 import categoriesReducer from "@/redux/slices/categoriesSlice";
 import notificationsReducer from "@/redux/slices/notificationsSlice";
 import ordersReducer from "@/redux/slices/ordersSlice";
@@ -17,6 +18,7 @@ export const store = configureStore({
     categories: categoriesReducer,
     brands: brandsReducer,
     cart: cartReducer,
+    compare: compareReducer,
     wishlist: wishlistReducer,
     orders: ordersReducer,
     notifications: notificationsReducer,

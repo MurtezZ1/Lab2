@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ShoppingCart, User, Menu, X, Cpu, Bell } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Cpu, Bell, GitCompareArrows } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAppSelector } from "@/redux/hooks";
 
@@ -16,6 +16,7 @@ export default function Navbar() {
   const cartCount = useAppSelector((state) =>
     state.cart.items.reduce((total, item) => total + item.quantity, 0),
   );
+  const compareCount = useAppSelector((state) => state.compare.items.length);
   const unreadCount = useAppSelector((state) => state.notifications.items.filter((item) => item.unread).length);
 
   useEffect(() => {
@@ -108,6 +109,15 @@ export default function Navbar() {
             </span>
           </Link>
 
+          <Link to="/compare" className="relative group" aria-label={`Compare ${compareCount} products`}>
+            <GitCompareArrows className="w-5 h-5 text-gray-400 group-hover:text-accent transition-colors" />
+            {compareCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-accent text-black text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {compareCount}
+              </span>
+            )}
+          </Link>
+
           <Link to="/notifications" className="relative group">
             <Bell className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
             {unreadCount > 0 && (
@@ -156,6 +166,7 @@ export default function Navbar() {
               </form>
               <div className="h-px bg-white/10 my-2" />
               <MobileNavLink to="/cart" onClick={() => setIsMobileMenuOpen(false)}>Cart ({cartCount})</MobileNavLink>
+              <MobileNavLink to="/compare" onClick={() => setIsMobileMenuOpen(false)}>Compare ({compareCount})</MobileNavLink>
               <MobileNavLink to="/notifications" onClick={() => setIsMobileMenuOpen(false)}>Notifications ({unreadCount})</MobileNavLink>
               <ThemeToggle showLabel className="w-fit px-3" />
               <MobileNavLink to="/account" onClick={() => setIsMobileMenuOpen(false)}>Account</MobileNavLink>

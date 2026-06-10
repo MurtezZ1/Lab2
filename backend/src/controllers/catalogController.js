@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { getAuditRequestContext } from "../utils/auditContext.js";
 import {
   addProductImage,
+  compareProducts,
   createCatalogProduct,
   getBrands,
   getCategories,
@@ -16,6 +17,10 @@ import {
 
 export const listProductsController = asyncHandler(async (req, res) => {
   res.json({ success: true, data: await getProducts(req.query) });
+});
+
+export const compareProductsController = asyncHandler(async (req, res) => {
+  res.json({ success: true, data: await compareProducts(req.query.ids) });
 });
 
 export const getProductController = asyncHandler(async (req, res) => {

@@ -1,11 +1,12 @@
 import CartNotice from "@/components/CartNotice";
 import ProductFeedback from "@/components/ProductFeedback";
 import { motion } from "framer-motion";
-import { ShoppingCart, Heart } from "lucide-react";
+import { GitCompareArrows, Heart, ShoppingCart } from "lucide-react";
 import { useState, useTransition } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCartItems } from "@/redux/slices/cartSlice";
+import { addToCompare } from "@/redux/slices/compareSlice";
 import { setWishlistItems } from "@/redux/slices/wishlistSlice";
 import { addProductToCart } from "@/services/cartService";
 import { toggleWishlist } from "@/services/wishlistService";
@@ -23,8 +24,10 @@ interface ProductProps {
 export default function ProductCard({ id, uuid, name, price, image, manufacturer }: ProductProps) {
   const [isAdded, setIsAdded] = useState(false);
   const [showNotice, setShowNotice] = useState(false);
+  const [compareNotice, setCompareNotice] = useState("");
   const [isPending, startTransition] = useTransition();
   const user = useAppSelector((state) => state.auth.user);
+  const compareItems = useAppSelector((state) => state.compare.items);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const product: Product = {
@@ -51,6 +54,8 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
     camera: null,
     additional_features: null,
     description: null,
+    discount_percentage: 0,
+    stock_quantity: 0,
   };
 
   const handleAddToCart = () => {
@@ -66,6 +71,17 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
       setTimeout(() => setIsAdded(false), 1500);
       setTimeout(() => setShowNotice(false), 2600);
     });
+  };
+
+  const handleCompare = () => {
+    const alreadyAdded = compareItems.some(
+      (item) => String(item.uuid ?? item.id) === String(product.uuid ?? product.id) || String(item.id) === String(product.id),
+    );
+    if (alreadyAdded) setCompareNotice("Product is already in compare.");
+    else if (compareItems.length >= 3) setCompareNotice("Maximum 3 products can be compared.");
+    else setCompareNotice(`${name} added to compare.`);
+    dispatch(addToCompare(product));
+    setTimeout(() => setCompareNotice(""), 2500);
   };
 
   return (
@@ -86,6 +102,14 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
           className="bg-white/10 hover:bg-primary text-white p-2 rounded-full backdrop-blur-md transition-colors"
         >
           <Heart className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={handleCompare}
+          className="bg-white/10 hover:bg-accent text-white p-2 rounded-full backdrop-blur-md transition-colors"
+          aria-label={`Compare ${name}`}
+        >
+          <GitCompareArrows className="w-4 h-4" />
         </button>
       </div>
 
@@ -128,7 +152,15 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
           <ShoppingCart className="w-5 h-5" />
         </button>
       </div>
+      <button
+        type="button"
+        onClick={handleCompare}
+        className="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold text-gray-200 transition-colors hover:border-accent/50 hover:text-white"
+      >
+        Compare
+      </button>
       <CartNotice show={showNotice} message={`${name} u shtua ne shporte.`} />
+      <CartNotice show={Boolean(compareNotice)} message={compareNotice} />
     </motion.div>
   );
 }

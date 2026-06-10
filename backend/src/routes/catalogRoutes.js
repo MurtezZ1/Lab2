@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   addProductImageController,
+  compareProductsController,
   createProductController,
   deleteProductController,
   getProductController,
@@ -20,6 +21,31 @@ const router = Router();
 const adminOnly = [authenticate, authorizeRoles("Admin", "Manager")];
 
 router.get("/products", listProductsController);
+
+/**
+ * @openapi
+ * /api/products/compare:
+ *   get:
+ *     summary: Compare two or three products side by side
+ *     tags:
+ *       - Products
+ *     parameters:
+ *       - in: query
+ *         name: ids
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "1,2,3"
+ *         description: Comma-separated product identifiers. Minimum 2, maximum 3.
+ *     responses:
+ *       200:
+ *         description: Product comparison data
+ *       400:
+ *         description: Invalid comparison request
+ *       404:
+ *         description: One or more products were not found
+ */
+router.get("/products/compare", compareProductsController);
 router.get("/products/:id", getProductController);
 router.post("/products", ...adminOnly, validateRequest(validateProduct), createProductController);
 router.put("/products/:id", ...adminOnly, updateProductController);

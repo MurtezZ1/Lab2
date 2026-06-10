@@ -3,6 +3,7 @@ import {
   createProductImage,
   deleteProduct,
   findProductIdentifier,
+  findProductsForComparison,
   listBrands,
   listCategories,
   listProducts,
@@ -33,6 +34,32 @@ export async function getProduct(id) {
   const product = await findProductIdentifier(id);
   if (!product) throw new AppError("Product not found.", 404);
   return serializeProduct(product);
+}
+
+export async function compareProducts(ids = "") {
+  const identifiers = String(ids)
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+
+  if (identifiers.length < 2) throw new AppError("At least 2 products are required for comparison.", 400);
+
+  const products = await findProductsForComparison(identifiers);
+  const order = new Map(identifiers.map((id, index) => [id, index]));
+  return products
+    .map(serializeComparisonProduct)
+    .sort((left, right) => {
+      const leftIndex = Math.min(
+        order.get(String(left.id)) ?? Number.MAX_SAFE_INTEGER,
+        order.get(String(left.uuid)) ?? Number.MAX_SAFE_INTEGER,
+      );
+      const rightIndex = Math.min(
+        order.get(String(right.id)) ?? Number.MAX_SAFE_INTEGER,
+        order.get(String(right.uuid)) ?? Number.MAX_SAFE_INTEGER,
+      );
+      return leftIndex - rightIndex;
+    });
 }
 
 export async function createCatalogProduct(data, userId, auditContext = {}) {
@@ -104,4 +131,33 @@ export async function saveInventory(productId, data, userId) {
   const inventory = await updateInventory(productId, data, userId);
   if (!inventory) throw new AppError("Product not found.", 404);
   return inventory;
+}
+
+function serializeComparisonProduct(product) {
+  const serialized = serializeProduct(product);
+  return {
+    ...serialized,
+    brand: serialized.brand?.name ?? serialized.manufacturer,
+    category: serialized.category?.name ?? serialized.type,
+    rating: serialized.rating_average ?? 0,
+    reviewsCount: product._count?.reviews ?? 0,
+    stock: serialized.stock_quantity ?? 0,
+    discount: serialized.discount_percentage ?? 0,
+    specifications: {
+      processor: serialized.processor,
+      ram: serialized.ram_size,
+      storage: serialized.storage,
+      display: serialized.display,
+      os: serialized.os,
+      battery: serialized.battery,
+      weight: serialized.weight,
+      dimensions: serialized.dimensions,
+      keyboard: serialized.keyboard,
+      ports: serialized.ports,
+      connectivity: serialized.connectivity,
+      camera: serialized.camera,
+    },
+    features: serialized.additional_features,
+    productImage: serialized.image,
+  };
 }
