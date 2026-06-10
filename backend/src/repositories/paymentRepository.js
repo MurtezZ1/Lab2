@@ -109,3 +109,61 @@ export function updatePaymentOrderStatus(orderId, status, userId = null) {
     },
   });
 }
+
+export async function createCompletedDemoPayment({ order, demoPaymentId, userId }) {
+  const existingPayment = await prisma.payment.findFirst({
+    where: { order_id: order.id },
+    orderBy: { created_at: "desc" },
+  });
+
+  if (existingPayment) {
+    return prisma.payment.update({
+      where: { id: existingPayment.id },
+      data: {
+        provider: "Demo",
+        transaction_id: demoPaymentId,
+        amount: order.total,
+        status: "COMPLETED",
+        paid_at: new Date(),
+        updated_by: userId,
+        logs: {
+          create: {
+            event: "DEMO_PAYMENT_COMPLETED",
+            payload: {
+              demoPaymentId,
+              orderId: order.id,
+              reason: "Stripe keys are not configured in local environment.",
+            },
+            created_by: userId,
+          },
+        },
+      },
+      include: { order: true, logs: true },
+    });
+  }
+
+  return prisma.payment.create({
+    data: {
+      order_id: order.id,
+      provider: "Demo",
+      transaction_id: demoPaymentId,
+      amount: order.total,
+      status: "COMPLETED",
+      paid_at: new Date(),
+      created_by: userId,
+      updated_by: userId,
+      logs: {
+        create: {
+          event: "DEMO_PAYMENT_COMPLETED",
+          payload: {
+            demoPaymentId,
+            orderId: order.id,
+            reason: "Stripe keys are not configured in local environment.",
+          },
+          created_by: userId,
+        },
+      },
+    },
+    include: { order: true, logs: true },
+  });
+}

@@ -10,12 +10,14 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { ArrowRight, CreditCard, Loader2 } from "lucide-react";
 import StripePaymentForm from "@/components/StripePaymentForm";
+import { useNavigate } from "react-router-dom";
 
 export default function CheckoutPage() {
   const user = useAppSelector((state) => state.auth.user);
   const items = useAppSelector((state) => state.cart.items);
   const summary = getCartSummary(items);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [paymentIntent, setPaymentIntent] = useState<PaymentIntentResponse | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
@@ -27,15 +29,21 @@ export default function CheckoutPage() {
     try {
       const order = await createOrder(user, items, summary.total);
       const intent = await createPaymentIntent(order.id);
+      await saveCartItems(user, []);
+      dispatch(setCartItems([]));
+      dispatch(setOrders(await getOrders(user)));
+      if (intent.demoMode) {
+        navigate(`/payment-success?orderId=${intent.order.id}`, {
+          state: { message: intent.message ?? "Demo payment completed." },
+        });
+        return;
+      }
       if (!intent.publishableKey) {
         setError("Stripe publishable key is not configured.");
         return;
       }
       setPaymentIntent(intent);
       setStripePromise(loadStripe(intent.publishableKey));
-      await saveCartItems(user, []);
-      dispatch(setCartItems([]));
-      dispatch(setOrders(await getOrders(user)));
     } catch (nextError) {
       setError(nextError instanceof Error ? nextError.message : "Unable to prepare Stripe payment.");
     } finally {

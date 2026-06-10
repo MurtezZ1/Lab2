@@ -5,6 +5,8 @@ export type PaymentIntentResponse = {
   clientSecret: string;
   paymentIntentId: string;
   publishableKey: string;
+  demoMode?: boolean;
+  message?: string;
   order: Order;
 };
 
@@ -17,4 +19,3 @@ export async function verifyPayment(paymentIntentId: string) {
   const { data } = await apiClient.post("/payments/verify", { paymentIntentId });
   return data.data as { order: Order; status: string };
 }
-

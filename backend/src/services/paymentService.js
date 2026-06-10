@@ -2,6 +2,7 @@ import { env } from "../config/env.js";
 import { requireStripe } from "../config/stripe.js";
 import { findOrder } from "../repositories/orderRepository.js";
 import {
+  createCompletedDemoPayment,
   findPaymentByOrder,
   findPaymentByStripeId,
   updatePaymentOrderStatus,
@@ -61,9 +62,30 @@ async function syncPaymentStatus(paymentIntent, userId = null, eventName = "STRI
 }
 
 export async function createPaymentIntent(orderId, userId) {
-  const stripe = requireStripe();
   const order = await findOrder(orderId, userId, false);
   assertPayableOrder(order);
+
+  if (!env.stripeSecretKey || !env.stripePublishableKey) {
+    const demoPaymentId = `demo_pi_${order.id.replace(/-/g, "").slice(0, 18)}_${Date.now()}`;
+    await createCompletedDemoPayment({ order, demoPaymentId, userId });
+    const paidOrder = await updatePaymentOrderStatus(order.id, "PAID", userId);
+    await generateInvoice(order.id, { id: userId, roles: ["Customer"] }).catch(() => {});
+    notifyAnalyticsDashboardChanged("payment_completed", {
+      orderId: order.id,
+      source: "demo_payment",
+    }).catch(() => {});
+
+    return {
+      clientSecret: "",
+      paymentIntentId: demoPaymentId,
+      publishableKey: "",
+      demoMode: true,
+      message: "Stripe is not configured locally, so a demo payment was completed.",
+      order: serializeOrder(paidOrder),
+    };
+  }
+
+  const stripe = requireStripe();
 
   const existingPayment = await findPaymentByOrder(order.id);
   if (existingPayment?.transaction_id && existingPayment.provider === "Stripe") {
