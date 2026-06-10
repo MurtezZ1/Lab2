@@ -1,8 +1,8 @@
 import type { FormEvent } from "react";
-import type { Order, Product, SupportTicket } from "@/types";
+import type { Order, Product, SupportTicket, User } from "@/types";
 
 type AdminManagementPanelProps = {
-  users: Array<{ id: string; email: string; username: string; role: string }>;
+  users: User[];
   orders: Order[];
   tickets: SupportTicket[];
   onSaveNamedEntity: (event: FormEvent<HTMLFormElement>, type: "category" | "brand") => void;

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ShoppingCart, User, Menu, X, Cpu, Bell, GitCompareArrows } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, Cpu, Bell, GitCompareArrows, ShieldCheck } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAppSelector } from "@/redux/hooks";
 
@@ -18,6 +18,8 @@ export default function Navbar() {
   );
   const compareCount = useAppSelector((state) => state.compare.items.length);
   const unreadCount = useAppSelector((state) => state.notifications.items.filter((item) => item.unread).length);
+  const user = useAppSelector((state) => state.auth.user);
+  const isAdmin = user?.role?.toLowerCase() === "admin" || user?.roles?.some((role) => role.toLowerCase() === "admin");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -127,6 +129,16 @@ export default function Navbar() {
             )}
           </Link>
 
+          {isAdmin && (
+            <Link
+              to="/admin/dashboard"
+              className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-white"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Admin
+            </Link>
+          )}
+
           <ThemeToggle />
 
           <Link to="/account" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
@@ -168,6 +180,7 @@ export default function Navbar() {
               <MobileNavLink to="/cart" onClick={() => setIsMobileMenuOpen(false)}>Cart ({cartCount})</MobileNavLink>
               <MobileNavLink to="/compare" onClick={() => setIsMobileMenuOpen(false)}>Compare ({compareCount})</MobileNavLink>
               <MobileNavLink to="/notifications" onClick={() => setIsMobileMenuOpen(false)}>Notifications ({unreadCount})</MobileNavLink>
+              {isAdmin && <MobileNavLink to="/admin/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</MobileNavLink>}
               <ThemeToggle showLabel className="w-fit px-3" />
               <MobileNavLink to="/account" onClick={() => setIsMobileMenuOpen(false)}>Account</MobileNavLink>
             </div>

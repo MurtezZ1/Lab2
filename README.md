@@ -635,6 +635,48 @@ POST /api/ai/shopping-assistant
 GET  /api/ai/analytics
 ```
 
+## Admin Dashboard Access And User Management
+
+Admin users can access a protected admin area with a responsive sidebar.
+
+Frontend admin routes:
+
+```text
+/admin/dashboard
+/admin/users
+/admin/roles
+/admin/products
+/admin/orders
+/admin/reports
+/admin/audit-logs
+/admin/settings
+/admin/cms
+/admin/notifications
+```
+
+Backend user management endpoints:
+
+```text
+GET    /api/admin/users
+GET    /api/admin/users/:id
+PATCH  /api/admin/users/:id/role
+PATCH  /api/admin/users/:id/status
+DELETE /api/admin/users/:id
+GET    /api/admin/roles
+POST   /api/admin/roles/:roleId/permissions
+DELETE /api/admin/roles/:roleId/permissions/:permissionId
+```
+
+Security protections:
+
+- Admin routes require JWT authentication and the `Admin` role.
+- Normal users are redirected away from admin pages.
+- Deactivated users cannot log in.
+- Admin cannot remove their own Admin role.
+- Admin cannot deactivate or delete themselves.
+- The system prevents removing or deactivating the last active Admin.
+- Role, status, delete, and permission changes are recorded in `AuditLogs`.
+
 ## Main Results
 
 The integrated pipeline trains and compares:

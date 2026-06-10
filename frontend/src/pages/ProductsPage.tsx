@@ -7,7 +7,7 @@ import { useSearchParams } from "react-router-dom";
 
 export default function ProductsPage() {
   const [searchParams] = useSearchParams();
-  const { products } = useProducts();
+  const { products } = useProducts({ pageSize: 100 });
   const [brandFilter, setBrandFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("name");

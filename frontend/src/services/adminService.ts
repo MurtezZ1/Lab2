@@ -1,9 +1,73 @@
 import { apiClient } from "@/services/apiClient";
-import type { AuditLogListResult, AuditLogQuery, Product, Order, SupportTicket } from "@/types";
+import type { AuditLogListResult, AuditLogQuery, Product, Order, SupportTicket, User } from "@/types";
 
-export async function getAdminUsers() {
-  const { data } = await apiClient.get("/admin/users");
-  return data.data.items as Array<{ id: string; email: string; username: string; role: string; status: string }>;
+export type AdminUsersQuery = {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  role?: string;
+  status?: string;
+};
+
+export type AdminUsersResult = {
+  items: User[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
+export type AdminPermission = {
+  id: string;
+  name: string;
+  description?: string;
+};
+
+export type AdminRole = {
+  id: string;
+  name: string;
+  description?: string;
+  usersCount: number;
+  permissions: AdminPermission[];
+};
+
+export async function getAdminUsers(query: AdminUsersQuery = {}) {
+  const { data } = await apiClient.get("/admin/users", { params: cleanParams(query) });
+  return data.data as AdminUsersResult;
+}
+
+export async function getAdminUser(id: string) {
+  const { data } = await apiClient.get(`/admin/users/${id}`);
+  return data.data as User;
+}
+
+export async function changeAdminUserRole(id: string, role: "Admin" | "Manager" | "Customer") {
+  const { data } = await apiClient.patch(`/admin/users/${id}/role`, { role });
+  return data.data as User;
+}
+
+export async function changeAdminUserStatus(id: string, isActive: boolean) {
+  const { data } = await apiClient.patch(`/admin/users/${id}/status`, { is_active: isActive });
+  return data.data as User;
+}
+
+export async function deleteAdminUser(id: string) {
+  const { data } = await apiClient.delete(`/admin/users/${id}`);
+  return data.data as User;
+}
+
+export async function getAdminRoles() {
+  const { data } = await apiClient.get("/admin/roles");
+  return data.data as { roles: AdminRole[]; permissions: AdminPermission[] };
+}
+
+export async function addRolePermission(roleId: string, permissionId: string) {
+  const { data } = await apiClient.post(`/admin/roles/${roleId}/permissions`, { permissionId });
+  return data.data as { roles: AdminRole[]; permissions: AdminPermission[] };
+}
+
+export async function removeRolePermission(roleId: string, permissionId: string) {
+  const { data } = await apiClient.delete(`/admin/roles/${roleId}/permissions/${permissionId}`);
+  return data.data as { roles: AdminRole[]; permissions: AdminPermission[] };
 }
 
 export async function getAdminOrders() {

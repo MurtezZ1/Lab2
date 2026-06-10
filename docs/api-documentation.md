@@ -21,6 +21,14 @@ Important endpoints:
 - `GET /api/reports/export/:format`
 - `GET /api/admin/audit-logs`
 - `GET /api/admin/audit-logs/export/:format`
+- `GET /api/admin/users`
+- `GET /api/admin/users/:id`
+- `PATCH /api/admin/users/:id/role`
+- `PATCH /api/admin/users/:id/status`
+- `DELETE /api/admin/users/:id`
+- `GET /api/admin/roles`
+- `POST /api/admin/roles/:roleId/permissions`
+- `DELETE /api/admin/roles/:roleId/permissions/:permissionId`
 - `GET /api/admin/analytics/dashboard`
 - `GET /api/admin/analytics/dashboard/export/:format`
 - `POST /api/payments/orders/:orderId/intent`
@@ -65,6 +73,25 @@ Admin audit logs:
 - `GET /api/admin/audit-logs/export/excel` downloads filtered logs as XLSX.
 - Supported query parameters: `search`, `user`, `action`, `entity`, `dateFrom`, `dateTo`, `page`, `pageSize`, `sortOrder`.
 - Access is restricted to the `Admin` role.
+
+Admin user management:
+
+- `GET /api/admin/users` returns paginated users with search, role filter, and active/inactive filter.
+- `GET /api/admin/users/:id` returns one account.
+- `PATCH /api/admin/users/:id/role` accepts `{ "role": "Manager" }`.
+- `PATCH /api/admin/users/:id/status` accepts `{ "is_active": false }`.
+- `DELETE /api/admin/users/:id` performs a safe delete by suspending the account.
+- All endpoints require JWT authentication and the `Admin` role.
+- Role changes prevent self-demotion and prevent removing the last active Admin.
+- Status changes prevent self-deactivation and prevent deactivating the last active Admin.
+- Role/status/delete operations are written to `AuditLogs`.
+
+Admin roles and permissions:
+
+- `GET /api/admin/roles` returns roles and their assigned permissions.
+- `POST /api/admin/roles/:roleId/permissions` assigns a permission to a role.
+- `DELETE /api/admin/roles/:roleId/permissions/:permissionId` removes a permission.
+- Permission changes are Admin-only and are logged in `AuditLogs`.
 
 Similar products:
 

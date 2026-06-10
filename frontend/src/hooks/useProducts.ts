@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getProducts } from "@/services/productService";
 import type { Product } from "@/types";
 
-export function useProducts(options?: { take?: number }) {
+export function useProducts(options?: { take?: number; pageSize?: number }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ export function useProducts(options?: { take?: number }) {
     return () => {
       active = false;
     };
-  }, [options?.take]);
+  }, [options?.pageSize, options?.take]);
 
   return { products, loading, error };
 }

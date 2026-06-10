@@ -46,6 +46,7 @@ export type User = {
   id: number | string;
   email: string;
   username: string;
+  fullName?: string;
   password?: string;
   role: string;
   active: number;
@@ -53,6 +54,9 @@ export type User = {
   permissions?: string[];
   accessToken?: string;
   refreshToken?: string;
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type CartItem = {

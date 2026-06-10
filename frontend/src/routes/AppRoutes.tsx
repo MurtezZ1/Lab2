@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
+import AdminLayout from "@/layouts/AdminLayout";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import RoleRoute from "@/routes/RoleRoute";
 
@@ -8,6 +9,9 @@ const AccountPage = lazy(() => import("@/pages/AccountPage"));
 const AdminAuditLogsPage = lazy(() => import("@/pages/AdminAuditLogsPage"));
 const AdminAnalyticsDashboardPage = lazy(() => import("@/pages/AdminAnalyticsDashboardPage"));
 const AdminDashboardPage = lazy(() => import("@/pages/AdminDashboardPage"));
+const AdminRolesPage = lazy(() => import("@/pages/AdminRolesPage"));
+const AdminSectionPage = lazy(() => import("@/pages/AdminSectionPage"));
+const AdminUsersPage = lazy(() => import("@/pages/AdminUsersPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const ComparePage = lazy(() => import("@/pages/ComparePage"));
 const CategoriesPage = lazy(() => import("@/pages/CategoriesPage"));
@@ -55,11 +59,20 @@ export function AppRoutes() {
             <Route path="/support" element={<SupportTicketsPage />} />
           </Route>
           <Route element={<RoleRoute roles={["admin", "Admin"]} />}>
-            <Route path="/admin" element={<AdminDashboardPage />} />
-            <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
-          </Route>
-          <Route element={<RoleRoute roles={["admin", "Admin", "manager", "Manager"]} />}>
-            <Route path="/admin/dashboard" element={<AdminAnalyticsDashboardPage />} />
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<AdminDashboardPage />} />
+              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/roles" element={<AdminRolesPage />} />
+              <Route path="/admin/products" element={<AdminSectionPage section="products" />} />
+              <Route path="/admin/orders" element={<AdminSectionPage section="orders" />} />
+              <Route path="/admin/reports" element={<AdminSectionPage section="reports" />} />
+              <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
+              <Route path="/admin/cms" element={<AdminSectionPage section="cms" />} />
+              <Route path="/admin/notifications" element={<AdminSectionPage section="notifications" />} />
+              <Route path="/admin/settings" element={<AdminSectionPage section="settings" />} />
+              <Route path="/admin/analytics" element={<AdminAnalyticsDashboardPage />} />
+            </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Route>

@@ -101,6 +101,9 @@ export async function register(input) {
 export async function login({ email, password }) {
   const user = await findUserByEmail(email);
   if (!user) throw new AppError("Invalid email or password.", 401);
+  if (Number(user.active) !== 1 || user.status === "INACTIVE" || user.status === "SUSPENDED") {
+    throw new AppError("This account is deactivated. Please contact an administrator.", 403);
+  }
 
   const passwordHash = user.password_hash ?? user.password;
   const matches = user.password_hash

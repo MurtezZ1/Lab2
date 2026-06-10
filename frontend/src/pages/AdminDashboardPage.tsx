@@ -1,6 +1,6 @@
 import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Bot, FileClock, LineChart, Package, Upload, Users } from "lucide-react";
+import { BarChart3, Bot, FileClock, LineChart, Package, ShieldCheck, Upload, Users } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import {
   getAdminOrders,
@@ -12,7 +12,7 @@ import {
 } from "@/services/adminService";
 import { getCmsContent, type CmsContent, updateCmsContent } from "@/services/cmsService";
 import { getAIAnalytics, type AIAnalytics } from "@/services/aiShoppingAssistantService";
-import type { Order, SupportTicket } from "@/types";
+import type { Order, SupportTicket, User } from "@/types";
 
 const AdminManagementPanel = lazy(() => import("@/pages/admin/AdminManagementPanel"));
 const AdminCmsPanel = lazy(() => import("@/pages/admin/AdminCmsPanel"));
@@ -25,7 +25,7 @@ function PanelLoader() {
 
 export default function AdminDashboardPage() {
   const { products } = useProducts();
-  const [users, setUsers] = useState<Array<{ id: string; email: string; username: string; role: string }>>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [cms, setCms] = useState<CmsContent | null>(null);
@@ -34,13 +34,13 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     Promise.all([
-      getAdminUsers().catch(() => []),
+      getAdminUsers().catch(() => ({ items: [], total: 0, page: 1, pageSize: 10 })),
       getAdminOrders().catch(() => []),
       getAdminSupportTickets().catch(() => []),
       getCmsContent().catch(() => null),
       getAIAnalytics().catch(() => null),
     ]).then(([nextUsers, nextOrders, nextTickets, nextCms, nextAIAnalytics]) => {
-      setUsers(nextUsers);
+      setUsers(nextUsers.items ?? []);
       setOrders(nextOrders);
       setTickets(nextTickets);
       setCms(nextCms);
@@ -89,7 +89,21 @@ export default function AdminDashboardPage() {
         </h1>
         <div className="flex flex-wrap gap-3">
           <Link
-            to="/admin/dashboard"
+            to="/admin/users"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
+          >
+            <Users className="h-4 w-4 text-primary" />
+            Manage Users
+          </Link>
+          <Link
+            to="/admin/roles"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
+          >
+            <ShieldCheck className="h-4 w-4 text-accent" />
+            Roles
+          </Link>
+          <Link
+            to="/admin/analytics"
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
           >
             <LineChart className="h-4 w-4 text-primary" />
