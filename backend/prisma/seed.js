@@ -96,7 +96,7 @@ const sampleProducts = [
     type: "camera",
     year: 2018,
     price: 1999.99,
-    image: "/file.svg",
+    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80",
     description: "High-performance full-frame Sony camera with fast hybrid autofocus.",
   },
   {
@@ -107,7 +107,7 @@ const sampleProducts = [
     type: "fitness tracker",
     year: 2022,
     price: 149.99,
-    image: "/file.svg",
+    image: "https://images.unsplash.com/photo-1576243345690-4e4b79b63288?auto=format&fit=crop&w=900&q=80",
     description: "Fitness tracker with GPS, stress tracking, SpO2 sensor, and long battery life.",
   },
 ];
