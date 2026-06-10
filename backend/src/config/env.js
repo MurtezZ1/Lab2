@@ -18,6 +18,8 @@ export const env = {
   stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY ?? "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
   stripeCurrency: process.env.STRIPE_CURRENCY ?? "usd",
+  openAIApiKey: process.env.OPENAI_API_KEY ?? "",
+  openAIModel: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
 };
 
 export function validateEnv() {

@@ -26,6 +26,8 @@ Important endpoints:
 - `POST /api/payments/orders/:orderId/intent`
 - `POST /api/payments/verify`
 - `POST /api/payments/webhook`
+- `POST /api/ai/shopping-assistant`
+- `GET /api/ai/analytics`
 - `GET /api/invoices`
 - `GET /api/invoices/:orderId`
 - `GET /api/invoices/:orderId/download`
@@ -83,6 +85,15 @@ Product comparison:
 - The endpoint returns product name, brand, category, price, rating, reviews count, stock, discount, specifications, features, and image.
 - The frontend stores selected products in Redux Toolkit `compareSlice` and persists them in `localStorage`.
 - Duplicate products are blocked and the maximum comparison size is 3 products.
+
+AI shopping assistant:
+
+- `POST /api/ai/shopping-assistant` accepts natural-language requests such as `{ "message": "I need a laptop for programming under 800 euros" }`.
+- The endpoint extracts category, budget, brand preference, product type, purpose, and requested features.
+- Recommendations use real PostgreSQL product data and rank products by category match, brand, price, rating, reviews, stock, discount, specifications, and AI product score.
+- If `OPENAI_API_KEY` is configured, OpenAI improves the assistant explanation. If not, local NLP recommendation logic is used.
+- MongoDB `AIChatHistory` stores the user id, question, response, extracted intent, recommended product ids, and timestamp.
+- `GET /api/ai/analytics` is restricted to `Admin` and `Manager` roles and returns total AI chats, most common questions, and most requested categories.
 
 Admin analytics dashboard:
 

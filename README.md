@@ -594,6 +594,47 @@ ProductCard / ProductDetailsPage
 
 Users can compare 2 or 3 products side-by-side. The comparison page shows price, brand, category, rating, review count, stock, discount, storage, RAM, camera, battery, processor, display, and features. The page highlights best values such as best price, best rating, best storage, biggest battery, and best performance.
 
+## AI Shopping Assistant
+
+The application includes a floating AI Shopping Assistant button on every page.
+
+Frontend flow:
+
+```text
+MainLayout
+  -> AIShoppingAssistant
+  -> aiShoppingAssistantService.ts
+  -> POST /api/ai/shopping-assistant
+```
+
+Backend flow:
+
+```text
+aiRoutes
+  -> aiShoppingAssistantController
+  -> aiShoppingAssistantService
+  -> aiRepository
+  -> PostgreSQL products + MongoDB AIChatHistory
+```
+
+Features:
+
+- Floating bottom-right AI robot button with `Ask AI` tooltip.
+- Chat window with user messages, AI messages, typing indicator, suggested questions, minimize, close, and auto-scroll.
+- Suggested chips include `Best Phones`, `Gaming Laptops`, `Programming Laptops`, `Budget Deals`, and `Trending Products`.
+- Natural-language extraction for category, budget, brand, purpose, and requested features.
+- Recommendations are ranked using real product data, price, rating, reviews, stock, discount, specifications, and AI product score.
+- If `OPENAI_API_KEY` exists, OpenAI improves explanations. Without it, local recommendation logic keeps the assistant working.
+- MongoDB `AIChatHistory` tracks questions, responses, extracted intent, products, and timestamp.
+- Admin Dashboard shows total AI chats, most requested categories, and common questions.
+
+API endpoints:
+
+```text
+POST /api/ai/shopping-assistant
+GET  /api/ai/analytics
+```
+
 ## Main Results
 
 The integrated pipeline trains and compares:

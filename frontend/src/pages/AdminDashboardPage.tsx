@@ -1,6 +1,6 @@
 import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, FileClock, LineChart, Package, Upload, Users } from "lucide-react";
+import { BarChart3, Bot, FileClock, LineChart, Package, Upload, Users } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import {
   getAdminOrders,
@@ -11,6 +11,7 @@ import {
   saveProduct,
 } from "@/services/adminService";
 import { getCmsContent, type CmsContent, updateCmsContent } from "@/services/cmsService";
+import { getAIAnalytics, type AIAnalytics } from "@/services/aiShoppingAssistantService";
 import type { Order, SupportTicket } from "@/types";
 
 const AdminManagementPanel = lazy(() => import("@/pages/admin/AdminManagementPanel"));
@@ -28,6 +29,7 @@ export default function AdminDashboardPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [cms, setCms] = useState<CmsContent | null>(null);
+  const [aiAnalytics, setAIAnalytics] = useState<AIAnalytics | null>(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -36,11 +38,13 @@ export default function AdminDashboardPage() {
       getAdminOrders().catch(() => []),
       getAdminSupportTickets().catch(() => []),
       getCmsContent().catch(() => null),
-    ]).then(([nextUsers, nextOrders, nextTickets, nextCms]) => {
+      getAIAnalytics().catch(() => null),
+    ]).then(([nextUsers, nextOrders, nextTickets, nextCms, nextAIAnalytics]) => {
       setUsers(nextUsers);
       setOrders(nextOrders);
       setTickets(nextTickets);
       setCms(nextCms);
+      setAIAnalytics(nextAIAnalytics);
     });
   }, []);
 
@@ -108,6 +112,43 @@ export default function AdminDashboardPage() {
         <div className="glass-card rounded-2xl p-6"><Users className="w-7 h-7 text-accent" /><p className="mt-6 text-sm text-gray-400">Users</p><h2 className="text-3xl font-black text-white">{users.length}</h2></div>
         <div className="glass-card rounded-2xl p-6"><BarChart3 className="w-7 h-7 text-purple-400" /><p className="mt-6 text-sm text-gray-400">Orders</p><h2 className="text-3xl font-black text-white">{orders.length}</h2></div>
       </div>
+
+      {aiAnalytics && (
+        <div className="glass-card rounded-2xl p-6 mb-8">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Bot className="w-5 h-5 text-primary" />
+            AI Shopping Assistant Analytics
+          </h2>
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-sm text-gray-400">Total AI Chats</p>
+              <h3 className="mt-2 text-3xl font-black text-white">{aiAnalytics.totalChats}</h3>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-sm font-bold text-gray-300">Most Requested Categories</p>
+              <div className="mt-3 space-y-2 text-sm text-gray-400">
+                {aiAnalytics.requestedCategories.length ? aiAnalytics.requestedCategories.map((item) => (
+                  <div key={item.category} className="flex justify-between gap-3">
+                    <span className="capitalize">{item.category}</span>
+                    <span className="font-bold text-white">{item.count}</span>
+                  </div>
+                )) : <p>No AI category data yet.</p>}
+              </div>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <p className="text-sm font-bold text-gray-300">Common Questions</p>
+              <div className="mt-3 space-y-2 text-sm text-gray-400">
+                {aiAnalytics.commonQuestions.length ? aiAnalytics.commonQuestions.map((item) => (
+                  <div key={item.question} className="flex justify-between gap-3">
+                    <span className="line-clamp-1">{item.question}</span>
+                    <span className="font-bold text-white">{item.count}</span>
+                  </div>
+                )) : <p>No AI questions yet.</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Suspense fallback={<PanelLoader />}>
         <AdminManagementPanel

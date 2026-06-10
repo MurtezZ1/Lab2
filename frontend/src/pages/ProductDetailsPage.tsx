@@ -7,7 +7,7 @@ import { addToCompare } from "@/redux/slices/compareSlice";
 import { getProductById } from "@/services/productService";
 import { trackProductView } from "@/services/recommendationService";
 import type { Product } from "@/types";
-import { Battery, Cpu, GitCompareArrows, Maximize, RotateCcw, Shield, Truck } from "lucide-react";
+import { Battery, Cpu, GitCompareArrows, HardDrive, Info, Maximize, RotateCcw, Shield, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -47,12 +47,7 @@ export default function ProductDetailsPage() {
     setTimeout(() => setCompareNotice(""), 2500);
   };
 
-  let displaySpecs: { width?: string; height?: string } | null = null;
-  try {
-    displaySpecs = product.display ? JSON.parse(product.display) : null;
-  } catch {
-    displaySpecs = null;
-  }
+  const productSpecifications = getProductSpecifications(product);
 
   return (
     <div className="container mx-auto px-6 py-12">
@@ -74,6 +69,20 @@ export default function ProductDetailsPage() {
                 <img src={product.image} alt="thumbnail" className="h-full w-full object-contain p-2" />
               </div>
             ))}
+          </div>
+          <div className="glass-card rounded-2xl border border-white/5 p-6">
+            <div className="mb-5 flex items-center gap-3">
+              <Info className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold text-white">Real Product Specifications</h2>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {productSpecifications.map((spec) => (
+                <div key={spec.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-xs font-bold uppercase text-gray-500">{spec.label}</p>
+                  <p className="mt-1 text-sm font-semibold leading-relaxed text-white">{spec.value}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -116,12 +125,21 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
             )}
-            {displaySpecs && (
+            {product.display && (
               <div className="flex items-center gap-3 p-4 rounded-xl glass bg-white/5 col-span-2">
                 <Maximize className="w-6 h-6 text-purple-400" />
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 uppercase">Display Dimensions</span>
-                  <span className="text-sm text-white font-medium">{displaySpecs.width} x {displaySpecs.height} inches</span>
+                  <span className="text-xs text-gray-500 uppercase">Display</span>
+                  <span className="text-sm text-white font-medium">{product.display}</span>
+                </div>
+              </div>
+            )}
+            {product.storage && (
+              <div className="flex items-center gap-3 p-4 rounded-xl glass bg-white/5 col-span-2">
+                <HardDrive className="w-6 h-6 text-green-400" />
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-500 uppercase">Storage</span>
+                  <span className="text-sm text-white font-medium">{product.storage}</span>
                 </div>
               </div>
             )}
@@ -160,4 +178,26 @@ export default function ProductDetailsPage() {
       <CartNotice show={Boolean(compareNotice)} message={compareNotice} />
     </div>
   );
+}
+
+function getProductSpecifications(product: Product) {
+  return [
+    { label: "Brand", value: product.manufacturer },
+    { label: "Model", value: product.model },
+    { label: "Category", value: product.type },
+    { label: "Year", value: product.year ? String(product.year) : "" },
+    { label: "Processor", value: product.processor },
+    { label: "RAM", value: product.ram_size },
+    { label: "Storage", value: product.storage },
+    { label: "Display", value: product.display },
+    { label: "Operating System", value: product.os },
+    { label: "Battery", value: product.battery },
+    { label: "Weight", value: product.weight },
+    { label: "Dimensions", value: product.dimensions },
+    { label: "Keyboard", value: product.keyboard },
+    { label: "Ports", value: product.ports },
+    { label: "Connectivity", value: product.connectivity },
+    { label: "Camera", value: product.camera },
+    { label: "Extra Features", value: product.additional_features },
+  ].filter((spec): spec is { label: string; value: string } => Boolean(spec.value && String(spec.value).trim()));
 }

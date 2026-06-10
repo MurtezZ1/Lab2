@@ -32,3 +32,19 @@ export const ProductViewHistory =
     "ProductViewHistory",
     new mongoose.Schema({ userId: String, productId: String, productName: String }, baseOptions),
   );
+
+export const AIChatHistory =
+  mongoose.models.AIChatHistory ??
+  mongoose.model(
+    "AIChatHistory",
+    new mongoose.Schema(
+      {
+        userId: String,
+        question: String,
+        response: String,
+        extractedIntent: Object,
+        productIds: [String],
+      },
+      baseOptions,
+    ),
+  );

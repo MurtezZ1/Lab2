@@ -27,6 +27,7 @@ export type Product = {
   stock_quantity?: number;
   similarityScore?: number;
   recommendationScore?: number;
+  aiProductScore?: number;
 };
 
 export type ComparedProduct = Product & {
