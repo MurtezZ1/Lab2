@@ -9,7 +9,7 @@ const defaultFooter = {
   about:
     "Electronic Online Shop is a modern e-commerce platform dedicated to providing high-quality electronics, accessories and technology products. Our mission is to deliver the best shopping experience through innovation, reliability and customer satisfaction.",
   companyName: "Electronic Online Shop",
-  address: "Dukagjini Center\nPrishtine, Kosovo",
+  address: "Dukagjini Center\nPrishtinë, Kosovo",
   phone: "+383 XX XXX XXX",
   email: "info@electronicshop.com",
   workingHours: {

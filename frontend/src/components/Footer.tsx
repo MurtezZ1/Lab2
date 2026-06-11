@@ -8,7 +8,6 @@ import {
   Clock,
   Cookie,
   Cpu,
-  ExternalLink,
   FileText,
   Heart,
   Home,
@@ -161,28 +160,6 @@ export default function Footer() {
 
             <h2 className="mt-6 text-lg font-black text-white">About Us</h2>
             <p className="mt-3 text-sm leading-6 text-gray-400">{footer.about}</p>
-
-            <div className="mt-6">
-              <h2 className="text-lg font-black text-white">Social Media</h2>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {socialLinks.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <a
-                      key={item.label}
-                      href={normalizeExternalUrl(item.href)}
-                      target="_blank"
-                      rel="noreferrer"
-                      title={item.label}
-                      aria-label={item.label}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-gray-300 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white"
-                    >
-                      <Icon className="h-4 w-4" />
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
           </section>
 
           <section className="min-w-0">
@@ -214,7 +191,7 @@ export default function Footer() {
             </div>
           </section>
 
-          <section id="footer-contact" className="min-w-0">
+          <section className="min-w-0">
             <h2 className="text-lg font-black text-white">Quick Links</h2>
             <nav className="mt-4 grid grid-cols-2 gap-2 text-sm">
               {quickLinks.map((item) => {
@@ -238,26 +215,46 @@ export default function Footer() {
                 );
               })}
             </nav>
-
-            <div className="mt-8">
-              <h2 className="text-lg font-black text-white">Contact Us</h2>
-              <div className="mt-4 space-y-3 text-sm text-gray-400">
-                <ContactLine icon={Phone} href={`tel:${footer.phone.replace(/\s/g, "")}`} value={footer.phone} />
-                <ContactLine icon={Mail} href={`mailto:${footer.email}`} value={footer.email} />
-                <ContactLine icon={MapPin} value={footer.address.replace("\n", ", ")} />
-              </div>
-              <a
-                href={`mailto:${footer.email}`}
-                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/80"
-              >
-                Get In Touch
-                <Send className="h-4 w-4" />
-              </a>
-            </div>
           </section>
 
-          <section className="min-w-0">
-            <h2 className="text-lg font-black text-white">Newsletter</h2>
+          <section id="footer-contact" className="min-w-0">
+            <h2 className="text-lg font-black text-white">Contact & Social Media</h2>
+            <div className="mt-4 space-y-3 text-sm text-gray-400">
+              <ContactLine icon={Phone} href={`tel:${footer.phone.replace(/\s/g, "")}`} value={footer.phone} />
+              <ContactLine icon={Mail} href={`mailto:${footer.email}`} value={footer.email} />
+              <ContactLine icon={MapPin} value={footer.address.replace("\n", ", ")} />
+            </div>
+            <a
+              href={`mailto:${footer.email}`}
+              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/80"
+            >
+              Get In Touch
+              <Send className="h-4 w-4" />
+            </a>
+
+            <div className="mt-7">
+              <h3 className="text-sm font-black uppercase tracking-wide text-white">Social Media</h3>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {socialLinks.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <a
+                      key={item.label}
+                      href={normalizeExternalUrl(item.href)}
+                      target="_blank"
+                      rel="noreferrer"
+                      title={item.label}
+                      aria-label={item.label}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-gray-300 transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-white"
+                    >
+                      <Icon className="h-4 w-4" />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
+            <h2 className="mt-8 text-lg font-black text-white">Newsletter</h2>
             <form onSubmit={submitNewsletter} className="mt-4 space-y-3">
               <input
                 type="email"
@@ -281,12 +278,10 @@ export default function Footer() {
                 </p>
               )}
             </form>
-
-            <div className="mt-6">
-              <GoogleMapLocation />
-            </div>
           </section>
         </div>
+
+        <GoogleMapLocation />
       </div>
 
       <div className="border-t border-white/10">
