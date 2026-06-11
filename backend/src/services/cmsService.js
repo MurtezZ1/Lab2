@@ -5,10 +5,31 @@ import {
   recordAuditLogSafe,
 } from "./auditLogService.js";
 
+const defaultFooter = {
+  about:
+    "Electronic Online Shop is a modern e-commerce platform dedicated to providing high-quality electronics, accessories and technology products. Our mission is to deliver the best shopping experience through innovation, reliability and customer satisfaction.",
+  companyName: "Electronic Online Shop",
+  address: "Dukagjini Center\nPrishtine, Kosovo",
+  phone: "+383 XX XXX XXX",
+  email: "info@electronicshop.com",
+  workingHours: {
+    mondayFriday: "09:00 - 18:00",
+    saturday: "10:00 - 16:00",
+    sunday: "Closed",
+  },
+  socialLinks: {
+    facebook: "https://www.facebook.com/",
+    instagram: "https://www.instagram.com/",
+    linkedin: "https://www.linkedin.com/",
+    tiktok: "https://www.tiktok.com/",
+    x: "https://x.com/",
+  },
+};
+
 const defaultCms = {
   hero: { title: "Elevate Your Digital Lifestyle", subtitle: "Discover premium tech." },
   homepage: { featuredTitle: "Trending Now" },
-  footer: { text: "Sunspot Electronic Online Shop" },
+  footer: { text: "Sunspot Electronic Online Shop", ...defaultFooter },
   about: { text: "Premium technology store." },
   contact: { email: "support@sunspot.com" },
   banners: [],
@@ -16,7 +37,7 @@ const defaultCms = {
 
 export async function getCmsContent() {
   const setting = await prisma.setting.findUnique({ where: { key: "cms_content" } });
-  return setting?.value ?? defaultCms;
+  return mergeCmsDefaults(setting?.value);
 }
 
 export async function updateCmsContent(value, userId, auditContext = {}) {
@@ -36,4 +57,30 @@ export async function updateCmsContent(value, userId, auditContext = {}) {
     ...auditContext,
   });
   return setting;
+}
+
+function mergeCmsDefaults(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return defaultCms;
+
+  return {
+    ...defaultCms,
+    ...value,
+    hero: { ...defaultCms.hero, ...(value.hero ?? {}) },
+    homepage: { ...defaultCms.homepage, ...(value.homepage ?? {}) },
+    footer: {
+      ...defaultCms.footer,
+      ...(value.footer ?? {}),
+      workingHours: {
+        ...defaultCms.footer.workingHours,
+        ...(value.footer?.workingHours ?? {}),
+      },
+      socialLinks: {
+        ...defaultCms.footer.socialLinks,
+        ...(value.footer?.socialLinks ?? {}),
+      },
+    },
+    about: { ...defaultCms.about, ...(value.about ?? {}) },
+    contact: { ...defaultCms.contact, ...(value.contact ?? {}) },
+    banners: Array.isArray(value.banners) ? value.banners : defaultCms.banners,
+  };
 }

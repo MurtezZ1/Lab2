@@ -3,7 +3,26 @@ import { apiClient } from "@/services/apiClient";
 export type CmsContent = {
   hero: { title: string; subtitle: string };
   homepage: { featuredTitle: string };
-  footer: { text: string };
+  footer: {
+    text: string;
+    about: string;
+    companyName: string;
+    address: string;
+    phone: string;
+    email: string;
+    workingHours: {
+      mondayFriday: string;
+      saturday: string;
+      sunday: string;
+    };
+    socialLinks: {
+      facebook: string;
+      instagram: string;
+      linkedin: string;
+      tiktok: string;
+      x: string;
+    };
+  };
   about: { text: string };
   contact: { email: string };
   banners: string[];

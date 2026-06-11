@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import AIShoppingAssistant from "@/components/AIShoppingAssistant";
+import Footer from "@/components/Footer";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCartItems } from "@/redux/slices/cartSlice";
 import { getCartItems } from "@/services/cartService";
@@ -51,11 +52,12 @@ export default function MainLayout() {
   }, [dispatch, user]);
 
   return (
-    <main className="min-h-screen bg-dark-bg text-foreground selection:bg-primary selection:text-white">
+    <main className="flex min-h-screen flex-col bg-dark-bg text-foreground selection:bg-primary selection:text-white">
       <Navbar />
-      <div className="pt-24">
+      <div className="flex-1 pt-24">
         <Outlet />
       </div>
+      <Footer />
       <AIShoppingAssistant />
     </main>
   );

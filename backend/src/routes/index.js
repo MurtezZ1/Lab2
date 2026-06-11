@@ -12,6 +12,7 @@ import commerceRoutes from "./commerceRoutes.js";
 import orderRoutes from "./orderRoutes.js";
 import paymentRoutes from "./paymentRoutes.js";
 import invoiceRoutes from "./invoiceRoutes.js";
+import newsletterRoutes from "./newsletterRoutes.js";
 import supportRoutes from "./supportRoutes.js";
 import notificationRoutes from "./notificationRoutes.js";
 
@@ -29,6 +30,7 @@ router.use("/cart", cartRoutes);
 router.use("/orders", orderRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/invoices", invoiceRoutes);
+router.use("/newsletter", newsletterRoutes);
 router.use("/support-tickets", supportRoutes);
 router.use("/notifications", notificationRoutes);
 router.use("/", advancedRoutes);
