@@ -195,6 +195,9 @@ export default function AdminAnalyticsDashboardPage() {
         <ChartPanel title="User Growth" icon={Users}>
           <LineChart data={dashboard?.charts.userGrowth ?? []} loading={loading} valuePrefix="" />
         </ChartPanel>
+        <ChartPanel title="AI Demand Forecast" icon={TrendingUp}>
+          <LineChart data={dashboard?.charts.demandForecast ?? []} loading={loading} valuePrefix="" />
+        </ChartPanel>
         <ChartPanel title="Top Selling Products" icon={BarChart3}>
           <BarChart data={dashboard?.charts.topSellingProducts ?? []} loading={loading} valueKey="units" />
         </ChartPanel>

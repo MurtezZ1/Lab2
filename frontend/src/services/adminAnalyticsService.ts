@@ -48,6 +48,7 @@ export type AnalyticsDashboard = {
     ordersPerMonth: MonthPoint[];
     revenuePerMonth: MonthPoint[];
     userGrowth: MonthPoint[];
+    demandForecast: MonthPoint[];
     topSellingProducts: BarPoint[];
     topCategories: BarPoint[];
     ordersByStatus: StatusPoint[];

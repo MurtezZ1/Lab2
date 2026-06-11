@@ -175,6 +175,7 @@ async function buildAnalyticsDashboard(filters) {
       ordersPerMonth: monthlyCount(orders, "created_at", "Orders"),
       revenuePerMonth: monthlySum(payments, "created_at", "amount", "Revenue"),
       userGrowth: monthlyCount(users, "created_at", "Users"),
+      demandForecast: demandForecast(orderItems, mongo),
       topSellingProducts: topSellingProducts(orderItems),
       topCategories: topCategories(orderItems),
       ordersByStatus: ordersByStatus(orders),
@@ -296,12 +297,33 @@ function ordersByStatus(orders) {
   return [...buckets.entries()].map(([status, value]) => ({ status, value }));
 }
 
+function demandForecast(orderItems, mongo) {
+  const soldUnits = orderItems.reduce((sum, item) => sum + Number(item.quantity ?? 0), 0);
+  const productViews = Number(mongo.productViews ?? 0);
+  const userActivities = Number(mongo.userActivities ?? 0);
+  const baseDemand = Math.max(5, soldUnits + productViews * 0.12 + userActivities * 0.08);
+  const growthSignal = soldUnits > 0 ? 1.04 : productViews > 0 ? 1.03 : 1.01;
+  const now = new Date();
+
+  return Array.from({ length: 6 }).map((_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() + index + 1, 1);
+    const seasonalMultiplier = 1 + Math.sin((index + 1) / 6 * Math.PI) * 0.08;
+    const value = Math.round(baseDemand * Math.pow(growthSignal, index + 1) * seasonalMultiplier);
+    return {
+      month: monthKey(date),
+      label: "AI Forecast Demand",
+      value,
+    };
+  });
+}
+
 function exportRows(dashboard) {
   return [
     ...dashboard.kpis.map((item) => ({ section: "KPI", metric: item.title, value: item.value })),
     ...dashboard.charts.ordersPerMonth.map((item) => ({ section: "Orders Per Month", metric: item.month, value: item.value })),
     ...dashboard.charts.revenuePerMonth.map((item) => ({ section: "Revenue Per Month", metric: item.month, value: item.value })),
     ...dashboard.charts.userGrowth.map((item) => ({ section: "User Growth", metric: item.month, value: item.value })),
+    ...dashboard.charts.demandForecast.map((item) => ({ section: "AI Demand Forecast", metric: item.month, value: item.value })),
     ...dashboard.charts.topSellingProducts.map((item) => ({ section: "Top Selling Products", metric: item.name, value: `${item.units} units / ${money(item.revenue)}` })),
     ...dashboard.charts.topCategories.map((item) => ({ section: "Top Categories", metric: item.name, value: `${item.units} units / ${money(item.revenue)}` })),
     ...dashboard.charts.ordersByStatus.map((item) => ({ section: "Orders By Status", metric: item.status, value: item.value })),

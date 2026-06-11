@@ -1,6 +1,7 @@
 import AddToCartButton from "@/components/AddToCartButton";
 import CartNotice from "@/components/CartNotice";
 import ProductFeedback from "@/components/ProductFeedback";
+import Product360Viewer from "@/components/Product360Viewer";
 import SimilarProductsWidget from "@/components/SimilarProductsWidget";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { addToCompare } from "@/redux/slices/compareSlice";
@@ -53,16 +54,7 @@ export default function ProductDetailsPage() {
     <div className="container mx-auto px-6 py-12">
       <div className="grid lg:grid-cols-2 gap-12">
         <div className="space-y-6">
-          <div className="glass-card rounded-3xl p-12 aspect-square relative flex items-center justify-center border border-white/5 group">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="h-full w-full object-contain p-8 group-hover:scale-105 transition-transform duration-500"
-            />
-            <button className="absolute top-6 right-6 p-3 rounded-xl glass bg-black/50 text-white hover:text-primary hover:bg-black/80 transition-all opacity-0 group-hover:opacity-100">
-              <Maximize className="w-5 h-5" />
-            </button>
-          </div>
+          <Product360Viewer image={product.image} name={product.name} />
           <div className="grid grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((item) => (
               <div key={item} className={`glass-card rounded-xl aspect-square relative border ${item === 1 ? "border-primary" : "border-white/5 opacity-50 hover:opacity-100 cursor-pointer"} transition-all`}>
