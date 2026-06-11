@@ -34,6 +34,11 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION || 'eu-central-1' }}
   TF_ENV: ${{ inputs.environment || 'dev' }}
   BACKEND_IMAGE_TAG: ${{ github.sha }}
+  AWS_GITHUB_ACTIONS_ROLE_ARN: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+  TF_BUCKET_NAME_PREFIX: ${{ vars.TF_BUCKET_NAME_PREFIX }}
+  BACKEND_ECR_REPOSITORY_URL: ${{ vars.BACKEND_ECR_REPOSITORY_URL }}
+  ECS_CLUSTER_NAME: ${{ vars.ECS_CLUSTER_NAME }}
+  ECS_SERVICE_NAME: ${{ vars.ECS_SERVICE_NAME }}
 
 jobs:
   terraform:
@@ -44,12 +49,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -57,22 +56,39 @@ jobs:
         run: terraform fmt -check -recursive infra/terraform
 
       - name: Terraform init
-        run: terraform -chdir=infra/terraform/environments/${{ env.TF_ENV }} init
+        run: terraform -chdir=infra/terraform/environments/${{ env.TF_ENV }} init -backend=false
 
       - name: Terraform validate
         run: terraform -chdir=infra/terraform/environments/${{ env.TF_ENV }} validate
 
+      - name: Skip AWS plan notice
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN == '' || env.TF_BUCKET_NAME_PREFIX == ''
+        run: |
+          echo "::notice::Terraform syntax validation passed. AWS plan was skipped because AWS_GITHUB_ACTIONS_ROLE_ARN or TF_BUCKET_NAME_PREFIX is not configured."
+
+      - name: Configure AWS credentials
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN != '' && env.TF_BUCKET_NAME_PREFIX != ''
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform init with backend
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN != '' && env.TF_BUCKET_NAME_PREFIX != ''
+        run: terraform -chdir=infra/terraform/environments/${{ env.TF_ENV }} init
+
       - name: Terraform plan
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN != '' && env.TF_BUCKET_NAME_PREFIX != ''
         run: |
           terraform -chdir=infra/terraform/environments/${{ env.TF_ENV }} plan \
-            -var="bucket_name_prefix=${{ vars.TF_BUCKET_NAME_PREFIX }}" \
+            -var="bucket_name_prefix=${{ env.TF_BUCKET_NAME_PREFIX }}" \
             -var="github_org=${{ github.repository_owner }}" \
             -var="github_repo=${{ github.event.repository.name }}" \
             -var="backend_image_tag=${{ env.BACKEND_IMAGE_TAG }}" \
             -out=tfplan
 
       - name: Terraform apply
-        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.apply == true)
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN != '' && env.TF_BUCKET_NAME_PREFIX != '' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.apply == true)
         run: terraform -chdir=infra/terraform/environments/${{ env.TF_ENV }} apply -auto-approve tfplan
 
   build-and-deploy-backend:
@@ -85,26 +101,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Skip backend deploy notice
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN == '' || env.BACKEND_ECR_REPOSITORY_URL == '' || env.ECS_CLUSTER_NAME == '' || env.ECS_SERVICE_NAME == ''
+        run: |
+          echo "::notice::Backend deploy was skipped because AWS/ECR/ECS GitHub secrets or variables are not configured yet."
+
       - name: Configure AWS credentials
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN != '' && env.BACKEND_ECR_REPOSITORY_URL != '' && env.ECS_CLUSTER_NAME != '' && env.ECS_SERVICE_NAME != ''
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_GITHUB_ACTIONS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN != '' && env.BACKEND_ECR_REPOSITORY_URL != '' && env.ECS_CLUSTER_NAME != '' && env.ECS_SERVICE_NAME != ''
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push backend image
-        env:
-          ECR_REPOSITORY_URL: ${{ vars.BACKEND_ECR_REPOSITORY_URL }}
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN != '' && env.BACKEND_ECR_REPOSITORY_URL != '' && env.ECS_CLUSTER_NAME != '' && env.ECS_SERVICE_NAME != ''
         run: |
-          docker build -f backend/Dockerfile -t "$ECR_REPOSITORY_URL:${BACKEND_IMAGE_TAG}" backend
-          docker push "$ECR_REPOSITORY_URL:${BACKEND_IMAGE_TAG}"
+          docker build -f backend/Dockerfile -t "$BACKEND_ECR_REPOSITORY_URL:${BACKEND_IMAGE_TAG}" backend
+          docker push "$BACKEND_ECR_REPOSITORY_URL:${BACKEND_IMAGE_TAG}"
 
       - name: Force ECS new deployment
+        if: env.AWS_GITHUB_ACTIONS_ROLE_ARN != '' && env.BACKEND_ECR_REPOSITORY_URL != '' && env.ECS_CLUSTER_NAME != '' && env.ECS_SERVICE_NAME != ''
         run: |
           aws ecs update-service \
-            --cluster "${{ vars.ECS_CLUSTER_NAME }}" \
-            --service "${{ vars.ECS_SERVICE_NAME }}" \
+            --cluster "$ECS_CLUSTER_NAME" \
+            --service "$ECS_SERVICE_NAME" \
             --force-new-deployment
