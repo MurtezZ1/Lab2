@@ -1,4 +1,4 @@
-import ProductCard from "@/components/ProductCard";
+import ProductCarousel from "@/components/ProductCarousel";
 import RecommendationSection from "@/components/RecommendationSection";
 import { useProducts } from "@/hooks/useProducts";
 import {
@@ -7,8 +7,9 @@ import {
 } from "@/services/recommendationService";
 import { getCmsContent, type CmsContent } from "@/services/cmsService";
 import { ArrowRight, Star, Zap, Shield, Truck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import type { Product } from "@/types";
 
 const initialRecommendations: PersonalizedRecommendationBundle = {
   personalizedProducts: [],
@@ -19,7 +20,7 @@ const initialRecommendations: PersonalizedRecommendationBundle = {
 };
 
 export default function HomePage() {
-  const { products } = useProducts({ take: 4 });
+  const { products, loading: productsLoading, error: productsError } = useProducts({ take: 12 });
   const [recommendations, setRecommendations] = useState<PersonalizedRecommendationBundle>(initialRecommendations);
   const [recommendationsLoading, setRecommendationsLoading] = useState(true);
   const [recommendationsError, setRecommendationsError] = useState("");
@@ -32,6 +33,17 @@ export default function HomePage() {
       .finally(() => setRecommendationsLoading(false));
     getCmsContent().then(setCms).catch(() => undefined);
   }, []);
+
+  const popularProducts = useMemo(() => {
+    return [...products].sort((left, right) => popularityScore(right) - popularityScore(left));
+  }, [products]);
+
+  const recommendedProducts = recommendations.personalizedProducts.length
+    ? recommendations.personalizedProducts
+    : popularProducts;
+  const trendingProducts = recommendations.trendingProducts.length
+    ? recommendations.trendingProducts
+    : popularProducts;
 
   return (
     <div className="flex flex-col gap-24 pb-24">
@@ -143,23 +155,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="container mx-auto px-6">
-        <div className="flex items-end justify-between mb-10">
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-2">{cms?.homepage.featuredTitle ?? "Trending Now"}</h2>
-            <p className="text-gray-400">The most sought-after tech this week.</p>
-          </div>
-          <Link to="/products" className="hidden sm:flex items-center gap-2 text-primary hover:text-accent transition-colors font-medium">
-            View All <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} {...product} />
-          ))}
-        </div>
-      </section>
+      <ProductCarousel
+        title={cms?.homepage.featuredTitle ?? "Trending Now"}
+        subtitle="Popular products ranked by customer activity, demand signals, ratings and recent catalog momentum."
+        products={popularProducts}
+        loading={productsLoading}
+        error={productsError ?? ""}
+        emptyMessage="Trending products are not available yet."
+        viewAllTo="/products"
+      />
 
       <section className="container mx-auto px-6 mb-12">
         <h2 className="text-3xl font-bold text-white mb-10 text-center">Shop by Category</h2>
@@ -175,17 +179,30 @@ export default function HomePage() {
 
       <RecommendationSection
         title="Recommended For You"
-        products={recommendations.personalizedProducts}
-        loading={recommendationsLoading}
+        subtitle={recommendations.fallback ? "Popular products selected while we learn your shopping preferences." : "Personalized from purchase history, wishlist, product views and AI recommendations."}
+        products={recommendedProducts}
+        loading={recommendationsLoading && !recommendedProducts.length}
         error={recommendationsError}
+        emptyMessage="Popular recommendations are not available yet."
       />
 
       <RecommendationSection
         title="Trending Products"
-        products={recommendations.trendingProducts}
-        loading={recommendationsLoading}
+        subtitle="Top-selling, high-demand and highly rated products from the store catalog."
+        products={trendingProducts}
+        loading={recommendationsLoading && !trendingProducts.length}
         error={recommendationsError}
+        emptyMessage="Trending products are not available yet."
       />
     </div>
+  );
+}
+
+function popularityScore(product: Product) {
+  return (
+    Number(product.recommendationScore ?? 0) * 100 +
+    Number(product.rating_average ?? 0) * 20 +
+    Number(product.discount_percentage ?? 0) +
+    Number(product.stock_quantity ?? 0) * 0.05
   );
 }

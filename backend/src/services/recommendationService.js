@@ -28,7 +28,7 @@ const featureFields = [
   "model",
 ];
 
-const RECOMMENDATION_LIMIT = 4;
+const RECOMMENDATION_LIMIT = 12;
 
 export async function getSimilarProducts(productId) {
   const numericProductId = Number(productId);
