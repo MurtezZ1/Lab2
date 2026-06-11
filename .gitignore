@@ -11,6 +11,10 @@ node_modules/
 dist/
 build/
 tsconfig.tsbuildinfo
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfplan
 
 # Local runtime logs
 *.log
