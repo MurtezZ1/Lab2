@@ -6,6 +6,7 @@ export type PaymentIntentResponse = {
   paymentIntentId: string;
   publishableKey: string;
   demoMode?: boolean;
+  paymentMode?: "demo" | "test" | "live" | "configured";
   message?: string;
   order: Order;
 };

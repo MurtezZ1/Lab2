@@ -25,6 +25,7 @@ export type Product = {
   rating_average?: number;
   discount_percentage?: number;
   stock_quantity?: number;
+  is_active?: boolean;
   similarityScore?: number;
   recommendationScore?: number;
   aiProductScore?: number;

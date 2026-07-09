@@ -1,9 +1,12 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Bell, Boxes, ClipboardList, FileClock, Gauge, LayoutPanelTop, Menu, Package, Settings, ShieldCheck, Users, X } from "lucide-react";
+import { Bell, Boxes, ClipboardList, FileClock, Gauge, LayoutPanelTop, Menu, Package, Rocket, ServerCog, Settings, ShieldCheck, Users, X } from "lucide-react";
 import { useState } from "react";
+import AdminDemoModeBanner from "@/components/AdminDemoModeBanner";
 
 const links = [
   { to: "/admin/dashboard", label: "Dashboard", icon: Gauge },
+  { to: "/admin/launch-readiness", label: "Launch Readiness", icon: Rocket },
+  { to: "/admin/system-monitor", label: "System Monitor", icon: ServerCog },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/roles", label: "Roles & Permissions", icon: ShieldCheck },
   { to: "/admin/products", label: "Products", icon: Package },
@@ -66,6 +69,7 @@ export default function AdminLayout() {
         </aside>
 
         <div className="min-w-0">
+          <AdminDemoModeBanner />
           <Outlet />
         </div>
       </div>

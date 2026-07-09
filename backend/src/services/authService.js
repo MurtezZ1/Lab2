@@ -15,6 +15,7 @@ import {
   revokeRefreshToken,
 } from "../repositories/tokenRepository.js";
 import { notifyAnalyticsDashboardChanged } from "./analyticsService.js";
+import { frontendUrl, isEmailConfigured, sendEmail } from "./emailService.js";
 import { AppError } from "../utils/AppError.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
 import {
@@ -90,11 +91,17 @@ export async function register(input) {
   await assignRoleToUser(user.id, "Customer");
   const fullUser = await findUserById(user.id);
   notifyAnalyticsDashboardChanged("user_registered", { userId: user.id }).catch(() => {});
+  await sendEmail({
+    to: fullUser.email,
+    subject: "Welcome to Sunspot Electronic Online Shop",
+    text: `Welcome ${fullUser.username}. Verify your email here: ${frontendUrl(`/account?verify=${verificationToken}`)}`,
+    html: `<p>Welcome <strong>${fullUser.username}</strong>.</p><p>Verify your email here: <a href="${frontendUrl(`/account?verify=${verificationToken}`)}">Verify email</a></p>`,
+  }).catch(() => {});
 
   return {
     user: publicUser(fullUser),
     ...(await tokenPair(fullUser)),
-    emailVerificationToken: verificationToken,
+    ...(!isEmailConfigured() ? { emailVerificationToken: verificationToken } : {}),
   };
 }
 
@@ -142,7 +149,18 @@ export async function forgotPassword(email) {
 
   const token = randomToken();
   await setPasswordReset(user.id, token, new Date(Date.now() + 30 * 60 * 1000));
-  return { message: "Password reset token generated. Email delivery is a later integration.", resetToken: token };
+  await sendEmail({
+    to: user.email,
+    subject: "Reset your Sunspot password",
+    text: `Reset your password here: ${frontendUrl(`/account?resetToken=${token}`)}`,
+    html: `<p>Reset your password here: <a href="${frontendUrl(`/account?resetToken=${token}`)}">Reset password</a></p><p>This link expires in 30 minutes.</p>`,
+  }).catch(() => {});
+  return {
+    message: isEmailConfigured()
+      ? "If the email exists, a password reset link has been sent."
+      : "Password reset token generated. SMTP is not configured, so the token is returned for local demo.",
+    ...(!isEmailConfigured() ? { resetToken: token } : {}),
+  };
 }
 
 export async function resetPassword({ token, password }) {

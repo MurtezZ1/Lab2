@@ -119,6 +119,63 @@ stripe listen --forward-to localhost:5000/api/payments/webhook
 
 Use Stripe test card `4242 4242 4242 4242`, any future expiry date, any CVC, and any ZIP/postal code.
 
+## Email SMTP Setup
+
+For production-style email features, add SMTP credentials to `backend/.env`:
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+SMTP_FROM="Electronic Online Shop <your_email@gmail.com>"
+```
+
+Use an app password when using Gmail. After Stripe and SMTP are configured, open:
+
+```text
+http://localhost:3000/admin/launch-readiness
+```
+
+The launch dashboard will automatically switch those checks from warning/demo mode to configured mode.
+
+## Demo Login And Presentation Routes
+
+Default admin account:
+
+```text
+Email: admin@sunspot.com
+Password: AdminPassword123!
+```
+
+Optional seeded demo accounts from the admin dashboard:
+
+```text
+demo.customer@sunspot.com / DemoPassword123!
+demo.manager@sunspot.com  / DemoPassword123!
+```
+
+Recommended presentation flow:
+
+```text
+http://localhost:3000
+http://localhost:3000/products
+http://localhost:3000/3d-models
+http://localhost:3000/compare
+http://localhost:3000/admin/dashboard
+http://localhost:3000/admin/products
+http://localhost:3000/admin/analytics
+http://localhost:3000/admin/launch-readiness
+http://localhost:3000/admin/system-monitor
+```
+
+Admin production tools added for launch readiness:
+
+- `/admin/products` lists products with edit links.
+- `/admin/products/:id/edit` edits image, price, stock, specs, and active/draft status.
+- `/admin/dashboard` includes a `Seed Demo Data` button for demo users, order, payment and invoice data.
+- Global Error Boundary shows a professional fallback screen if a frontend page crashes.
+
 ## Run The Main ML Pipeline
 
 ```bash

@@ -56,3 +56,10 @@ export async function cacheDeleteByPrefix(prefix) {
     redisAvailable = false;
   }
 }
+
+export function getRedisStatus() {
+  return {
+    configured: Boolean(env.redisUrl),
+    connected: Boolean(redisAvailable && redisClient?.isOpen),
+  };
+}

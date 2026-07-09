@@ -1,7 +1,7 @@
 import CartNotice from "@/components/CartNotice";
 import ProductFeedback from "@/components/ProductFeedback";
 import { motion } from "framer-motion";
-import { GitCompareArrows, Heart, ShoppingCart } from "lucide-react";
+import { Box, GitCompareArrows, Heart, ShoppingCart } from "lucide-react";
 import { useState, useTransition } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -11,6 +11,7 @@ import { setWishlistItems } from "@/redux/slices/wishlistSlice";
 import { addProductToCart } from "@/services/cartService";
 import { toggleWishlist } from "@/services/wishlistService";
 import type { Product } from "@/types";
+import { hasVerifiedProduct3DModel } from "@/utils/product3dModels";
 
 interface ProductProps {
   id: number | string;
@@ -30,6 +31,7 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
   const compareItems = useAppSelector((state) => state.compare.items);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const has3DModel = hasVerifiedProduct3DModel(name);
   const product: Product = {
     id,
     uuid,
@@ -121,6 +123,12 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
           decoding="async"
           className="h-full w-full object-contain p-4 group-hover:scale-110 transition-transform duration-500"
         />
+        {has3DModel && (
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-primary/30 bg-black/70 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-primary backdrop-blur">
+            <Box className="h-3 w-3" />
+            3D
+          </span>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </Link>
 

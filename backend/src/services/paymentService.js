@@ -80,6 +80,7 @@ export async function createPaymentIntent(orderId, userId) {
       paymentIntentId: demoPaymentId,
       publishableKey: "",
       demoMode: true,
+      paymentMode: "demo",
       message: "Stripe is not configured locally, so a demo payment was completed.",
       order: serializeOrder(paidOrder),
     };
@@ -94,6 +95,7 @@ export async function createPaymentIntent(orderId, userId) {
       clientSecret: existingIntent.client_secret,
       paymentIntentId: existingIntent.id,
       publishableKey: env.stripePublishableKey,
+      paymentMode: getStripePaymentMode(),
       order: serializeOrder(order),
     };
   }
@@ -119,8 +121,15 @@ export async function createPaymentIntent(orderId, userId) {
     clientSecret: paymentIntent.client_secret,
     paymentIntentId: paymentIntent.id,
     publishableKey: env.stripePublishableKey,
+    paymentMode: getStripePaymentMode(),
     order: serializeOrder(order),
   };
+}
+
+function getStripePaymentMode() {
+  if (env.stripeSecretKey.startsWith("sk_live_") && env.stripePublishableKey.startsWith("pk_live_")) return "live";
+  if (env.stripeSecretKey.startsWith("sk_test_") && env.stripePublishableKey.startsWith("pk_test_")) return "test";
+  return "configured";
 }
 
 export async function verifyPaymentIntent(paymentIntentId, userId) {

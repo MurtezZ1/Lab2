@@ -76,6 +76,20 @@ export default function CheckoutPage() {
             <div className="flex justify-between text-lg font-bold text-white"><span>Total</span><span className="text-primary">{formatPrice(summary.total)}</span></div>
           </div>
           {error && <p className="mt-5 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</p>}
+          <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-gray-300">
+            <p className="font-bold text-white">Payment Mode</p>
+            <p className="mt-1">
+              {paymentIntent
+                ? paymentIntent.paymentMode === "live"
+                  ? "Stripe Live Mode"
+                  : paymentIntent.paymentMode === "test"
+                    ? "Stripe Test Mode"
+                    : paymentIntent.demoMode
+                      ? "Local Demo Mode"
+                      : "Stripe Configured"
+                : "The backend will show whether this checkout uses Stripe test/live mode or local demo mode."}
+            </p>
+          </div>
           {!paymentIntent && (
             <button
               onClick={preparePayment}
@@ -87,9 +101,14 @@ export default function CheckoutPage() {
             </button>
           )}
           {paymentIntent && stripePromise && (
+            <div className="mt-6">
+              <div className="mb-4 rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary">
+                Stripe {paymentIntent.paymentMode ?? "configured"} payment is ready. Complete the card form below.
+              </div>
             <Elements stripe={stripePromise} options={{ clientSecret: paymentIntent.clientSecret }}>
               <StripePaymentForm orderId={paymentIntent.order.id} paymentIntentId={paymentIntent.paymentIntentId} />
             </Elements>
+            </div>
           )}
         </div>
       </div>

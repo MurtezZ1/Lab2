@@ -32,6 +32,7 @@ export function serializeProduct(product) {
     discount_percentage: toNumber(product.discount_percentage),
     rating_average: toNumber(product.rating_average),
     stock_quantity: product.inventory?.stock_quantity ?? 0,
+    is_active: product.is_active,
     category: product.category ? { id: product.category.id, name: product.category.name, slug: product.category.slug } : null,
     brand: product.brand ? { id: product.brand.id, name: product.brand.name, slug: product.brand.slug } : null,
     images: product.images ?? [],

@@ -1,6 +1,6 @@
 import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Bot, FileClock, LineChart, Package, ShieldCheck, Upload, Users } from "lucide-react";
+import { BarChart3, Bot, FileClock, LineChart, Package, Rocket, ShieldCheck, Upload, Users } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import {
   getAdminOrders,
@@ -9,6 +9,8 @@ import {
   saveBrand,
   saveCategory,
   saveProduct,
+  seedAdminDemoData,
+  updateProductInventory,
 } from "@/services/adminService";
 import { getCmsContent, type CmsContent, updateCmsContent } from "@/services/cmsService";
 import { getAIAnalytics, type AIAnalytics } from "@/services/aiShoppingAssistantService";
@@ -62,14 +64,25 @@ export default function AdminDashboardPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    await saveProduct({
+    const product = await saveProduct({
       name: String(data.get("name") ?? ""),
       manufacturer: String(data.get("manufacturer") ?? ""),
       type: String(data.get("type") ?? "product"),
+      model: String(data.get("model") ?? ""),
+      year: Number(data.get("year") ?? 0) || null,
       price: Number(data.get("price") ?? 0),
       image: String(data.get("image") ?? "/file.svg"),
       description: String(data.get("description") ?? ""),
+      processor: String(data.get("processor") ?? ""),
+      ram_size: String(data.get("ram_size") ?? ""),
+      storage: String(data.get("storage") ?? ""),
+      display: String(data.get("display") ?? ""),
+      battery: String(data.get("battery") ?? ""),
+      additional_features: String(data.get("additional_features") ?? ""),
+      is_active: String(data.get("is_active") ?? "true") === "true",
     });
+    const stockQuantity = Number(data.get("stock_quantity") ?? 0);
+    if (stockQuantity > 0) await updateProductInventory(product.uuid ?? product.id, stockQuantity);
     setMessage("Product saved.");
     form.reset();
   };
@@ -80,6 +93,19 @@ export default function AdminDashboardPage() {
     setMessage("CMS content saved.");
   };
 
+  const seedDemoData = async () => {
+    const result = await seedAdminDemoData();
+    setMessage(
+      `Demo data ready. Users: ${result.users.map((user) => user.email).join(", ")}. Password: ${result.password}.`,
+    );
+    const [nextUsers, nextOrders] = await Promise.all([
+      getAdminUsers().catch(() => ({ items: [], total: 0, page: 1, pageSize: 10 })),
+      getAdminOrders().catch(() => []),
+    ]);
+    setUsers(nextUsers.items ?? []);
+    setOrders(nextOrders);
+  };
+
   return (
     <div className="container mx-auto px-6 py-12">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -88,6 +114,28 @@ export default function AdminDashboardPage() {
           Admin Dashboard
         </h1>
         <div className="flex flex-wrap gap-3">
+          <Link
+            to="/admin/products"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
+          >
+            <Package className="h-4 w-4 text-primary" />
+            Products
+          </Link>
+          <button
+            type="button"
+            onClick={seedDemoData}
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
+          >
+            <Upload className="h-4 w-4 text-green-300" />
+            Seed Demo Data
+          </button>
+          <Link
+            to="/admin/launch-readiness"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"
+          >
+            <Rocket className="h-4 w-4 text-green-300" />
+            Launch Readiness
+          </Link>
           <Link
             to="/admin/users"
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-gray-200 hover:border-primary/40 hover:text-white"

@@ -11,6 +11,7 @@ export type ProductQuery = {
   brand?: string;
   sort?: string;
   order?: "asc" | "desc";
+  includeInactive?: string;
 };
 
 export async function getProducts(options?: ProductQuery): Promise<Product[]> {

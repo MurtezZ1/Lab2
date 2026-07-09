@@ -72,6 +72,7 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8">
           <NavLink to="/">Home</NavLink>
           <NavLink to="/products">Products</NavLink>
+          <NavLink to="/3d-models">3D Models</NavLink>
           <NavLink to="/categories">Categories</NavLink>
           <NavLink to="/deals">Deals</NavLink>
         </nav>
@@ -165,6 +166,7 @@ export default function Navbar() {
             <div className="flex flex-col px-6 py-4 gap-4">
               <MobileNavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</MobileNavLink>
               <MobileNavLink to="/products" onClick={() => setIsMobileMenuOpen(false)}>Products</MobileNavLink>
+              <MobileNavLink to="/3d-models" onClick={() => setIsMobileMenuOpen(false)}>3D Models</MobileNavLink>
               <MobileNavLink to="/categories" onClick={() => setIsMobileMenuOpen(false)}>Categories</MobileNavLink>
               <MobileNavLink to="/deals" onClick={() => setIsMobileMenuOpen(false)}>Deals</MobileNavLink>
               <form onSubmit={submitSearch}>

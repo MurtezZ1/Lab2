@@ -8,7 +8,8 @@ import { addToCompare } from "@/redux/slices/compareSlice";
 import { getProductById } from "@/services/productService";
 import { trackProductView } from "@/services/recommendationService";
 import type { Product } from "@/types";
-import { Battery, Cpu, GitCompareArrows, HardDrive, Info, Maximize, RotateCcw, Shield, Truck } from "lucide-react";
+import { hasVerifiedProduct3DModel } from "@/utils/product3dModels";
+import { Battery, Box, Cpu, GitCompareArrows, HardDrive, Images, Info, Maximize, RotateCcw, Shield, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -17,6 +18,7 @@ export default function ProductDetailsPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [compareNotice, setCompareNotice] = useState("");
+  const [mediaView, setMediaView] = useState<"3d" | "photos">("photos");
   const compareItems = useAppSelector((state) => state.compare.items);
   const dispatch = useAppDispatch();
 
@@ -24,6 +26,7 @@ export default function ProductDetailsPage() {
     getProductById(id)
       .then((item) => {
         setProduct(item);
+        setMediaView(item && hasVerifiedProduct3DModel(item.name) ? "3d" : "photos");
         if (item) void trackProductView(item);
       })
       .finally(() => setLoading(false));
@@ -49,19 +52,52 @@ export default function ProductDetailsPage() {
   };
 
   const productSpecifications = getProductSpecifications(product);
+  const has3DModel = hasVerifiedProduct3DModel(product.name);
 
   return (
     <div className="container mx-auto px-6 py-12">
       <div className="grid lg:grid-cols-2 gap-12">
         <div className="space-y-6">
-          <Product360Viewer image={product.image} name={product.name} />
-          <div className="grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className={`glass-card rounded-xl aspect-square relative border ${item === 1 ? "border-primary" : "border-white/5 opacity-50 hover:opacity-100 cursor-pointer"} transition-all`}>
-                <img src={product.image} alt="thumbnail" className="h-full w-full object-contain p-2" />
-              </div>
-            ))}
+          <div className="flex flex-wrap gap-3">
+            {has3DModel && (
+              <button
+                type="button"
+                onClick={() => setMediaView("3d")}
+                className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${
+                  mediaView === "3d"
+                    ? "border-primary bg-primary/15 text-primary"
+                    : "border-white/10 text-gray-300 hover:border-primary/40 hover:text-white"
+                }`}
+              >
+                <Box className="h-4 w-4" />
+                3D Model
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setMediaView("photos")}
+              className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-bold transition-colors ${
+                mediaView === "photos"
+                  ? "border-accent bg-accent/15 text-accent"
+                  : "border-white/10 text-gray-300 hover:border-accent/40 hover:text-white"
+              }`}
+            >
+              <Images className="h-4 w-4" />
+              Photos
+            </button>
           </div>
+
+          {mediaView === "3d" && has3DModel ? (
+            <Product360Viewer image={product.image} name={product.name} />
+          ) : (
+            <ProductPhotoGallery product={product} />
+          )}
+
+          {has3DModel && (
+            <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4 text-sm text-gray-300">
+              This product has a verified interactive 3D model. You can switch back to photos anytime from the media controls above.
+            </div>
+          )}
           <div className="glass-card rounded-2xl border border-white/5 p-6">
             <div className="mb-5 flex items-center gap-3">
               <Info className="h-5 w-5 text-primary" />
@@ -168,6 +204,35 @@ export default function ProductDetailsPage() {
 
       <SimilarProductsWidget productId={product.uuid ?? product.id} />
       <CartNotice show={Boolean(compareNotice)} message={compareNotice} />
+    </div>
+  );
+}
+
+function ProductPhotoGallery({ product }: { product: Product }) {
+  const photos = [product.image, product.image, product.image, product.image];
+
+  return (
+    <div className="space-y-4">
+      <div className="glass-card rounded-3xl p-4">
+        <div className="relative aspect-square overflow-hidden rounded-3xl border border-white/5 bg-white/[0.03]">
+          <img src={product.image} alt={product.name} className="h-full w-full object-contain p-8" />
+          <div className="absolute left-5 top-5 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-xs font-black uppercase tracking-wide text-white backdrop-blur">
+            Product Photos
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-4 gap-4">
+        {photos.map((photo, index) => (
+          <div
+            key={`${photo}-${index}`}
+            className={`glass-card relative aspect-square rounded-xl border transition-all ${
+              index === 0 ? "border-accent" : "border-white/5 opacity-60 hover:opacity-100"
+            }`}
+          >
+            <img src={photo} alt={`${product.name} photo ${index + 1}`} className="h-full w-full object-contain p-2" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

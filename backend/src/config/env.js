@@ -20,6 +20,11 @@ export const env = {
   stripeCurrency: process.env.STRIPE_CURRENCY ?? "usd",
   openAIApiKey: process.env.OPENAI_API_KEY ?? "",
   openAIModel: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
+  smtpHost: process.env.SMTP_HOST ?? "",
+  smtpPort: Number(process.env.SMTP_PORT ?? 587),
+  smtpUser: process.env.SMTP_USER ?? "",
+  smtpPassword: process.env.SMTP_PASSWORD ?? "",
+  smtpFrom: process.env.SMTP_FROM ?? "",
 };
 
 export function validateEnv() {

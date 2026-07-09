@@ -209,9 +209,15 @@ function productData(data, userId, update = false) {
     ...(data.image ? { image: data.image } : {}),
     ...(data.discount_percentage != null ? { discount_percentage: Number(data.discount_percentage) } : {}),
     ...(data.rating_average != null ? { rating_average: Number(data.rating_average) } : {}),
-    ...(data.is_active != null ? { is_active: Boolean(data.is_active) } : {}),
+    ...(data.is_active != null ? { is_active: parseBoolean(data.is_active) } : {}),
     ...(update ? { updated_by: userId } : { created_by: userId, updated_by: userId }),
   };
+}
+
+function parseBoolean(value) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+  return String(value).toLowerCase() === "true";
 }
 
 function slugify(value) {

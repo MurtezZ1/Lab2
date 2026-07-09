@@ -13,6 +13,7 @@ export default defineConfig({
           if (id.includes("react-router-dom")) return "vendor-router";
           if (id.includes("@reduxjs") || id.includes("react-redux")) return "vendor-redux";
           if (id.includes("framer-motion")) return "vendor-motion";
+          if (id.includes("three")) return "vendor-3d";
           if (id.includes("lucide-react")) return "vendor-icons";
           if (id.includes("axios") || id.includes("socket.io-client")) return "vendor-network";
           return "vendor";

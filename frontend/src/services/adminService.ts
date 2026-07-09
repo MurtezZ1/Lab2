@@ -100,6 +100,23 @@ export async function saveProduct(product: Partial<Product>) {
   return data.data as Product;
 }
 
+export async function updateProductInventory(productId: string | number, stockQuantity: number) {
+  const { data } = await apiClient.put(`/products/${productId}/inventory`, {
+    stock_quantity: stockQuantity,
+  });
+  return data.data;
+}
+
+export async function seedAdminDemoData() {
+  const { data } = await apiClient.post("/admin/demo-data/seed");
+  return data.data as {
+    users: Array<{ id: string; email: string; role: string }>;
+    order: { id: string; orderNumber: string; total: number } | null;
+    invoice: { id: string; invoiceNumber: string } | null;
+    password: string;
+  };
+}
+
 export async function getAdminAuditLogs(filters: AuditLogQuery = {}) {
   const { data } = await apiClient.get("/admin/audit-logs", { params: cleanParams(filters) });
   return data.data as AuditLogListResult;

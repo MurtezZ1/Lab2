@@ -60,14 +60,14 @@ const quickLinks: FooterQuickLink[] = [
   { label: "Deals", to: "/deals", icon: BadgePercent },
   { label: "Wishlist", to: "/wishlist", icon: Heart },
   { label: "Cart", to: "/cart", icon: ShoppingCart },
-  { label: "Contact Us", href: "#footer-contact", icon: Mail },
-  { label: "About Us", href: "#footer-about", icon: FileText },
+  { label: "Contact Us", to: "/contact", icon: Mail },
+  { label: "About Us", to: "/about", icon: FileText },
 ];
 
 const policyLinks = [
-  { label: "Privacy Policy", href: "#privacy-policy", icon: ShieldCheck },
-  { label: "Terms of Service", href: "#terms-of-service", icon: FileText },
-  { label: "Cookie Policy", href: "#cookie-policy", icon: Cookie },
+  { label: "Privacy Policy", to: "/privacy-policy", icon: ShieldCheck },
+  { label: "Terms of Service", to: "/terms-of-service", icon: FileText },
+  { label: "Cookie Policy", to: "/cookie-policy", icon: Cookie },
 ];
 
 function normalizeExternalUrl(url: string) {
@@ -291,10 +291,10 @@ export default function Footer() {
             {policyLinks.map((item) => {
               const Icon = item.icon;
               return (
-                <a key={item.label} href={item.href} className="inline-flex items-center gap-2 transition-colors hover:text-white">
+                <Link key={item.label} to={item.to} className="inline-flex items-center gap-2 transition-colors hover:text-white">
                   <Icon className="h-4 w-4" />
                   {item.label}
-                </a>
+                </Link>
               );
             })}
           </div>
