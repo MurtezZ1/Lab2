@@ -161,6 +161,10 @@ def save_confusion_matrix(
     """Save a confusion matrix heatmap for a trained model."""
     output_dir.mkdir(parents=True, exist_ok=True)
     cm = confusion_matrix(y_true, y_pred, labels=list(labels))
+    safe_model_name = model_name.lower().replace(" ", "_").replace("-", "_").replace("(", "").replace(")", "").replace(",", "")
+    pd.DataFrame(cm, index=list(labels), columns=list(labels)).to_csv(
+        OUTPUT_DIR / f"{safe_model_name}_confusion_matrix.csv"
+    )
     plt.figure(figsize=(7, 5))
     sns.heatmap(
         cm,
@@ -174,7 +178,7 @@ def save_confusion_matrix(
     plt.xlabel("Predicted DemandLevel")
     plt.ylabel("Actual DemandLevel")
     plt.tight_layout()
-    file_name = model_name.lower().replace(" ", "_").replace("-", "_") + "_confusion_matrix.png"
+    file_name = safe_model_name + "_confusion_matrix.png"
     plt.savefig(output_dir / file_name, dpi=180)
     plt.close()
 
@@ -301,6 +305,7 @@ def classification_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, G
 
     results = []
     fitted_grids: Dict[str, GridSearchCV] = {}
+    classification_reports = []
 
     for name, (pipeline, params) in model_specs.items():
         start = time.perf_counter()
@@ -319,12 +324,20 @@ def classification_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, G
         results.append(metric_dict(name, y_test_labels, prediction_labels, elapsed))
         save_confusion_matrix(y_test_labels, prediction_labels, name, labels)
 
+        report = classification_report(y_test_labels, prediction_labels, zero_division=0)
+        classification_reports.append(f"\n{name}\n{'=' * len(name)}\n{report}")
         print(f"\n{name} classification report")
-        print(classification_report(y_test_labels, prediction_labels, zero_division=0))
+        print(report)
 
     metrics_df = pd.DataFrame(results).sort_values("F1 Score", ascending=False)
     metrics_df["Rank"] = range(1, len(metrics_df) + 1)
     metrics_df.to_csv(OUTPUT_DIR / "model_comparison.csv", index=False)
+    (OUTPUT_DIR / "classification_reports.txt").write_text(
+        "Electronic Online Shop DemandLevel Classification Reports\n"
+        "Model selection criterion: Weighted F1 Score\n"
+        + "\n".join(classification_reports),
+        encoding="utf-8",
+    )
 
     plt.figure(figsize=(10, 6))
     metrics_long = metrics_df.melt(

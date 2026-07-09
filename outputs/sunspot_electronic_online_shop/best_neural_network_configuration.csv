@@ -1,2 +1,2 @@
 Model,Accuracy,Precision,Recall,F1 Score,Training Time (s),model__activation,model__alpha,model__hidden_layer_sizes,model__learning_rate_init
-Best Tuned Neural Network,0.5479166666666667,0.521104827163901,0.5479166666666667,0.4844290093387297,15.575444100017194,tanh,0.0001,"(128, 64)",0.01
+Best Tuned Neural Network,0.5479166666666667,0.521104827163901,0.5479166666666667,0.4844290093387297,10.832007099990733,tanh,0.0001,"(128, 64)",0.01
