@@ -4,9 +4,9 @@ Sunspot Electronic Online Shop Machine Learning Pipeline
 This module covers the integrated Sunspot ML responsibilities:
 - Logistic Regression for DemandLevel prediction
 - SVM for DemandLevel prediction
-- Neural Network Architecture 1 and 2 with MLPClassifier
-- Neural Network GridSearchCV hyperparameter tuning
-- K-Means clustering with elbow and silhouette analysis
+- Neural Network architecture tuning with MLPClassifier
+- K-Means clustering with multiple K/init/n_init experiments
+- Agglomerative clustering with multiple linkage experiments
 - Cluster evaluation against real DemandLevel labels
 - Final comparison table for KNN, Decision Tree, Random Forest,
   Logistic Regression, SVM, and two Neural Network architectures
@@ -31,7 +31,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering, KMeans
 from sklearn.compose import ColumnTransformer
 from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier
@@ -39,8 +39,10 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score,
+    calinski_harabasz_score,
     classification_report,
     confusion_matrix,
+    davies_bouldin_score,
     f1_score,
     precision_score,
     recall_score,
@@ -50,6 +52,7 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -62,8 +65,9 @@ TARGET_COLUMN = "DemandLevel"
 DATA_PATH = Path("data/sunspot_electronic_online_shop.csv")
 OUTPUT_DIR = Path("outputs/sunspot_electronic_online_shop")
 FIGURE_DIR = OUTPUT_DIR / "figures"
-TUNING_SAMPLE_SIZE = 900
+TUNING_SAMPLE_SIZE = 700
 EXCLUDED_FEATURE_COLUMNS = ["ProductID", "ProductName", "SoldUnits"]
+NN_ARCHITECTURES = [(50,), (100,), (100, 50), (128, 64)]
 
 
 def make_one_hot_encoder() -> OneHotEncoder:
@@ -74,109 +78,14 @@ def make_one_hot_encoder() -> OneHotEncoder:
         return OneHotEncoder(handle_unknown="ignore", sparse=False)
 
 
-def generate_sample_dataset(n_rows: int = 700, random_state: int = RANDOM_STATE) -> pd.DataFrame:
-    """
-    Generate a realistic demonstration dataset when the official CSV is missing.
-
-    This is only for code demonstration. For the final university submission,
-    replace it with the official Electronic Online Shop dataset.
-    """
-    rng = np.random.default_rng(random_state)
-
-    categories = np.array(["Laptop", "Phone", "Tablet", "Accessory", "Camera", "Gaming"])
-    payment_methods = np.array(["Card", "PayPal", "CashOnDelivery", "BankTransfer"])
-    regions = np.array(["Urban", "Suburban", "Rural"])
-
-    category = rng.choice(categories, size=n_rows, p=[0.18, 0.24, 0.14, 0.22, 0.10, 0.12])
-    payment = rng.choice(payment_methods, size=n_rows, p=[0.45, 0.25, 0.20, 0.10])
-    region = rng.choice(regions, size=n_rows, p=[0.55, 0.30, 0.15])
-
-    price = np.round(rng.gamma(shape=2.2, scale=85, size=n_rows) + 25, 2)
-    discount_rate = np.round(rng.beta(a=2.2, b=6.0, size=n_rows) * 0.55, 3)
-    customer_rating = np.round(np.clip(rng.normal(4.0, 0.55, size=n_rows), 1.0, 5.0), 2)
-    stock_level = rng.integers(8, 600, size=n_rows)
-    monthly_visitors = rng.poisson(lam=950, size=n_rows) + rng.integers(0, 600, size=n_rows)
-    ad_spend = np.round(rng.gamma(shape=2.0, scale=140, size=n_rows), 2)
-    seasonality_index = np.round(np.clip(rng.normal(1.0, 0.18, size=n_rows), 0.55, 1.55), 3)
-    delivery_days = rng.integers(1, 11, size=n_rows)
-
-    category_effect = {
-        "Laptop": 1.8,
-        "Phone": 2.0,
-        "Tablet": 0.9,
-        "Accessory": 0.6,
-        "Camera": 0.4,
-        "Gaming": 1.5,
-    }
-    region_effect = {"Urban": 1.0, "Suburban": 0.5, "Rural": -0.4}
-
-    cart_adds = np.maximum(
-        0,
-        (
-            monthly_visitors * (0.025 + discount_rate * 0.20 + customer_rating / 160)
-            + rng.normal(0, 14, size=n_rows)
-        ).astype(int),
-    )
-    previous_purchases = np.maximum(
-        0,
-        (
-            cart_adds * (0.18 + discount_rate * 0.25)
-            + rng.normal(0, 8, size=n_rows)
-        ).astype(int),
-    )
-
-    demand_score = (
-        0.004 * monthly_visitors
-        + 0.075 * cart_adds
-        + 0.180 * previous_purchases
-        + 1.600 * customer_rating
-        + 8.000 * discount_rate
-        + 0.002 * ad_spend
-        + 1.200 * seasonality_index
-        - 0.010 * price
-        - 0.180 * delivery_days
-        + np.vectorize(category_effect.get)(category)
-        + np.vectorize(region_effect.get)(region)
-        + rng.normal(0, 1.2, size=n_rows)
-    )
-
-    demand_level = pd.qcut(
-        demand_score,
-        q=[0.0, 0.33, 0.67, 1.0],
-        labels=["Low", "Medium", "High"],
-    ).astype(str)
-
-    return pd.DataFrame(
-        {
-            "ProductCategory": category,
-            "PaymentMethod": payment,
-            "CustomerRegion": region,
-            "ProductPrice": price,
-            "DiscountRate": discount_rate,
-            "CustomerRating": customer_rating,
-            "StockLevel": stock_level,
-            "MonthlyVisitors": monthly_visitors,
-            "CartAdds": cart_adds,
-            "PreviousPurchases": previous_purchases,
-            "AdSpend": ad_spend,
-            "SeasonalityIndex": seasonality_index,
-            "DeliveryDays": delivery_days,
-            TARGET_COLUMN: demand_level,
-        }
-    )
-
-
 def load_dataset(path: Path = DATA_PATH, target_column: str = TARGET_COLUMN) -> pd.DataFrame:
-    """Load the project dataset, or create a clearly marked sample dataset for testing."""
-    if path.exists():
-        df = pd.read_csv(path)
-        print(f"Loaded official dataset from {path.resolve()}")
-    else:
-        df = generate_sample_dataset()
-        print(
-            "WARNING: Official dataset was not found. "
-            "Using a generated sample dataset for demonstration only."
+    """Load the synthetic but realistic Electronic Online Shop dataset."""
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Dataset was not found at {path}. The ML pipeline requires the project dataset."
         )
+    df = pd.read_csv(path)
+    print(f"Loaded synthetic but realistic academic dataset from {path.resolve()}")
 
     if target_column not in df.columns:
         raise ValueError(
@@ -199,10 +108,22 @@ def split_columns(df: pd.DataFrame, target_column: str = TARGET_COLUMN) -> Tuple
 
 def build_preprocessor(numeric_features: Iterable[str], categorical_features: Iterable[str]) -> ColumnTransformer:
     """Create preprocessing for numerical and categorical variables."""
+    numeric_pipeline = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
+        ]
+    )
+    categorical_pipeline = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("encoder", make_one_hot_encoder()),
+        ]
+    )
     return ColumnTransformer(
         transformers=[
-            ("numeric", StandardScaler(), list(numeric_features)),
-            ("categorical", make_one_hot_encoder(), list(categorical_features)),
+            ("numeric", numeric_pipeline, list(numeric_features)),
+            ("categorical", categorical_pipeline, list(categorical_features)),
         ],
         remainder="drop",
     )
@@ -358,37 +279,25 @@ def classification_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, G
                 "model__gamma": ["scale", "auto"],
             },
         ),
-        "Neural Network Architecture 1": (
-            pipeline_for(
-                MLPClassifier(
-                    hidden_layer_sizes=(50,),
-                    activation="relu",
-                    solver="adam",
-                    alpha=0.0001,
-                    learning_rate_init=0.001,
-                    early_stopping=True,
-                    max_iter=500,
-                    random_state=RANDOM_STATE,
-                )
-            ),
-            {},
-        ),
-        "Neural Network Architecture 2": (
-            pipeline_for(
-                MLPClassifier(
-                    hidden_layer_sizes=(100, 50),
-                    activation="relu",
-                    solver="adam",
-                    alpha=0.0001,
-                    learning_rate_init=0.001,
-                    early_stopping=True,
-                    max_iter=500,
-                    random_state=RANDOM_STATE,
-                )
-            ),
-            {},
-        ),
     }
+
+    for architecture in NN_ARCHITECTURES:
+        model_specs[f"Neural Network {architecture}"] = (
+            pipeline_for(
+                MLPClassifier(
+                    solver="adam",
+                    early_stopping=True,
+                    max_iter=500,
+                    random_state=RANDOM_STATE,
+                )
+            ),
+            {
+                "model__hidden_layer_sizes": [architecture],
+                "model__activation": ["relu", "tanh"],
+                "model__alpha": [0.0001, 0.001],
+                "model__learning_rate_init": [0.001, 0.01],
+            },
+        )
 
     results = []
     fitted_grids: Dict[str, GridSearchCV] = {}
@@ -396,7 +305,8 @@ def classification_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, G
     for name, (pipeline, params) in model_specs.items():
         start = time.perf_counter()
         if params:
-            model, grid, elapsed = train_grid_model(name, pipeline, params, X_train, y_train)
+            cv = 2 if name.startswith("Neural Network") else 5
+            model, grid, elapsed = train_grid_model(name, pipeline, params, X_train, y_train, cv=cv)
             fitted_grids[name] = grid
         else:
             model = pipeline
@@ -432,6 +342,13 @@ def classification_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, G
     plt.savefig(FIGURE_DIR / "final_model_comparison.png", dpi=200)
     plt.close()
 
+    tuning_rows = []
+    for model_name, grid in fitted_grids.items():
+        row = {"Model": model_name, "Best CV F1 Weighted": grid.best_score_}
+        row.update(grid.best_params_)
+        tuning_rows.append(row)
+    pd.DataFrame(tuning_rows).to_csv(OUTPUT_DIR / "hyperparameter_tuning_summary.csv", index=False)
+
     return metrics_df, fitted_grids
 
 
@@ -463,11 +380,10 @@ def neural_network_grid_search(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str
     )
 
     param_grid = {
-        "model__hidden_layer_sizes": [(50,), (100, 50)],
+        "model__hidden_layer_sizes": NN_ARCHITECTURES,
         "model__activation": ["relu", "tanh"],
         "model__learning_rate_init": [0.001, 0.01],
         "model__alpha": [0.0001, 0.001],
-        "model__batch_size": [32, 64],
     }
 
     if len(X_train) > 800:
@@ -530,7 +446,7 @@ def prepare_clustering_matrix(df: pd.DataFrame) -> Tuple[np.ndarray, pd.Series]:
 
 
 def clustering_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, float]:
-    """Run K-Means for K=2..6, elbow method, silhouette score, and label comparison."""
+    """Run K-Means and Agglomerative clustering experiments with multiple metrics."""
     OUTPUT_DIR.mkdir(exist_ok=True)
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -539,15 +455,42 @@ def clustering_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, f
     pca_points = pca.fit_transform(X_prepared)
 
     cluster_rows = []
-    cluster_labels_by_k = {}
+    best_labels = None
+    best_name = ""
+    best_k = None
+    best_silhouette = -1.0
 
     for k in range(2, 7):
-        kmeans = KMeans(n_clusters=k, random_state=RANDOM_STATE, n_init=20)
-        labels = kmeans.fit_predict(X_prepared)
-        cluster_labels_by_k[k] = labels
-        score = silhouette_score(X_prepared, labels)
-        cluster_rows.append({"K": k, "Inertia": kmeans.inertia_, "Silhouette Score": score})
+        for init in ["k-means++", "random"]:
+            for n_init in [10, 20]:
+                kmeans = KMeans(n_clusters=k, init=init, random_state=RANDOM_STATE, n_init=n_init)
+                labels = kmeans.fit_predict(X_prepared)
+                silhouette = silhouette_score(X_prepared, labels)
+                davies_bouldin = davies_bouldin_score(X_prepared, labels)
+                calinski_harabasz = calinski_harabasz_score(X_prepared, labels)
+                cluster_rows.append(
+                    {
+                        "Algorithm": "KMeans",
+                        "K": k,
+                        "Init": init,
+                        "NInit": n_init,
+                        "Linkage": "",
+                        "Metric": "euclidean",
+                        "Inertia": kmeans.inertia_,
+                        "Silhouette Score": silhouette,
+                        "Davies-Bouldin Score": davies_bouldin,
+                        "Calinski-Harabasz Score": calinski_harabasz,
+                        "Cluster Distribution": dict(pd.Series(labels).value_counts().sort_index()),
+                    }
+                )
+                if silhouette > best_silhouette:
+                    best_silhouette = silhouette
+                    best_labels = labels
+                    best_name = f"KMeans_k{k}_{init}_n{n_init}"
+                    best_k = k
 
+        kmeans = KMeans(n_clusters=k, init="k-means++", random_state=RANDOM_STATE, n_init=20)
+        labels = kmeans.fit_predict(X_prepared)
         plot_df = pd.DataFrame({"PC1": pca_points[:, 0], "PC2": pca_points[:, 1], "Cluster": labels})
         plt.figure(figsize=(8, 6))
         sns.scatterplot(data=plot_df, x="PC1", y="PC2", hue="Cluster", palette="tab10", s=45)
@@ -565,11 +508,55 @@ def clustering_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, f
         plt.savefig(FIGURE_DIR / f"cluster_distribution_k{k}.png", dpi=180)
         plt.close()
 
+    for k in range(2, 7):
+        for linkage in ["ward", "complete", "average"]:
+            metric = "euclidean"
+            model = AgglomerativeClustering(n_clusters=k, linkage=linkage, metric=metric)
+            labels = model.fit_predict(X_prepared)
+            silhouette = silhouette_score(X_prepared, labels)
+            davies_bouldin = davies_bouldin_score(X_prepared, labels)
+            calinski_harabasz = calinski_harabasz_score(X_prepared, labels)
+            cluster_rows.append(
+                {
+                    "Algorithm": "Agglomerative",
+                    "K": k,
+                    "Init": "",
+                    "NInit": "",
+                    "Linkage": linkage,
+                    "Metric": metric,
+                    "Inertia": np.nan,
+                    "Silhouette Score": silhouette,
+                    "Davies-Bouldin Score": davies_bouldin,
+                    "Calinski-Harabasz Score": calinski_harabasz,
+                    "Cluster Distribution": dict(pd.Series(labels).value_counts().sort_index()),
+                }
+            )
+            if silhouette > best_silhouette:
+                best_silhouette = silhouette
+                best_labels = labels
+                best_name = f"Agglomerative_k{k}_{linkage}"
+                best_k = k
+
+    representative_agglomerative = AgglomerativeClustering(n_clusters=3, linkage="ward", metric="euclidean")
+    representative_labels = representative_agglomerative.fit_predict(X_prepared)
+    plot_df = pd.DataFrame({"PC1": pca_points[:, 0], "PC2": pca_points[:, 1], "Cluster": representative_labels})
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(data=plot_df, x="PC1", y="PC2", hue="Cluster", palette="tab10", s=45)
+    plt.title("Agglomerative PCA Visualization (K=3, ward)")
+    plt.tight_layout()
+    plt.savefig(FIGURE_DIR / "agglomerative_pca_k3_ward.png", dpi=180)
+    plt.close()
+
     cluster_metrics = pd.DataFrame(cluster_rows)
     cluster_metrics.to_csv(OUTPUT_DIR / "cluster_metrics.csv", index=False)
 
+    kmeans_elbow = cluster_metrics[
+        (cluster_metrics["Algorithm"] == "KMeans")
+        & (cluster_metrics["Init"] == "k-means++")
+        & (cluster_metrics["NInit"].astype(str) == "20")
+    ].copy()
     plt.figure(figsize=(8, 5))
-    sns.lineplot(data=cluster_metrics, x="K", y="Inertia", marker="o")
+    sns.lineplot(data=kmeans_elbow, x="K", y="Inertia", marker="o")
     plt.title("Elbow Method for K-Means")
     plt.xlabel("Number of Clusters (K)")
     plt.ylabel("Inertia")
@@ -578,16 +565,28 @@ def clustering_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, f
     plt.close()
 
     plt.figure(figsize=(8, 5))
-    sns.lineplot(data=cluster_metrics, x="K", y="Silhouette Score", marker="o", color="#1F4D78")
-    plt.title("Silhouette Score by Number of Clusters")
+    sns.lineplot(data=cluster_metrics, x="K", y="Silhouette Score", hue="Algorithm", marker="o")
+    plt.title("Silhouette Score by Clustering Experiment")
     plt.xlabel("Number of Clusters (K)")
     plt.ylabel("Silhouette Score")
     plt.tight_layout()
     plt.savefig(FIGURE_DIR / "silhouette_scores.png", dpi=200)
     plt.close()
 
-    optimal_k = int(cluster_metrics.sort_values("Silhouette Score", ascending=False).iloc[0]["K"])
-    selected_labels = cluster_labels_by_k[optimal_k]
+    plt.figure(figsize=(10, 6))
+    top_cluster_metrics = cluster_metrics.sort_values("Silhouette Score", ascending=False).head(12).copy()
+    top_cluster_metrics["Experiment"] = top_cluster_metrics.apply(
+        lambda row: f"{row['Algorithm']} K={row['K']} {row['Init'] or row['Linkage']}", axis=1
+    )
+    sns.barplot(data=top_cluster_metrics, x="Silhouette Score", y="Experiment", color="#2E74B5")
+    plt.title("Top Clustering Experiments by Silhouette Score")
+    plt.tight_layout()
+    plt.savefig(FIGURE_DIR / "clustering_metrics_comparison.png", dpi=200)
+    plt.close()
+
+    if best_labels is None:
+        raise RuntimeError("No clustering labels were generated.")
+    selected_labels = best_labels
 
     crosstab = pd.crosstab(
         pd.Series(selected_labels, name="Cluster"),
@@ -599,7 +598,7 @@ def clustering_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, f
 
     plt.figure(figsize=(8, 5))
     sns.heatmap(crosstab, annot=True, fmt="d", cmap="Blues")
-    plt.title(f"Cluster vs DemandLevel Crosstab (K={optimal_k})")
+    plt.title(f"Cluster vs DemandLevel Crosstab ({best_name})")
     plt.xlabel("Actual DemandLevel")
     plt.ylabel("K-Means Cluster")
     plt.tight_layout()
@@ -609,9 +608,11 @@ def clustering_workflow(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, f
     summary = pd.DataFrame(
         [
             {
-                "Optimal K": optimal_k,
+                "Optimal K": best_k,
+                "Best Experiment": best_name,
+                "Best Silhouette Score": best_silhouette,
                 "Matching Percentage": matching_percentage,
-                "Selection Rule": "Highest silhouette score, checked against elbow curve",
+                "Selection Rule": "Highest silhouette score, checked with Davies-Bouldin and Calinski-Harabasz",
             }
         ]
     )

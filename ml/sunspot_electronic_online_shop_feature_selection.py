@@ -15,13 +15,22 @@ from sklearn.metrics import (
     recall_score,
 )
 from sklearn.model_selection import cross_val_score, train_test_split
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 
 
 DATASET_PATH = os.path.join("data", "sunspot_electronic_online_shop.csv")
 OUTPUT_DIR = os.path.join("outputs", "sunspot_electronic_online_shop", "feature_selection")
 RANDOM_STATE = 42
 SELECTED_FEATURE_COUNT = 15
+
+
+def make_one_hot_encoder():
+    try:
+        return OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+    except TypeError:
+        return OneHotEncoder(handle_unknown="ignore", sparse=False)
 
 
 def save_plot(file_name):
@@ -33,19 +42,32 @@ def save_plot(file_name):
 def build_preprocessor(X):
     numeric_features = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
     categorical_features = X.select_dtypes(include=["object", "string"]).columns.tolist()
+    numeric_pipeline = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
+        ]
+    )
+    categorical_pipeline = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("encoder", make_one_hot_encoder()),
+        ]
+    )
 
     preprocessor = ColumnTransformer(
         transformers=[
-            ("numeric", "passthrough", numeric_features),
-            ("categorical", OneHotEncoder(handle_unknown="ignore", sparse_output=False), categorical_features),
+            ("numeric", numeric_pipeline, numeric_features),
+            ("categorical", categorical_pipeline, categorical_features),
         ]
     )
     return preprocessor, numeric_features, categorical_features
 
 
 def get_feature_names(preprocessor, numeric_features, categorical_features):
+    encoder = preprocessor.named_transformers_["categorical"].named_steps["encoder"]
     encoded_categorical_names = (
-        preprocessor.named_transformers_["categorical"].get_feature_names_out(categorical_features).tolist()
+        encoder.get_feature_names_out(categorical_features).tolist()
     )
     return numeric_features + encoded_categorical_names
 

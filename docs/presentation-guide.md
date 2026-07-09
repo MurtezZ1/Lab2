@@ -73,7 +73,7 @@ Show:
 
 Professor question: Which model performed best?
 
-Answer: Neural Network Architecture 2 ranked first by weighted F1 score in the final comparison.
+Answer: Neural Network `(100,)` ranked first by weighted F1 score in the final comparison. Logistic Regression remains a strong baseline and is very close by both accuracy and F1.
 
 ## 7. AI Features
 

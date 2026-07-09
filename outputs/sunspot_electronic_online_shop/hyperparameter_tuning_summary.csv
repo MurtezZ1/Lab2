@@ -1,0 +1,10 @@
+Model,Best CV F1 Weighted,model__metric,model__n_neighbors,model__weights,model__criterion,model__max_depth,model__min_samples_split,model__n_estimators,model__C,model__solver,model__gamma,model__kernel,model__activation,model__alpha,model__hidden_layer_sizes,model__learning_rate_init
+KNN,0.4766678124545785,euclidean,5.0,uniform,,,,,,,,,,,,
+Decision Tree,0.4618562561218506,,,,gini,8.0,2.0,,,,,,,,,
+Random Forest,0.4594187210087308,,,,,,2.0,100.0,,,,,,,,
+Logistic Regression,0.48587634701873217,,,,,,,,1.0,lbfgs,,,,,,
+SVM,0.4983464150267032,,,,,,,,10.0,,scale,rbf,,,,
+"Neural Network (50,)",0.4586141785363187,,,,,,,,,,,,tanh,0.0001,"(50,)",0.001
+"Neural Network (100,)",0.4417222851184335,,,,,,,,,,,,tanh,0.0001,"(100,)",0.001
+"Neural Network (100, 50)",0.48317316464242316,,,,,,,,,,,,tanh,0.001,"(100, 50)",0.01
+"Neural Network (128, 64)",0.460648289398101,,,,,,,,,,,,tanh,0.0001,"(128, 64)",0.01

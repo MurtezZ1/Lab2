@@ -1,2 +1,2 @@
-Optimal K,Matching Percentage,Selection Rule
-2,56.166666666666664,"Highest silhouette score, checked against elbow curve"
+Optimal K,Best Experiment,Best Silhouette Score,Matching Percentage,Selection Rule
+2,Agglomerative_k2_average,0.1637006302697377,56.25,"Highest silhouette score, checked with Davies-Bouldin and Calinski-Harabasz"
