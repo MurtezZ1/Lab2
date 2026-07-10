@@ -80,9 +80,9 @@ export default function AIShoppingAssistant() {
             setIsOpen(true);
             setIsMinimized(false);
           }}
-          className="group fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-white shadow-[0_0_35px_rgba(10,132,255,0.45)] transition-all hover:scale-105 hover:bg-primary/90 md:bottom-8 md:right-8"
+          className="group fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-[0_0_28px_rgba(10,132,255,0.38)] transition-all hover:scale-105 hover:bg-primary/90 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14 md:bottom-8 md:right-8 md:h-16 md:w-16 md:shadow-[0_0_35px_rgba(10,132,255,0.45)]"
         >
-          <Bot className="h-8 w-8 animate-pulse" />
+          <Bot className="h-5 w-5 animate-pulse sm:h-6 sm:w-6 md:h-8 md:w-8" />
           <span className="pointer-events-none absolute right-20 rounded-xl border border-white/10 bg-black/80 px-3 py-2 text-sm font-bold text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
             Ask AI
           </span>

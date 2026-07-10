@@ -69,7 +69,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-8">
           <NavLink to="/">Home</NavLink>
           <NavLink to="/products">Products</NavLink>
           <NavLink to="/3d-models">3D Models</NavLink>
@@ -77,7 +77,7 @@ export default function Navbar() {
           <NavLink to="/deals">Deals</NavLink>
         </nav>
 
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-6">
           <div ref={searchRef} className="relative">
             <button
               type="button"
@@ -148,7 +148,7 @@ export default function Navbar() {
         </div>
 
         <button
-          className="md:hidden text-gray-300"
+          className="lg:hidden text-gray-300"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -161,7 +161,7 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-t border-white/10 overflow-hidden"
+            className="lg:hidden glass border-t border-white/10 overflow-hidden"
           >
             <div className="flex flex-col px-6 py-4 gap-4">
               <MobileNavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</MobileNavLink>

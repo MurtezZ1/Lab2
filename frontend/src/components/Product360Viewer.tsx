@@ -86,7 +86,7 @@ export default function Product360Viewer({ image, name }: Product360ViewerProps)
   const viewer = (ref: typeof containerRef | typeof fullscreenRef) => {
     if (realProductModel) {
       return (
-        <div className="relative h-full min-h-[20rem] overflow-hidden rounded-3xl border border-white/5 bg-white/[0.03]">
+        <div className="relative h-full min-h-[18rem] overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] sm:min-h-[24rem] sm:rounded-3xl lg:min-h-[30rem]">
           <iframe
             title={`${name} real 3D model`}
             src={realProductModel.embedUrl}
@@ -94,15 +94,15 @@ export default function Product360Viewer({ image, name }: Product360ViewerProps)
             allow="autoplay; fullscreen; xr-spatial-tracking"
             allowFullScreen
           />
-          <div className="absolute left-5 top-5 rounded-full border border-primary/30 bg-black/70 px-3 py-1 text-xs font-black uppercase tracking-wide text-primary backdrop-blur">
+          <div className="absolute left-3 top-3 rounded-full border border-primary/30 bg-black/70 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-primary backdrop-blur sm:left-5 sm:top-5 sm:text-xs">
             Real 3D Model
           </div>
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
-          <div className="absolute bottom-5 left-5 right-5">
-            <p className="text-xs text-gray-300">
+          <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5">
+            <p className="text-[11px] leading-relaxed text-gray-300 sm:text-xs">
               Interactive product model. Drag to rotate, scroll to zoom, and use fullscreen for presentation.
             </p>
-            <p className="mt-1 text-[11px] text-gray-500">
+            <p className="mt-1 line-clamp-1 text-[10px] text-gray-500 sm:text-[11px]">
               Model source: {realProductModel.source}. {realProductModel.matchType}
             </p>
           </div>
@@ -113,17 +113,17 @@ export default function Product360Viewer({ image, name }: Product360ViewerProps)
     return (
       <div
         ref={ref}
-        className="relative flex h-full min-h-[20rem] items-center justify-center overflow-hidden rounded-3xl border border-white/5 bg-white/[0.03]"
+        className="relative flex h-full min-h-[18rem] items-center justify-center overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] sm:min-h-[24rem] sm:rounded-3xl lg:min-h-[30rem]"
         role="img"
         aria-label={`${name} product image`}
       >
-        <img src={image} alt={name} className="h-full w-full object-contain p-8" />
-        <div className="absolute left-5 top-5 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-xs font-black uppercase tracking-wide text-white backdrop-blur">
+        <img src={image} alt={name} className="h-full w-full object-contain p-5 sm:p-8" />
+        <div className="absolute left-3 top-3 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-white backdrop-blur sm:left-5 sm:top-5 sm:text-xs">
           Product Image
         </div>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent" />
-        <div className="absolute bottom-5 left-5 right-5">
-          <p className="text-xs text-gray-300">
+        <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5">
+          <p className="text-[11px] leading-relaxed text-gray-300 sm:text-xs">
             Real product photo shown because no verified product-specific 3D model is available for this item.
           </p>
         </div>
@@ -133,14 +133,14 @@ export default function Product360Viewer({ image, name }: Product360ViewerProps)
 
   return (
     <>
-      <div className="glass-card rounded-3xl p-4">
-        <div className="relative aspect-square">
+      <div className="glass-card rounded-3xl p-2 sm:p-4">
+        <div className="relative aspect-[4/5] sm:aspect-[16/11] xl:aspect-square">
           {viewer(containerRef)}
           {realProductModel ? (
             <button
               type="button"
               onClick={() => setIsFullscreen(true)}
-              className="absolute right-5 top-5 rounded-xl border border-white/10 bg-black/60 p-3 text-white backdrop-blur transition-colors hover:border-primary/50 hover:text-primary"
+              className="absolute right-3 top-3 rounded-xl border border-white/10 bg-black/60 p-2.5 text-white backdrop-blur transition-colors hover:border-primary/50 hover:text-primary sm:right-5 sm:top-5 sm:p-3"
               aria-label="Fullscreen real 3D model"
               title="Fullscreen"
             >
@@ -150,7 +150,7 @@ export default function Product360Viewer({ image, name }: Product360ViewerProps)
             <button
               type="button"
               onClick={() => setIsFullscreen(true)}
-              className="absolute right-5 top-5 rounded-xl border border-white/10 bg-black/60 p-3 text-white backdrop-blur transition-colors hover:border-primary/50 hover:text-primary"
+              className="absolute right-3 top-3 rounded-xl border border-white/10 bg-black/60 p-2.5 text-white backdrop-blur transition-colors hover:border-primary/50 hover:text-primary sm:right-5 sm:top-5 sm:p-3"
               aria-label="Fullscreen product image"
               title="Fullscreen"
             >
@@ -161,11 +161,11 @@ export default function Product360Viewer({ image, name }: Product360ViewerProps)
       </div>
 
       {isFullscreen && (
-        <div className="fixed inset-0 z-[100] bg-black/95 p-6">
+        <div className="fixed inset-0 z-[100] bg-black/95 p-3 sm:p-6">
           <button
             type="button"
             onClick={() => setIsFullscreen(false)}
-            className="absolute right-6 top-6 z-10 rounded-full border border-white/10 bg-white/10 p-3 text-white hover:bg-white/20"
+            className="absolute right-4 top-4 z-10 rounded-full border border-white/10 bg-white/10 p-3 text-white hover:bg-white/20 sm:right-6 sm:top-6"
             aria-label="Close fullscreen 3D viewer"
           >
             <X className="h-5 w-5" />

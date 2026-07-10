@@ -55,9 +55,9 @@ export default function ProductDetailsPage() {
   const has3DModel = hasVerifiedProduct3DModel(product.name);
 
   return (
-    <div className="container mx-auto px-6 py-12">
-      <div className="grid lg:grid-cols-2 gap-12">
-        <div className="space-y-6">
+    <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-10 lg:px-12 lg:py-12">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.95fr)] xl:gap-12">
+        <div className="min-w-0 space-y-5 sm:space-y-6">
           <div className="flex flex-wrap gap-3">
             {has3DModel && (
               <button
@@ -94,53 +94,53 @@ export default function ProductDetailsPage() {
           )}
 
           {has3DModel && (
-            <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4 text-sm text-gray-300">
+            <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4 text-sm leading-relaxed text-gray-300">
               This product has a verified interactive 3D model. You can switch back to photos anytime from the media controls above.
             </div>
           )}
-          <div className="glass-card rounded-2xl border border-white/5 p-6">
+          <div className="glass-card rounded-2xl border border-white/5 p-4 sm:p-6">
             <div className="mb-5 flex items-center gap-3">
               <Info className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-bold text-white">Real Product Specifications</h2>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {productSpecifications.map((spec) => (
-                <div key={spec.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <div key={spec.label} className="min-w-0 rounded-xl border border-white/10 bg-white/[0.03] p-4">
                   <p className="text-xs font-bold uppercase text-gray-500">{spec.label}</p>
-                  <p className="mt-1 text-sm font-semibold leading-relaxed text-white">{spec.value}</p>
+                  <p className="mt-1 break-words text-sm font-semibold leading-relaxed text-white">{spec.value}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="min-w-0 flex flex-col gap-5 sm:gap-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary w-fit text-sm font-semibold">
             {product.manufacturer}
           </div>
 
-          <h1 className="text-4xl lg:text-5xl font-black text-white leading-tight">{product.name}</h1>
+          <h1 className="break-words text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">{product.name}</h1>
 
           <div className="flex flex-col gap-3">
             <ProductFeedback productId={product.id} />
             <span className="text-green-400 text-sm font-medium">In Stock</span>
           </div>
 
-          <div className="text-4xl font-bold text-white my-2">${product.price.toFixed(2)}</div>
+          <div className="my-2 text-3xl font-bold text-white sm:text-4xl">${product.price.toFixed(2)}</div>
 
-          <p className="text-gray-400 leading-relaxed text-lg">
+          <p className="text-base leading-relaxed text-gray-400 sm:text-lg">
             {product.description || "No description available for this premium product."}
           </p>
 
           <div className="h-px bg-white/10 my-4" />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {product.processor && (
               <div className="flex items-center gap-3 p-4 rounded-xl glass bg-white/5">
                 <Cpu className="w-6 h-6 text-primary" />
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-500 uppercase">Processor</span>
-                  <span className="text-sm text-white font-medium truncate" title={product.processor}>{product.processor.split(" ")[0]} {product.processor.split(" ")[1]}</span>
+                  <span className="text-sm font-medium text-white" title={product.processor}>{product.processor.split(" ")[0]} {product.processor.split(" ")[1]}</span>
                 </div>
               </div>
             )}
@@ -149,25 +149,25 @@ export default function ProductDetailsPage() {
                 <Battery className="w-6 h-6 text-accent" />
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-500 uppercase">Battery</span>
-                  <span className="text-sm text-white font-medium truncate" title={product.battery}>{product.battery.split(":")[0]}</span>
+                  <span className="text-sm font-medium text-white" title={product.battery}>{product.battery.split(":")[0]}</span>
                 </div>
               </div>
             )}
             {product.display && (
-              <div className="flex items-center gap-3 p-4 rounded-xl glass bg-white/5 col-span-2">
+              <div className="flex items-center gap-3 rounded-xl glass bg-white/5 p-4 sm:col-span-2">
                 <Maximize className="w-6 h-6 text-purple-400" />
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-500 uppercase">Display</span>
-                  <span className="text-sm text-white font-medium">{product.display}</span>
+                  <span className="break-words text-sm font-medium text-white">{product.display}</span>
                 </div>
               </div>
             )}
             {product.storage && (
-              <div className="flex items-center gap-3 p-4 rounded-xl glass bg-white/5 col-span-2">
+              <div className="flex items-center gap-3 rounded-xl glass bg-white/5 p-4 sm:col-span-2">
                 <HardDrive className="w-6 h-6 text-green-400" />
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-500 uppercase">Storage</span>
-                  <span className="text-sm text-white font-medium">{product.storage}</span>
+                  <span className="break-words text-sm font-medium text-white">{product.storage}</span>
                 </div>
               </div>
             )}
@@ -185,7 +185,7 @@ export default function ProductDetailsPage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-3 sm:gap-4">
             <div className="flex flex-col items-center gap-2 text-center p-4 rounded-xl glass-card">
               <Truck className="w-6 h-6 text-gray-400" />
               <span className="text-xs text-gray-300">Free Shipping</span>
@@ -213,15 +213,15 @@ function ProductPhotoGallery({ product }: { product: Product }) {
 
   return (
     <div className="space-y-4">
-      <div className="glass-card rounded-3xl p-4">
-        <div className="relative aspect-square overflow-hidden rounded-3xl border border-white/5 bg-white/[0.03]">
-          <img src={product.image} alt={product.name} className="h-full w-full object-contain p-8" />
-          <div className="absolute left-5 top-5 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-xs font-black uppercase tracking-wide text-white backdrop-blur">
+        <div className="glass-card rounded-3xl p-2 sm:p-4">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] sm:aspect-[16/11] lg:rounded-3xl xl:aspect-square">
+          <img src={product.image} alt={product.name} className="h-full w-full object-contain p-5 sm:p-8" />
+          <div className="absolute left-3 top-3 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-white backdrop-blur sm:left-5 sm:top-5 sm:text-xs">
             Product Photos
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-2 sm:gap-4">
         {photos.map((photo, index) => (
           <div
             key={`${photo}-${index}`}
