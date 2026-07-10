@@ -1,6 +1,9 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { ArrowLeft, ImagePlus, Save } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import DemandForecastCard from "@/components/DemandForecastCard";
+import { AdminPanelSkeleton } from "@/components/Skeleton";
+import { useToast } from "@/components/ToastProvider";
 import { updateProductInventory } from "@/services/adminService";
 import { getProductById, updateProduct } from "@/services/productService";
 import type { Product } from "@/types";
@@ -30,6 +33,7 @@ const fields: Array<{ name: keyof Product | "stock_quantity"; label: string; typ
 
 export default function AdminProductEditPage() {
   const { id } = useParams();
+  const { showToast } = useToast();
   const [product, setProduct] = useState<Product | null>(null);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
@@ -67,18 +71,22 @@ export default function AdminProductEditPage() {
       await updateProductInventory(saved.uuid ?? saved.id, Number(product.stock_quantity ?? 0));
       setProduct(saved);
       setMessage("Product updated successfully.");
+      showToast("Product changes were updated successfully.", "success");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Product could not be updated.");
+      const nextMessage = error instanceof Error ? error.message : "Product could not be updated.";
+      setMessage(nextMessage);
+      showToast(nextMessage, "error");
     } finally {
       setSaving(false);
     }
   };
 
-  if (!product) return <div className="glass-card rounded-2xl p-8 text-gray-400">Loading product...</div>;
+  if (!product) return <AdminPanelSkeleton />;
 
   return (
-    <form onSubmit={submit} className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <form onSubmit={submit} className="space-y-6 pb-24 md:pb-6">
+      <div className="glass-card sticky top-24 z-30 rounded-2xl p-4 backdrop-blur-xl">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <Link to="/admin/products" className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-white">
             <ArrowLeft className="h-4 w-4" />
@@ -91,9 +99,12 @@ export default function AdminProductEditPage() {
           <Save className="h-4 w-4" />
           {saving ? "Saving..." : "Save Changes"}
         </button>
+        </div>
       </div>
 
       {message && <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4 text-sm text-white">{message}</div>}
+
+      <DemandForecastCard product={product} compact />
 
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <section className="glass-card rounded-2xl p-6">
@@ -140,6 +151,13 @@ export default function AdminProductEditPage() {
             <textarea name="additional_features" value={product.additional_features ?? ""} onChange={updateField} rows={3} className="w-full resize-none rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none focus:border-primary" />
           </label>
         </section>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/90 p-3 backdrop-blur-xl md:hidden">
+        <button disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-bold text-white hover:bg-primary/80 disabled:opacity-60">
+          <Save className="h-4 w-4" />
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
       </div>
     </form>
   );

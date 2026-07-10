@@ -1,17 +1,20 @@
 import ProductCard from "@/components/ProductCard";
 import PriceRangeFilter from "@/components/PriceRangeFilter";
+import { ProductCardSkeleton } from "@/components/Skeleton";
 import { useProducts } from "@/hooks/useProducts";
-import { Filter, ChevronDown } from "lucide-react";
+import { Filter, ChevronDown, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 export default function ProductsPage() {
   const [searchParams] = useSearchParams();
-  const { products } = useProducts({ pageSize: 100 });
+  const productsHook = useProducts({ pageSize: 100 });
+  const products = productsHook.products;
   const [brandFilter, setBrandFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("name");
   const [page, setPage] = useState(1);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const searchTerm = String(searchParams.get("search") ?? "").trim().toLowerCase();
   const manufacturers = Array.from(new Set(products.map((product) => product.manufacturer)));
   const categories = Array.from(new Set(products.map((product) => product.type)));
@@ -50,105 +53,61 @@ export default function ProductsPage() {
   const pageCount = Math.max(1, Math.ceil(visibleProducts.length / pageSize));
   const pageProducts = visibleProducts.slice((page - 1) * pageSize, page * pageSize);
 
+  const filterPanel = (
+    <FilterPanel
+      brandFilter={brandFilter}
+      categoryFilter={categoryFilter}
+      sortBy={sortBy}
+      manufacturers={manufacturers}
+      categories={categories}
+      onBrandChange={(value) => {
+        setBrandFilter(value);
+        setPage(1);
+      }}
+      onCategoryChange={(value) => {
+        setCategoryFilter(value);
+        setPage(1);
+      }}
+      onSortChange={(value) => {
+        setSortBy(value);
+        setPage(1);
+      }}
+    />
+  );
+
   return (
-    <div className="container mx-auto px-6 py-12">
-      <div className="flex flex-col md:flex-row gap-8">
-        <aside className="w-full md:w-64 flex-shrink-0">
-          <div className="glass-card p-6 rounded-2xl sticky top-24">
-            <div className="flex items-center gap-2 mb-6 text-white font-bold text-lg">
-              <Filter className="w-5 h-5 text-primary" />
-              Filters
+    <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-12">
+      <button
+        type="button"
+        onClick={() => setIsFilterOpen(true)}
+        className="mb-5 inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-white lg:hidden"
+      >
+        <Filter className="h-4 w-4 text-primary" />
+        Filters & Sort
+      </button>
+
+      {isFilterOpen && (
+        <div className="fixed inset-0 z-[90] lg:hidden">
+          <button className="absolute inset-0 bg-black/60" onClick={() => setIsFilterOpen(false)} aria-label="Close filters" />
+          <aside className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl border border-white/10 bg-zinc-950 p-5 shadow-2xl">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-lg font-black text-white">Filters</h2>
+              <button onClick={() => setIsFilterOpen(false)} className="rounded-xl border border-white/10 p-2 text-white">
+                <X className="h-4 w-4" />
+              </button>
             </div>
+            {filterPanel}
+            <button onClick={() => setIsFilterOpen(false)} className="mt-6 w-full rounded-xl bg-primary px-4 py-3 font-bold text-white">
+              Apply Filters
+            </button>
+          </aside>
+        </div>
+      )}
 
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center justify-between">
-                  Brands
-                  <ChevronDown className="w-4 h-4" />
-                </h3>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-3 cursor-pointer group">
-                    <input
-                      type="radio"
-                      name="brand"
-                      checked={brandFilter === "all"}
-                      onChange={() => {
-                        setBrandFilter("all");
-                        setPage(1);
-                      }}
-                      className="accent-primary"
-                    />
-                    <span className="text-gray-400 group-hover:text-white transition-colors text-sm">All Brands</span>
-                  </label>
-                  {manufacturers.map((brand) => (
-                    <label key={brand} className="flex items-center gap-3 cursor-pointer group">
-                      <input
-                        type="radio"
-                        name="brand"
-                        checked={brandFilter === brand}
-                        onChange={() => {
-                          setBrandFilter(brand);
-                          setPage(1);
-                        }}
-                        className="accent-primary"
-                      />
-                      <span className="text-gray-400 group-hover:text-white transition-colors text-sm">{brand}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="h-px bg-white/10" />
-
-              <div>
-                <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center justify-between">
-                  Category
-                  <ChevronDown className="w-4 h-4" />
-                </h3>
-                <select
-                  value={categoryFilter}
-                  onChange={(event) => {
-                    setCategoryFilter(event.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="h-px bg-white/10" />
-
-              <div>
-                <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center justify-between">
-                  Sort By
-                  <ChevronDown className="w-4 h-4" />
-                </h3>
-                <select
-                  value={sortBy}
-                  onChange={(event) => setSortBy(event.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none"
-                >
-                  <option value="name">Name</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="brand">Brand</option>
-                </select>
-              </div>
-
-              <div className="h-px bg-white/10" />
-
-              <div>
-                <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center justify-between">
-                  Price Range
-                  <ChevronDown className="w-4 h-4" />
-                </h3>
-                <PriceRangeFilter />
-              </div>
-            </div>
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <aside className="hidden w-72 flex-shrink-0 lg:block">
+          <div className="glass-card sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl p-6">
+            {filterPanel}
           </div>
         </aside>
 
@@ -162,8 +121,10 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pageProducts.map((product) => (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {productsHook.loading ? Array.from({ length: 6 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            )) : pageProducts.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
@@ -188,5 +149,95 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function FilterPanel({
+  brandFilter,
+  categoryFilter,
+  sortBy,
+  manufacturers,
+  categories,
+  onBrandChange,
+  onCategoryChange,
+  onSortChange,
+}: {
+  brandFilter: string;
+  categoryFilter: string;
+  sortBy: string;
+  manufacturers: string[];
+  categories: string[];
+  onBrandChange: (value: string) => void;
+  onCategoryChange: (value: string) => void;
+  onSortChange: (value: string) => void;
+}) {
+  return (
+    <>
+      <div className="mb-6 flex items-center gap-2 text-lg font-bold text-white">
+        <Filter className="h-5 w-5 text-primary" />
+        Filters
+      </div>
+
+      <div className="space-y-6">
+        <div>
+          <h3 className="mb-3 flex items-center justify-between text-sm font-semibold text-gray-300">
+            Brands
+            <ChevronDown className="h-4 w-4" />
+          </h3>
+          <div className="space-y-2">
+            <label className="group flex cursor-pointer items-center gap-3">
+              <input type="radio" name="brand" checked={brandFilter === "all"} onChange={() => onBrandChange("all")} className="accent-primary" />
+              <span className="text-sm text-gray-400 transition-colors group-hover:text-white">All Brands</span>
+            </label>
+            {manufacturers.map((brand) => (
+              <label key={brand} className="group flex cursor-pointer items-center gap-3">
+                <input type="radio" name="brand" checked={brandFilter === brand} onChange={() => onBrandChange(brand)} className="accent-primary" />
+                <span className="text-sm text-gray-400 transition-colors group-hover:text-white">{brand}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="h-px bg-white/10" />
+
+        <div>
+          <h3 className="mb-3 flex items-center justify-between text-sm font-semibold text-gray-300">
+            Category
+            <ChevronDown className="h-4 w-4" />
+          </h3>
+          <select value={categoryFilter} onChange={(event) => onCategoryChange(event.target.value)} className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none">
+            <option value="all">All Categories</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="h-px bg-white/10" />
+
+        <div>
+          <h3 className="mb-3 flex items-center justify-between text-sm font-semibold text-gray-300">
+            Sort By
+            <ChevronDown className="h-4 w-4" />
+          </h3>
+          <select value={sortBy} onChange={(event) => onSortChange(event.target.value)} className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none">
+            <option value="name">Name</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="brand">Brand</option>
+          </select>
+        </div>
+
+        <div className="h-px bg-white/10" />
+
+        <div>
+          <h3 className="mb-3 flex items-center justify-between text-sm font-semibold text-gray-300">
+            Price Range
+            <ChevronDown className="h-4 w-4" />
+          </h3>
+          <PriceRangeFilter />
+        </div>
+      </div>
+    </>
   );
 }

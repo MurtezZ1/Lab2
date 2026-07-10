@@ -1,6 +1,8 @@
 import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BarChart3, Bot, FileClock, LineChart, Package, Rocket, ShieldCheck, Upload, Users } from "lucide-react";
+import { AdminPanelSkeleton } from "@/components/Skeleton";
+import SmartInventoryAlerts from "@/components/SmartInventoryAlerts";
 import { useProducts } from "@/hooks/useProducts";
 import {
   getAdminOrders,
@@ -22,7 +24,7 @@ const AdminReportsPanel = lazy(() => import("@/pages/admin/AdminReportsPanel"));
 const AdminInvoicesPanel = lazy(() => import("@/pages/admin/AdminInvoicesPanel"));
 
 function PanelLoader() {
-  return <div className="glass-card rounded-2xl p-6 mt-8 text-sm text-gray-400">Loading...</div>;
+  return <AdminPanelSkeleton />;
 }
 
 export default function AdminDashboardPage() {
@@ -174,6 +176,8 @@ export default function AdminDashboardPage() {
         <div className="glass-card rounded-2xl p-6"><Users className="w-7 h-7 text-accent" /><p className="mt-6 text-sm text-gray-400">Users</p><h2 className="text-3xl font-black text-white">{users.length}</h2></div>
         <div className="glass-card rounded-2xl p-6"><BarChart3 className="w-7 h-7 text-purple-400" /><p className="mt-6 text-sm text-gray-400">Orders</p><h2 className="text-3xl font-black text-white">{orders.length}</h2></div>
       </div>
+
+      <SmartInventoryAlerts products={products} />
 
       {aiAnalytics && (
         <div className="glass-card rounded-2xl p-6 mb-8">

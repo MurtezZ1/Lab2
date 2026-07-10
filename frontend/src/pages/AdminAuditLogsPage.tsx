@@ -15,6 +15,7 @@ import {
   downloadAdminAuditLogs,
   getAdminAuditLogs,
 } from "@/services/adminService";
+import AuditActivityFeed from "@/components/AuditActivityFeed";
 import type { AuditLogListResult, AuditLogQuery } from "@/types";
 
 const initialResult: AuditLogListResult = {
@@ -209,6 +210,8 @@ export default function AdminAuditLogsPage() {
           </div>
         )}
       </div>
+
+      <AuditActivityFeed logs={result.items} />
 
       <div className="glass-card mt-8 overflow-hidden rounded-2xl">
         <div className="overflow-x-auto">

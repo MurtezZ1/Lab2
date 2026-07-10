@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setOrders } from "@/redux/slices/ordersSlice";
+import OrderTimeline from "@/components/OrderTimeline";
 import { downloadInvoice, generateInvoice, viewInvoice } from "@/services/invoiceService";
 import { getOrders } from "@/services/orderService";
 import { formatPrice } from "@/utils/products";
@@ -39,31 +40,34 @@ export default function OrderHistoryPage() {
           <div className="glass-card rounded-2xl p-8 text-center text-gray-400">No orders yet.</div>
         ) : (
           orders.map((order) => (
-            <div key={order.id} className="glass-card rounded-2xl p-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h2 className="font-bold text-white">{order.orderNumber}</h2>
-                <p className="text-sm text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</p>
+            <div key={order.id} className="glass-card rounded-2xl p-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <h2 className="font-bold text-white">{order.orderNumber}</h2>
+                  <p className="text-sm text-gray-400">{new Date(order.createdAt).toLocaleDateString()}</p>
+                </div>
+                <div className="text-sm font-bold uppercase text-gray-300">{order.status}</div>
+                <div className="text-xl font-bold text-primary">{formatPrice(order.total)}</div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void handleInvoice(order.id, "download")}
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm font-bold text-gray-200 hover:border-primary/40"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Invoice
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleInvoice(order.id, "view")}
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm font-bold text-gray-200 hover:border-primary/40"
+                  >
+                    <Eye className="h-4 w-4" />
+                    View
+                  </button>
+                </div>
               </div>
-              <div className="text-sm text-gray-300">{order.status}</div>
-              <div className="text-xl font-bold text-primary">{formatPrice(order.total)}</div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => void handleInvoice(order.id, "download")}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm font-bold text-gray-200 hover:border-primary/40"
-                >
-                  <Download className="h-4 w-4" />
-                  Download Invoice
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleInvoice(order.id, "view")}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm font-bold text-gray-200 hover:border-primary/40"
-                >
-                  <Eye className="h-4 w-4" />
-                  View
-                </button>
-              </div>
+              <OrderTimeline order={order} />
             </div>
           ))
         )}

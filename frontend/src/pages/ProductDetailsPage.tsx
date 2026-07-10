@@ -2,6 +2,9 @@ import AddToCartButton from "@/components/AddToCartButton";
 import CartNotice from "@/components/CartNotice";
 import ProductFeedback from "@/components/ProductFeedback";
 import Product360Viewer from "@/components/Product360Viewer";
+import DemandForecastCard from "@/components/DemandForecastCard";
+import { ProductDetailsSkeleton } from "@/components/Skeleton";
+import { useToast } from "@/components/ToastProvider";
 import SimilarProductsWidget from "@/components/SimilarProductsWidget";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { addToCompare } from "@/redux/slices/compareSlice";
@@ -21,6 +24,7 @@ export default function ProductDetailsPage() {
   const [mediaView, setMediaView] = useState<"3d" | "photos">("photos");
   const compareItems = useAppSelector((state) => state.compare.items);
   const dispatch = useAppDispatch();
+  const { showToast } = useToast();
 
   useEffect(() => {
     getProductById(id)
@@ -32,9 +36,7 @@ export default function ProductDetailsPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) {
-    return <div className="container mx-auto px-6 py-12 text-gray-400">Loading product...</div>;
-  }
+  if (loading) return <ProductDetailsSkeleton />;
 
   if (!product) {
     return <div className="container mx-auto px-6 py-12 text-gray-400">Product not found.</div>;
@@ -48,6 +50,7 @@ export default function ProductDetailsPage() {
     else if (compareItems.length >= 3) setCompareNotice("Maximum 3 products can be compared.");
     else setCompareNotice(`${product.name} added to compare.`);
     dispatch(addToCompare(product));
+    showToast(alreadyAdded ? "Product is already in compare." : compareItems.length >= 3 ? "Maximum 3 products can be compared." : `${product.name} added to compare.`, compareItems.length >= 3 ? "error" : "success");
     setTimeout(() => setCompareNotice(""), 2500);
   };
 
@@ -55,7 +58,7 @@ export default function ProductDetailsPage() {
   const has3DModel = hasVerifiedProduct3DModel(product.name);
 
   return (
-    <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-10 lg:px-12 lg:py-12">
+    <div className="container mx-auto px-4 pb-28 pt-8 sm:px-6 sm:py-10 lg:px-12 lg:py-12">
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.95fr)] xl:gap-12">
         <div className="min-w-0 space-y-5 sm:space-y-6">
           <div className="flex flex-wrap gap-3">
@@ -134,6 +137,8 @@ export default function ProductDetailsPage() {
 
           <div className="h-px bg-white/10 my-4" />
 
+          <DemandForecastCard product={product} />
+
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             {product.processor && (
               <div className="flex items-center gap-3 p-4 rounded-xl glass bg-white/5">
@@ -204,6 +209,25 @@ export default function ProductDetailsPage() {
 
       <SimilarProductsWidget productId={product.uuid ?? product.id} />
       <CartNotice show={Boolean(compareNotice)} message={compareNotice} />
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-zinc-950/95 p-3 shadow-[0_-14px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl lg:hidden">
+        <div className="mx-auto flex max-w-xl items-center gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-xs font-bold uppercase text-gray-500">{product.manufacturer}</p>
+            <p className="text-lg font-black text-white">${product.price.toFixed(2)}</p>
+          </div>
+          <div className="ml-auto flex flex-1 justify-end gap-2">
+            <AddToCartButton product={product} />
+            <button
+              type="button"
+              onClick={handleCompare}
+              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-white/10 text-white transition-colors hover:border-accent/50"
+              aria-label="Compare product"
+            >
+              <GitCompareArrows className="h-5 w-5 text-accent" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

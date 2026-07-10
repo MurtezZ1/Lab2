@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Download, Eye, PackageCheck, RefreshCw, Search, Truck } from "lucide-react";
+import OrderTimeline from "@/components/OrderTimeline";
 import { downloadInvoice, generateInvoice, viewInvoice } from "@/services/invoiceService";
 import { getAdminOrders, updateAdminOrderStatus } from "@/services/adminService";
 import type { Order } from "@/types";
@@ -143,6 +144,7 @@ export default function AdminOrdersPage() {
 
               {isExpanded && (
                 <div className="border-t border-white/10 p-5">
+                  <OrderTimeline order={order} />
                   <div className="mb-4 flex items-center gap-2 text-sm font-black text-white">
                     <Truck className="h-4 w-4 text-primary" />
                     Ordered Products

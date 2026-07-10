@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import AIShoppingAssistant from "@/components/AIShoppingAssistant";
 import Footer from "@/components/Footer";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCartItems } from "@/redux/slices/cartSlice";
 import { getCartItems } from "@/services/cartService";
@@ -58,6 +59,7 @@ export default function MainLayout() {
         <Outlet />
       </div>
       <Footer />
+      <ScrollToTopButton />
       <AIShoppingAssistant />
     </main>
   );
