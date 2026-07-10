@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Trash2, ShoppingBag } from "lucide-react";
+import { ArrowRight, LogIn, ShoppingBag, ShoppingCart, Trash2 } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
+import TrustRow from "@/components/TrustRow";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCartItems } from "@/redux/slices/cartSlice";
 import {
@@ -29,27 +31,28 @@ export default function CartPage() {
         <ShoppingBag className="w-8 h-8 text-primary" />
         Shopping Cart
       </h1>
+      <TrustRow className="mb-8" />
 
       <div className="flex flex-col lg:flex-row gap-12">
         <div className="flex-1 space-y-6">
           {!user && (
-            <div className="glass-card p-8 rounded-2xl text-center">
-              <h2 className="text-xl font-bold text-white">Sign in to use your cart</h2>
-              <p className="mt-2 text-gray-400">Your cart is saved in your account so it stays connected to the database.</p>
-              <Link to="/account" className="mt-6 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 font-bold text-white hover:bg-primary/90">
-                Go to Account
-              </Link>
-            </div>
+            <EmptyState
+              icon={LogIn}
+              title="Sign in to use your cart"
+              description="Your cart is saved in your account so it stays connected to the database across devices."
+              actionLabel="Go to Account"
+              actionTo="/account"
+            />
           )}
 
           {user && items.length === 0 && (
-            <div className="glass-card p-8 rounded-2xl text-center">
-              <h2 className="text-xl font-bold text-white">Your cart is empty</h2>
-              <p className="mt-2 text-gray-400">Add a product and it will appear here.</p>
-              <Link to="/products" className="mt-6 inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 font-bold text-white hover:bg-primary/90">
-                Browse Products
-              </Link>
-            </div>
+            <EmptyState
+              icon={ShoppingCart}
+              title="Your cart is empty"
+              description="Explore the latest tech products and add your favorite devices to start checkout."
+              actionLabel="Browse Products"
+              actionTo="/products"
+            />
           )}
 
           {items.map((item) => (

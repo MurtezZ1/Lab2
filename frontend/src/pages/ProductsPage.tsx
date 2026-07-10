@@ -1,8 +1,9 @@
 import ProductCard from "@/components/ProductCard";
+import EmptyState from "@/components/EmptyState";
 import PriceRangeFilter from "@/components/PriceRangeFilter";
 import { ProductCardSkeleton } from "@/components/Skeleton";
 import { useProducts } from "@/hooks/useProducts";
-import { Filter, ChevronDown, X } from "lucide-react";
+import { Filter, ChevronDown, SearchX, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -112,11 +113,23 @@ export default function ProductsPage() {
         </aside>
 
         <div className="flex-1">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-white">
-              {searchTerm ? `Search: ${searchParams.get("search")}` : "All Products"}
-            </h1>
-            <div className="text-sm text-gray-400 glass px-4 py-2 rounded-lg border border-white/10">
+          <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                {searchTerm ? `Search: ${searchParams.get("search")}` : "All Products"}
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-gray-400">
+                Browse smart devices, accessories, 3D-enabled products and AI-picked recommendations.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {["Smart devices", "3D-enabled", "AI-picked", "Fast delivery"].map((chip) => (
+                  <span key={chip} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-bold text-gray-300">
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="w-fit text-sm text-gray-400 glass px-4 py-2 rounded-lg border border-white/10">
               Showing {visibleProducts.length} results
             </div>
           </div>
@@ -129,6 +142,19 @@ export default function ProductsPage() {
             ))}
           </div>
 
+          {!productsHook.loading && visibleProducts.length === 0 && (
+            <div className="mt-6">
+              <EmptyState
+                icon={SearchX}
+                title="No matching products"
+                description="Try changing the brand, category, sorting, or search keyword to discover more products."
+                actionLabel="Clear Search"
+                actionTo="/products"
+              />
+            </div>
+          )}
+
+          {visibleProducts.length > 0 && (
           <div className="mt-8 flex items-center justify-center gap-3">
             <button
               onClick={() => setPage((current) => Math.max(1, current - 1))}
@@ -146,6 +172,7 @@ export default function ProductsPage() {
               Next
             </button>
           </div>
+          )}
         </div>
       </div>
     </div>

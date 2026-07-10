@@ -10,6 +10,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { ArrowRight, CreditCard, Loader2 } from "lucide-react";
 import StripePaymentForm from "@/components/StripePaymentForm";
+import TrustRow from "@/components/TrustRow";
 import { useNavigate } from "react-router-dom";
 
 export default function CheckoutPage() {
@@ -57,6 +58,7 @@ export default function CheckoutPage() {
         <CreditCard className="w-8 h-8 text-primary" />
         Checkout
       </h1>
+      <TrustRow className="mb-8" />
       <div className="grid lg:grid-cols-[1fr_420px] gap-8">
         <div className="glass-card rounded-2xl p-6 space-y-5">
           <h2 className="text-xl font-bold text-white">Shipping Details</h2>

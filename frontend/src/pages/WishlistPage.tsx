@@ -1,4 +1,5 @@
 import ProductCard from "@/components/ProductCard";
+import EmptyState from "@/components/EmptyState";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setWishlistItems } from "@/redux/slices/wishlistSlice";
 import { getWishlist } from "@/services/wishlistService";
@@ -28,13 +29,13 @@ export default function WishlistPage() {
         Wishlist
       </h1>
       {items.length === 0 ? (
-        <div className="glass-card p-8 rounded-2xl text-center">
-          <h2 className="text-xl font-bold text-white">Your wishlist is empty</h2>
-          <p className="mt-2 text-gray-400">Save products and they will appear here.</p>
-          <Link to="/products" className="mt-6 inline-flex rounded-xl bg-primary px-5 py-3 font-bold text-white hover:bg-primary/90">
-            Browse Products
-          </Link>
-        </div>
+        <EmptyState
+          icon={Heart}
+          title="Your wishlist is empty"
+          description="Save products you like and come back later to compare, buy, or track price changes."
+          actionLabel="Browse Products"
+          actionTo="/products"
+        />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {items.map((product) => <ProductCard key={product.id} {...product} />)}

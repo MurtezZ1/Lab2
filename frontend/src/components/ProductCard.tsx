@@ -11,6 +11,7 @@ import { setWishlistItems } from "@/redux/slices/wishlistSlice";
 import { addProductToCart } from "@/services/cartService";
 import { toggleWishlist } from "@/services/wishlistService";
 import type { Product } from "@/types";
+import { calculateDemandForecast } from "@/utils/demandForecast";
 import { hasVerifiedProduct3DModel } from "@/utils/product3dModels";
 
 interface ProductProps {
@@ -20,9 +21,28 @@ interface ProductProps {
   price: number;
   image: string;
   manufacturer: string;
+  rating_average?: number;
+  discount_percentage?: number;
+  stock_quantity?: number;
+  aiProductScore?: number;
+  recommendationScore?: number;
+  similarityScore?: number;
 }
 
-export default function ProductCard({ id, uuid, name, price, image, manufacturer }: ProductProps) {
+export default function ProductCard({
+  id,
+  uuid,
+  name,
+  price,
+  image,
+  manufacturer,
+  rating_average = 0,
+  discount_percentage = 0,
+  stock_quantity = 0,
+  aiProductScore,
+  recommendationScore,
+  similarityScore,
+}: ProductProps) {
   const [isAdded, setIsAdded] = useState(false);
   const [showNotice, setShowNotice] = useState(false);
   const [compareNotice, setCompareNotice] = useState("");
@@ -56,9 +76,21 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
     camera: null,
     additional_features: null,
     description: null,
-    discount_percentage: 0,
-    stock_quantity: 0,
+    rating_average,
+    discount_percentage,
+    stock_quantity,
+    aiProductScore,
+    recommendationScore,
+    similarityScore,
   };
+  const demand = calculateDemandForecast(product);
+  const badges = getSmartBadges({
+    has3DModel,
+    demandLevel: demand.level,
+    stockQuantity: stock_quantity,
+    discountPercentage: discount_percentage,
+    aiScore: Number(aiProductScore ?? recommendationScore ?? similarityScore ?? 0),
+  });
 
   const handleAddToCart = () => {
     startTransition(async () => {
@@ -88,8 +120,8 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
 
   return (
     <motion.div
-      whileHover={{ y: -10 }}
-      className="glass-card rounded-2xl p-4 flex flex-col gap-4 group relative overflow-hidden"
+      whileHover={{ y: -6 }}
+      className="glass-card group relative flex h-full min-h-[31rem] flex-col gap-4 overflow-hidden rounded-2xl p-4"
     >
       <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 translate-x-4 group-hover:translate-x-0 duration-300">
         <button
@@ -115,7 +147,7 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
         </button>
       </div>
 
-      <Link to={`/products/${id}`} className="block relative w-full h-48 rounded-xl overflow-hidden bg-white/5">
+      <Link to={`/products/${id}`} className="relative block h-52 w-full shrink-0 overflow-hidden rounded-xl bg-white/5">
         <img
           src={image}
           alt={name}
@@ -123,19 +155,21 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
           decoding="async"
           className="h-full w-full object-contain p-4 group-hover:scale-110 transition-transform duration-500"
         />
-        {has3DModel && (
-          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-primary/30 bg-black/70 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-primary backdrop-blur">
-            <Box className="h-3 w-3" />
-            3D
-          </span>
-        )}
+        <div className="absolute left-3 top-3 flex min-h-6 max-w-[calc(100%-1.5rem)] flex-wrap gap-2">
+          {badges.map((badge) => (
+            <span key={badge.label} className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-black uppercase tracking-wide backdrop-blur ${badge.className}`}>
+              {badge.icon === "3d" && <Box className="h-3 w-3" />}
+              {badge.label}
+            </span>
+          ))}
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </Link>
 
-      <div className="flex flex-col gap-1 flex-1">
+      <div className="flex min-h-[8.5rem] flex-1 flex-col gap-1">
         <span className="text-xs font-semibold text-primary uppercase tracking-wider">{manufacturer}</span>
         <Link to={`/products/${id}`}>
-          <h3 className="text-lg font-bold text-white leading-tight hover:text-accent transition-colors line-clamp-2">
+          <h3 className="line-clamp-2 min-h-[3.25rem] text-lg font-bold leading-tight text-white transition-colors hover:text-accent">
             {name}
           </h3>
         </Link>
@@ -173,4 +207,60 @@ export default function ProductCard({ id, uuid, name, price, image, manufacturer
       <CartNotice show={Boolean(compareNotice)} message={compareNotice} />
     </motion.div>
   );
+}
+
+function getSmartBadges({
+  has3DModel,
+  demandLevel,
+  stockQuantity,
+  discountPercentage,
+  aiScore,
+}: {
+  has3DModel: boolean;
+  demandLevel: "High" | "Medium" | "Low";
+  stockQuantity: number;
+  discountPercentage: number;
+  aiScore: number;
+}) {
+  const badges: Array<{ label: string; className: string; icon?: "3d" }> = [];
+
+  if (has3DModel) {
+    badges.push({
+      label: "3D View",
+      icon: "3d",
+      className: "border-primary/30 bg-black/70 text-primary",
+    });
+  }
+  if (demandLevel === "High") {
+    badges.push({
+      label: "High Demand",
+      className: "border-green-400/30 bg-green-500/15 text-green-200",
+    });
+  }
+  if (stockQuantity > 0 && stockQuantity <= 5) {
+    badges.push({
+      label: `Only ${stockQuantity} left`,
+      className: "border-red-400/30 bg-red-500/15 text-red-200",
+    });
+  }
+  if (discountPercentage >= 10) {
+    badges.push({
+      label: "Best Value",
+      className: "border-yellow-400/30 bg-yellow-500/15 text-yellow-100",
+    });
+  }
+  if (aiScore >= 70 && badges.length < 3) {
+    badges.push({
+      label: "AI Pick",
+      className: "border-accent/30 bg-accent/15 text-accent",
+    });
+  }
+  if (badges.length === 0) {
+    badges.push({
+      label: "Smart Pick",
+      className: "border-white/15 bg-white/10 text-gray-200",
+    });
+  }
+
+  return badges.slice(0, 3);
 }

@@ -6,7 +6,7 @@ import {
   type PersonalizedRecommendationBundle,
 } from "@/services/recommendationService";
 import { getCmsContent, type CmsContent } from "@/services/cmsService";
-import { ArrowRight, Star, Zap, Shield, Truck } from "lucide-react";
+import { ArrowRight, Bot, Box, Brain, Star, Zap, Shield } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Product } from "@/types";
@@ -62,9 +62,9 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-black text-white leading-tight">
-              {(cms?.hero.title ?? "Elevate Your Digital Lifestyle").replace("Digital Lifestyle", "")} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-                Digital Lifestyle
+              Elevate Your <br />
+              <span className="text-primary">
+                Shopping Experience
               </span>
             </h1>
 
@@ -74,7 +74,7 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row gap-4 mt-4 justify-center lg:justify-start">
               <Link to="/products" className="px-8 py-4 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(10,132,255,0.4)] transition-all flex items-center justify-center gap-2 group">
-                Shop Now
+                Shop Latest Tech
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link to="/deals" className="px-8 py-4 rounded-xl glass border border-white/10 text-white font-bold hover:bg-white/5 transition-all flex items-center justify-center">
@@ -124,32 +124,41 @@ export default function HomePage() {
       </section>
 
       <section className="container mx-auto px-6">
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="glass-card p-6 rounded-2xl flex items-start gap-4">
             <div className="bg-primary/20 p-3 rounded-xl">
-              <Truck className="w-6 h-6 text-primary" />
+              <Bot className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg">Free Express Delivery</h3>
-              <p className="text-gray-400 text-sm mt-1">On all orders over $200</p>
+              <h3 className="text-white font-bold text-lg">AI Shopping Assistant</h3>
+              <p className="text-gray-400 text-sm mt-1">Ask in natural language and get product recommendations.</p>
             </div>
           </div>
           <div className="glass-card p-6 rounded-2xl flex items-start gap-4">
             <div className="bg-accent/20 p-3 rounded-xl">
-              <Shield className="w-6 h-6 text-accent" />
+              <Box className="w-6 h-6 text-accent" />
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg">2 Year Warranty</h3>
-              <p className="text-gray-400 text-sm mt-1">Peace of mind guaranteed</p>
+              <h3 className="text-white font-bold text-lg">Real 3D Product View</h3>
+              <p className="text-gray-400 text-sm mt-1">Inspect selected devices with interactive product models.</p>
             </div>
           </div>
           <div className="glass-card p-6 rounded-2xl flex items-start gap-4">
             <div className="bg-purple-500/20 p-3 rounded-xl">
-              <Zap className="w-6 h-6 text-purple-400" />
+              <Shield className="w-6 h-6 text-purple-400" />
             </div>
             <div>
               <h3 className="text-white font-bold text-lg">Secure Payments</h3>
-              <p className="text-gray-400 text-sm mt-1">256-bit SSL Encryption</p>
+              <p className="text-gray-400 text-sm mt-1">Checkout, invoices, and protected account flow.</p>
+            </div>
+          </div>
+          <div className="glass-card p-6 rounded-2xl flex items-start gap-4">
+            <div className="bg-green-500/20 p-3 rounded-xl">
+              <Brain className="w-6 h-6 text-green-300" />
+            </div>
+            <div>
+              <h3 className="text-white font-bold text-lg">ML Demand Forecast</h3>
+              <p className="text-gray-400 text-sm mt-1">Smart demand signals help surface better products.</p>
             </div>
           </div>
         </div>

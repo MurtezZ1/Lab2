@@ -5,6 +5,8 @@ import { Search, ShoppingCart, User, Menu, X, Cpu, Bell, GitCompareArrows, Shiel
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAppSelector } from "@/redux/hooks";
 
+const searchSuggestions = ["iPhone", "Laptop", "Headphones", "Gaming", "Samsung", "3D products"];
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -38,17 +40,32 @@ export default function Navbar() {
         setIsSearchOpen(false);
       }
     };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSearchOpen(false);
+        searchInputRef.current?.blur();
+      }
+    };
 
     document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [isSearchOpen]);
 
   const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const value = searchTerm.trim();
-    navigate(value ? `/products?search=${encodeURIComponent(value)}` : "/products");
+    runSearch(searchTerm);
+  };
+
+  const runSearch = (value: string) => {
+    const nextValue = value.trim();
+    navigate(nextValue ? `/products?search=${encodeURIComponent(nextValue)}` : "/products");
     setIsSearchOpen(false);
     setIsMobileMenuOpen(false);
+    setSearchTerm(nextValue);
   };
 
   return (
@@ -88,20 +105,38 @@ export default function Navbar() {
               <Search className="w-5 h-5" />
             </button>
             <div
-              className={`absolute right-0 top-10 w-64 transition-opacity glass p-2 rounded-xl border border-white/10 ${
+              className={`glass absolute right-0 top-10 w-80 rounded-2xl border border-white/10 p-4 shadow-2xl transition-all ${
                 isSearchOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
               }`}
             >
               <form onSubmit={submitSearch}>
+                <label className="mb-2 block text-xs font-black uppercase tracking-wide text-gray-500">
+                  Search products
+                </label>
                 <input
                   ref={searchInputRef}
                   type="search"
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  placeholder="Search products..."
-                  className="w-full bg-black/50 text-white text-sm px-4 py-2 rounded-lg outline-none border border-white/10 focus:border-primary transition-colors"
+                  placeholder="Try iPhone, laptop, headphones..."
+                  className="w-full rounded-xl border border-white/10 bg-black/60 px-4 py-3 text-sm text-white outline-none transition-colors focus:border-primary"
                 />
               </form>
+              <div className="mt-4">
+                <p className="mb-2 text-xs font-bold uppercase text-gray-500">Popular searches</p>
+                <div className="flex flex-wrap gap-2">
+                  {searchSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => runSearch(suggestion)}
+                      className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-bold text-gray-300 transition-colors hover:border-primary/40 hover:text-white"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -171,13 +206,26 @@ export default function Navbar() {
               <MobileNavLink to="/deals" onClick={() => setIsMobileMenuOpen(false)}>Deals</MobileNavLink>
               <form onSubmit={submitSearch}>
                 <input
+                  ref={searchInputRef}
                   type="search"
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  placeholder="Search products..."
+                  placeholder="Try iPhone, laptop, headphones..."
                   className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-primary"
                 />
               </form>
+              <div className="flex flex-wrap gap-2">
+                {searchSuggestions.slice(0, 4).map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => runSearch(suggestion)}
+                    className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-bold text-gray-300"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
               <div className="h-px bg-white/10 my-2" />
               <MobileNavLink to="/cart" onClick={() => setIsMobileMenuOpen(false)}>Cart ({cartCount})</MobileNavLink>
               <MobileNavLink to="/compare" onClick={() => setIsMobileMenuOpen(false)}>Compare ({compareCount})</MobileNavLink>

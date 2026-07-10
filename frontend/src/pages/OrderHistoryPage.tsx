@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setOrders } from "@/redux/slices/ordersSlice";
+import EmptyState from "@/components/EmptyState";
 import OrderTimeline from "@/components/OrderTimeline";
 import { downloadInvoice, generateInvoice, viewInvoice } from "@/services/invoiceService";
 import { getOrders } from "@/services/orderService";
@@ -37,7 +38,13 @@ export default function OrderHistoryPage() {
       </h1>
       <div className="space-y-4">
         {orders.length === 0 ? (
-          <div className="glass-card rounded-2xl p-8 text-center text-gray-400">No orders yet.</div>
+          <EmptyState
+            icon={PackageSearch}
+            title="No orders yet"
+            description="Your completed purchases, payment status, shipment progress, and invoices will appear here."
+            actionLabel="Start Shopping"
+            actionTo="/products"
+          />
         ) : (
           orders.map((order) => (
             <div key={order.id} className="glass-card rounded-2xl p-6">
